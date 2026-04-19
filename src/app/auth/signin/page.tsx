@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
+import LoginButton from "@/components/LoginButton";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -75,6 +76,14 @@ export default function SignIn() {
             Sign In
           </button>
         </form>
+        <div className="flex items-center gap-4 my-6">
+          <div className="flex-1 h-0.5 bg-on-surface"></div>
+          <span className="font-headline font-black text-on-surface-variant uppercase text-sm">Or</span>
+          <div className="flex-1 h-0.5 bg-on-surface"></div>
+        </div>
+        <div className="flex justify-center">
+          <LoginButton />
+        </div>
         <p className="mt-8 text-center text-sm font-label font-bold text-on-surface-variant">
           Don't have an account?{" "}
           <Link
