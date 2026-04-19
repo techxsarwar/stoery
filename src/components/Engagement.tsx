@@ -1,19 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toggleLike, addComment } from "@/actions/engage";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
 export function LikeButton({ storyId, initialLiked, initialCount }: { storyId: string, initialLiked: boolean, initialCount: number }) {
   const [liked, setLiked] = useState(initialLiked);
   const [count, setCount] = useState(initialCount);
   const [loading, setLoading] = useState(false);
-  const { data: session } = useSession();
+  const [user, setUser] = useState<any>(null);
   const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+  }, [supabase.auth]);
 
   const handleLike = async () => {
-    if (!session) {
+    if (!user) {
       router.push("/auth/signin");
       return;
     }
@@ -48,12 +57,21 @@ export function LikeButton({ storyId, initialLiked, initialCount }: { storyId: s
 export function CommentForm({ storyId }: { storyId: string }) {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
-  const { data: session } = useSession();
+  const [user, setUser] = useState<any>(null);
   const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+  }, [supabase.auth]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!session) {
+    if (!user) {
       router.push("/auth/signin");
       return;
     }
@@ -73,15 +91,15 @@ export function CommentForm({ storyId }: { storyId: string }) {
       <textarea
         className="w-full bg-surface border-2 border-on-surface rounded p-4 text-on-surface font-body resize-none focus:outline-none focus:ring-4 focus:ring-primary/50 transition-colors"
         rows={4}
-        placeholder={session ? "Share your thoughts on this chapter..." : "Sign in to leave a comment"}
+        placeholder={user ? "Share your thoughts on this chapter..." : "Sign in to leave a comment"}
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        disabled={!session || loading}
+        disabled={!user || loading}
       />
       <div className="flex justify-end">
         <button 
           type="submit" 
-          disabled={!session || loading || !content.trim()}
+          disabled={!user || loading || !content.trim()}
           className="bg-primary text-on-primary border-2 border-on-surface font-headline px-8 py-3 uppercase rounded font-black hover:bg-primary-container transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Posting..." : "Post Comment"}

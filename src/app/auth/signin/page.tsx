@@ -1,8 +1,8 @@
-"use client";
+    "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn } from "@/actions/auth";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import LoginButton from "@/components/LoginButton";
 
@@ -10,24 +10,27 @@ export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    startTransition(async () => {
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("password", password);
 
-    if (res?.error) {
-      setError("Invalid email or password");
-    } else {
-      router.push("/");
-      router.refresh();
-    }
+        const res = await signIn(formData);
+
+        if (res?.error) {
+          setError(res.error);
+        } else {
+          router.push("/");
+          router.refresh();
+        }
+    });
   };
 
   return (
@@ -37,60 +40,31 @@ export default function SignIn() {
         <h2 className="text-4xl font-headline font-black text-on-surface mb-8 text-center tracking-tighter uppercase">
           Welcome Back
         </h2>
-        {error && (
-          <div className="bg-error font-headline font-bold text-on-error p-3 rounded-lg text-sm mb-6 text-center border-2 border-on-surface">
-            {error}
-          </div>
-        )}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="font-headline font-bold text-sm text-on-surface uppercase tracking-wide">
-              Email
-            </label>
-            <input
-              type="email"
-              className="bg-surface border-2 border-on-surface text-on-surface px-4 py-3 rounded focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 font-label placeholder:text-outline-variant"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="font-headline font-bold text-sm text-on-surface uppercase tracking-wide">
-              Password
-            </label>
-            <input
-              type="password"
-              className="bg-surface border-2 border-on-surface text-on-surface px-4 py-3 rounded focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 font-label placeholder:text-outline-variant"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="mt-4 bg-primary text-on-primary border-2 border-on-surface font-headline text-xl px-8 py-4 rounded hover:bg-primary-container transition-all duration-300 glow-hover font-black w-full uppercase tracking-wider"
-          >
-            Sign In
-          </button>
-        </form>
-        <div className="flex items-center gap-4 my-6">
-          <div className="flex-1 h-0.5 bg-on-surface"></div>
-          <span className="font-headline font-black text-on-surface-variant uppercase text-sm">Or</span>
-          <div className="flex-1 h-0.5 bg-on-surface"></div>
-        </div>
-        <div className="flex justify-center">
+        <div className="flex flex-col gap-8">
           <LoginButton />
+          
+          <div className="flex justify-center">
+            <Link
+              href="/auth/forgot-password"
+              className="text-xs font-headline font-bold text-on-surface-variant hover:text-primary transition-colors uppercase tracking-wider underline underline-offset-4 decoration-2"
+            >
+              Forgot Password?
+            </Link>
+          </div>
         </div>
-        <p className="mt-8 text-center text-sm font-label font-bold text-on-surface-variant">
-          Don't have an account?{" "}
+
+        <div className="flex items-center gap-4 my-8">
+          <div className="flex-1 h-0.5 bg-on-surface opacity-10"></div>
+          <span className="font-headline font-black text-on-surface-variant uppercase text-xs opacity-50 tracking-widest">New Here?</span>
+          <div className="flex-1 h-0.5 bg-on-surface opacity-10"></div>
+        </div>
+
+        <p className="text-center text-sm font-label font-bold text-on-surface-variant">
           <Link
             href="/auth/signup"
-            className="text-on-surface hover:text-primary transition-colors hover:underline underline-offset-4 decoration-primary decoration-4"
+            className="text-on-surface hover:text-primary transition-colors hover:underline underline-offset-4 decoration-primary decoration-4 uppercase tracking-tighter text-lg"
           >
-            Create one
+            Create an account
           </Link>
         </p>
       </div>

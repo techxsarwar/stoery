@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Editor from "@/components/Editor";
 import { createStory } from "@/actions/story";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { createClient } from "@/utils/supabase/client";
 
 export default function WritePage() {
   const [content, setContent] = useState("");
@@ -15,15 +15,23 @@ export default function WritePage() {
   const [coverImage, setCoverImage] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const { status } = useSession({
-    required: true,
-    onUnauthenticated() {
-      router.push("/auth/signin");
-    },
-  });
+  const supabase = createClient();
 
-  if (status === "loading") {
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/auth/signin");
+      } else {
+        setIsLoading(false);
+      }
+    };
+    checkUser();
+  }, [router, supabase.auth]);
+
+  if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center font-headline font-bold text-on-surface uppercase tracking-wide text-xl">Loading...</div>;
   }
 
@@ -59,7 +67,7 @@ export default function WritePage() {
             STORYVERSE
           </Link>
           <div className="font-headline font-bold text-sm text-on-surface flex gap-4 uppercase tracking-wide">
-             <Link href="/dashboard" className="px-4 py-2 border-2 border-transparent hover:border-on-surface transition-all duration-300 rounded">Dashboard</Link>
+             <Link href="/library" className="px-4 py-2 border-2 border-transparent hover:border-on-surface transition-all duration-300 rounded">My Library</Link>
           </div>
       </nav>
 

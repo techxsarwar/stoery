@@ -1,14 +1,16 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { createClient } from "@/utils/supabase/server";
+import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 export async function createStory(formData: FormData) {
-  const session = await getServerSession(authOptions);
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!session || !session.user) {
+  if (!user) {
     return { error: "Unauthorized" };
   }
 
@@ -28,7 +30,7 @@ export async function createStory(formData: FormData) {
       description,
       genre,
       coverImage,
-      authorId: session.user.id,
+      authorId: user.id,
       chapters: {
         create: {
           title: "Chapter 1",

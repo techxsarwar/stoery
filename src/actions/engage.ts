@@ -1,21 +1,23 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { createClient } from "@/utils/supabase/server";
+import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 export async function toggleLike(storyId: string) {
-  const session = await getServerSession(authOptions);
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!session || !session.user) {
+  if (!user) {
     return { error: "Must be logged in to like" };
   }
 
   const existingLike = await prisma.like.findUnique({
     where: {
       userId_storyId: {
-        userId: session.user.id,
+        userId: user.id,
         storyId: storyId,
       },
     },
@@ -28,7 +30,7 @@ export async function toggleLike(storyId: string) {
   } else {
     await prisma.like.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         storyId: storyId,
       },
     });
@@ -39,9 +41,11 @@ export async function toggleLike(storyId: string) {
 }
 
 export async function addComment(storyId: string, content: string) {
-  const session = await getServerSession(authOptions);
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!session || !session.user) {
+  if (!user) {
     return { error: "Must be logged in to comment" };
   }
 
@@ -52,7 +56,7 @@ export async function addComment(storyId: string, content: string) {
   await prisma.comment.create({
     data: {
       content: content.trim(),
-      userId: session.user.id,
+      userId: user.id,
       storyId: storyId,
     },
   });

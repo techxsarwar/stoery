@@ -2,12 +2,15 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { LikeButton, CommentForm } from "@/components/Engagement";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { createClient } from "@/utils/supabase/server";
+import { cookies } from "next/headers";
 
 export default async function ReadStoryPage({ params }: { params: Promise<{ storyId: string }> }) {
   const { storyId } = await params;
-  const session = await getServerSession(authOptions);
+  
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  const { data: { user } } = await supabase.auth.getUser();
 
   const story = await prisma.story.findUnique({
     where: { id: storyId },
@@ -29,7 +32,7 @@ export default async function ReadStoryPage({ params }: { params: Promise<{ stor
   }
 
   const firstChapter = story.chapters[0];
-  const isLiked = session?.user ? story.likes.some(l => l.userId === session.user.id) : false;
+  const isLiked = user ? story.likes.some(l => l.userId === user.id) : false;
 
   return (
     <div className="min-h-screen bg-surface flex flex-col items-center pt-24 px-6 md:px-12 w-full mx-auto pb-32 relative">

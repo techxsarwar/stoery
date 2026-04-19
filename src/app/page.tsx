@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { createClient } from "@/utils/supabase/server";
+import { cookies } from "next/headers";
 
 export default async function Home() {
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  const { data: { user } } = await supabase.auth.getUser();
+
   const stories = await prisma.story.findMany({
     take: 6,
     orderBy: { createdAt: "desc" },
@@ -20,27 +26,37 @@ export default async function Home() {
           </Link>
           <div className="hidden md:flex space-x-8 items-center">
             <Link
-              className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold"
+              className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase"
               href="/discover"
             >
               Discover
             </Link>
             <Link
-              className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold"
+              className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase"
               href="/community"
             >
               Community
             </Link>
-            <Link
-              className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold"
-              href="/library"
-            >
-              My Library
-            </Link>
+            {user && (
+              <Link
+                className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase"
+                href="/library"
+              >
+                My Library
+              </Link>
+            )}
           </div>
-          <Link href="/dashboard/write" className="bg-primary text-on-primary font-headline px-6 py-2 rounded font-bold border-2 border-on-surface transition-all duration-300 glow-hover uppercase tracking-wide">
-            Start Writing
-          </Link>
+          <div className="flex gap-4">
+            {!user ? (
+                <Link href="/auth/signin" className="bg-white text-on-surface font-headline px-6 py-2 rounded font-bold border-2 border-on-surface transition-all duration-300 hover:bg-surface-container uppercase tracking-wide">
+                    Sign In
+                </Link>
+            ) : (
+                <Link href="/dashboard/write" className="bg-primary text-on-primary font-headline px-6 py-2 rounded font-bold border-2 border-on-surface transition-all duration-300 glow-hover uppercase tracking-wide">
+                    Start Writing
+                </Link>
+            )}
+          </div>
         </div>
       </nav>
 
@@ -58,9 +74,11 @@ export default async function Home() {
             <Link href="#trending" className="bg-primary text-on-primary font-headline text-lg px-10 py-4 rounded font-bold border-2 border-on-surface hover:scale-[1.02] transition-all duration-300 glow-hover uppercase tracking-wide">
               Start Reading
             </Link>
-            <Link href="/auth/signup" className="bg-surface text-on-surface border-2 border-on-surface font-headline text-lg px-10 py-4 rounded font-bold hover:bg-surface-container-high transition-all duration-300 flex items-center justify-center uppercase tracking-wide glow-hover">
-              Create an Account
-            </Link>
+            {!user && (
+              <Link href="/auth/signup" className="bg-surface text-on-surface border-2 border-on-surface font-headline text-lg px-10 py-4 rounded font-bold hover:bg-surface-container-high transition-all duration-300 flex items-center justify-center uppercase tracking-wide glow-hover">
+                Create an Account
+              </Link>
+            )}
           </div>
         </section>
 
@@ -97,7 +115,7 @@ export default async function Home() {
                         <h3 className="font-headline text-2xl font-black text-on-surface leading-tight uppercase group-hover:text-primary transition-colors">
                           {story.title}
                         </h3>
-                        <p className="font-label text-sm text-on-surface-variant font-medium mt-2">
+                        <p className="font-label text-sm text-on-surface-variant font-medium mt-2 uppercase">
                           By <span className="text-on-surface font-bold">{story.author.name}</span>
                         </p>
                       </div>
