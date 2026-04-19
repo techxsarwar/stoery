@@ -17,7 +17,7 @@ model User {
   email     String   @unique
   password  String?   // The ? makes it optional
   avatar    String?
-  provider  String   @default("google")
+  provider  String   @default("spotify")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
