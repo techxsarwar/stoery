@@ -4,6 +4,7 @@ import Link from "next/link";
 import { LikeButton, CommentForm } from "@/components/Engagement";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
+import Navbar from "@/components/Navbar";
 
 export default async function ReadStoryPage({ params }: { params: Promise<{ storyId: string }> }) {
   const { storyId } = await params;
@@ -39,14 +40,7 @@ export default async function ReadStoryPage({ params }: { params: Promise<{ stor
       <div className="fixed inset-0 bg-[#fdfdfa] -z-20"></div>
       <div className="fixed inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50 -z-10"></div>
       
-      <nav className="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-4 border-on-surface flex items-center justify-between px-8 py-4 px-6 md:px-12">
-          <Link href="/" className="text-2xl font-black tracking-tighter text-on-surface font-headline uppercase">
-            STORYVERSE
-          </Link>
-          <div className="font-headline font-bold text-sm text-on-surface flex gap-4 uppercase tracking-wide">
-             <Link href="/" className="px-4 py-2 border-2 border-transparent hover:border-on-surface transition-all duration-300 rounded">Explore More</Link>
-          </div>
-      </nav>
+      <Navbar user={user} />
 
       <main className="w-full max-w-3xl flex flex-col gap-12 mt-8">
         <header className="flex flex-col gap-6 items-center text-center pb-12 border-b-8 border-primary">

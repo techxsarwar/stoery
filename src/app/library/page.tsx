@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import Navbar from "@/components/Navbar";
 
 export default async function LibraryPage() {
   const cookieStore = await cookies();
@@ -25,19 +26,7 @@ export default async function LibraryPage() {
 
   return (
     <div className="min-h-screen bg-surface flex flex-col items-center pt-24 px-6 md:px-12 w-full mx-auto relative">
-      <nav className="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-4 border-on-surface flex items-center justify-between px-8 py-4 px-6 md:px-12">
-          <Link href="/" className="text-2xl font-black tracking-tighter text-on-surface font-headline uppercase">
-            STORYVERSE
-          </Link>
-          <div className="hidden md:flex space-x-8 items-center">
-            <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface transition-all duration-300 font-bold uppercase" href="/discover">Discover</Link>
-            <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface transition-all duration-300 font-bold uppercase" href="/community">Community</Link>
-            <Link className="font-headline tracking-wide text-primary hover:text-on-surface transition-all duration-300 font-black uppercase" href="/library">My Library</Link>
-          </div>
-          <Link href="/dashboard/write" className="bg-primary text-on-primary font-headline px-6 py-2 rounded font-bold border-2 border-on-surface transition-all duration-300 glow-hover uppercase tracking-wide">
-            Start Writing
-          </Link>
-      </nav>
+      <Navbar user={user} />
 
       <main className="w-full max-w-7xl flex flex-col gap-12 mt-8 pb-32">
         <header className="w-full flex flex-col gap-4 border-b-8 border-primary pb-8">
