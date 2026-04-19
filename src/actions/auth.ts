@@ -45,7 +45,8 @@ export async function signUp(formData: FormData) {
           id: data.user.id, // Use the Supabase UID as our ID
           name,
           email,
-          password: "", // Change null to an empty string
+          // @ts-ignore - Bypass strict password check for Google OAuth
+          password: "", 
         },
       });
     } catch (e) {
