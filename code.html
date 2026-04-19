@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>STORYVERSE - Where Every Story Finds Its Reader</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Space+Grotesk:wght@300..700&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#372464",
+                        "surface-dim": "#131315",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#5516be",
+                        "primary-fixed": "#e9ddff",
+                        "surface-variant": "#353437",
+                        "on-tertiary-fixed": "#2c1700",
+                        "surface-container-low": "#1c1b1d",
+                        "surface-container-high": "#2a2a2c",
+                        "on-tertiary": "#482900",
+                        "primary": "#d0bcff",
+                        "tertiary-fixed": "#ffdcbb",
+                        "on-error": "#690005",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "surface-container-lowest": "#0e0e10",
+                        "on-tertiary-container": "#3f2300",
+                        "on-primary": "#3c0091",
+                        "background": "#131315",
+                        "tertiary-fixed-dim": "#ffb869",
+                        "primary-container": "#a078ff",
+                        "on-tertiary-fixed-variant": "#673d00",
+                        "surface-container": "#201f22",
+                        "inverse-primary": "#6d3bd7",
+                        "on-surface-variant": "#cbc3d7",
+                        "inverse-on-surface": "#313032",
+                        "tertiary": "#ffb869",
+                        "surface": "#131315",
+                        "outline": "#958ea0",
+                        "on-primary-fixed": "#23005c",
+                        "surface-container-highest": "#353437",
+                        "outline-variant": "#494454",
+                        "secondary-container": "#513e7f",
+                        "on-background": "#e5e1e4",
+                        "error": "#ffb4ab",
+                        "secondary-fixed": "#e9ddff",
+                        "on-secondary-container": "#c3adf7",
+                        "on-secondary-fixed": "#220b4e",
+                        "on-primary-container": "#340080",
+                        "on-surface": "#e5e1e4",
+                        "inverse-surface": "#e5e1e4",
+                        "primary-fixed-dim": "#d0bcff",
+                        "secondary": "#d0bcff",
+                        "error-container": "#93000a",
+                        "surface-tint": "#d0bcff",
+                        "on-secondary-fixed-variant": "#4e3b7c",
+                        "surface-bright": "#39393b",
+                        "tertiary-container": "#ca801e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Space Grotesk", "sans-serif"],
+                        "body": ["Newsreader", "serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glow-hover:hover {
+            box-shadow: 0 0 15px theme('colors.primary');
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#131315]/60 backdrop-blur-xl bg-gradient-to-b from-[#1c1b1d] to-transparent shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+<div class="flex justify-between items-center px-8 py-4 max-w-full">
+<a class="text-2xl font-black tracking-tighter text-[#8B5CF6] font-headline" href="#">
+                STORYVERSE
+            </a>
+<div class="hidden md:flex space-x-8 items-center">
+<a class="font-headline tracking-wide text-[#f5f7fa]/70 hover:text-[#d0bcff] transition-colors duration-300" href="#">Discover</a>
+<a class="font-headline tracking-wide text-[#f5f7fa]/70 hover:text-[#d0bcff] transition-colors duration-300" href="#">Community</a>
+<a class="font-headline tracking-wide text-[#f5f7fa]/70 hover:text-[#d0bcff] transition-colors duration-300" href="#">My Library</a>
+</div>
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline px-6 py-2 rounded-full hover:scale-105 transition-all duration-300 glow-hover">
+                Start Writing
+            </button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto w-full flex flex-col gap-32">
+<!-- Hero Section -->
+<section class="flex flex-col items-center justify-center text-center min-h-[614px] relative z-10">
+<h1 class="font-headline text-5xl md:text-7xl font-bold tracking-tighter text-on-surface mb-6 max-w-4xl leading-tight">
+                Where Every Story Finds Its Reader
+            </h1>
+<p class="font-body text-xl md:text-2xl text-on-surface-variant max-w-2xl mb-12 italic">
+                Join a community of creators and readers. Write your masterpiece, design your covers, and share your universe with the world.
+            </p>
+<div class="flex flex-col sm:flex-row gap-6">
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline text-lg px-8 py-4 rounded-full hover:scale-[1.02] transition-all duration-300 glow-hover font-semibold">
+                    Start Reading
+                </button>
+<button class="border border-outline-variant/20 bg-transparent text-on-surface font-headline text-lg px-8 py-4 rounded-full hover:bg-surface-container-high transition-all duration-300">
+                    Create an Account
+                </button>
+</div>
+</section>
+<!-- Trending Stories Grid -->
+<section class="w-full relative z-10">
+<div class="flex items-center gap-4 mb-12">
+<div class="w-1 h-8 bg-primary rounded-full"></div>
+<h2 class="font-headline text-3xl md:text-4xl font-bold text-on-surface tracking-tight">Trending This Week</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Card 1 -->
+<article class="bg-surface-container-low rounded-lg overflow-hidden group hover:bg-surface-container-high transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.02] cursor-pointer relative">
+<div class="h-48 w-full bg-gradient-to-br from-surface-container-highest to-surface-container-low relative overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center opacity-40 group-hover:scale-110 transition-transform duration-700" data-alt="deep space nebula with bright stars and dark purple cosmic dust clouds" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC7A4-ulqSuiTDhl3QD7hv8-5nmGInWkH_eg72iif_LKUpv7z1TMw0ES5iWItYjkf3q_92WGHxPBCNsGpVw2xUbEyA_bMaqAHzInZFQWtgbcZeNsJZFlv0iltPemdwCRGZgGQ2T2B-YcsrhiE9I2s08jWfrzoFuyRdJZAJjFSLVX5vfaFHWTcXiR_mzoP5tA2OmJJ5zG9OJ-eCV1o4y18M_MUC2YCq94KD3ampkTSHn_wL1tcRGZOoQMe2RjHt4DHQZZaMJ0J-XyJg')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"></div>
+</div>
+<div class="p-8 flex flex-col gap-6 relative z-10">
+<span class="inline-flex items-center px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-xs font-label uppercase tracking-wider w-max">
+                            Sci-Fi / Fantasy
+                        </span>
+<div>
+<h3 class="font-headline text-2xl font-bold text-on-surface mb-2 leading-tight">The Slayer Of Stars</h3>
+<p class="font-label text-sm text-outline">Sarwar Altaf Dar</p>
+</div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-surface-container-low rounded-lg overflow-hidden group hover:bg-surface-container-high transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.02] cursor-pointer relative">
+<div class="h-48 w-full bg-gradient-to-br from-surface-container-highest to-surface-container-low relative overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center opacity-40 group-hover:scale-110 transition-transform duration-700" data-alt="abstract macro photography of dark metallic circuitry with subtle purple lighting" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC7A4-ulqSuiTDhl3QD7hv8-5nmGInWkH_eg72iif_LKUpv7z1TMw0ES5iWItYjkf3q_92WGHxPBCNsGpVw2xUbEyA_bMaqAHzInZFQWtgbcZeNsJZFlv0iltPemdwCRGZgGQ2T2B-YcsrhiE9I2s08jWfrzoFuyRdJZAJjFSLVX5vfaFHWTcXiR_mzoP5tA2OmJJ5zG9OJ-eCV1o4y18M_MUC2YCq94KD3ampkTSHn_wL1tcRGZOoQMe2RjHt4DHQZZaMJ0J-XyJg')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"></div>
+</div>
+<div class="p-8 flex flex-col gap-6 relative z-10">
+<span class="inline-flex items-center px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-xs font-label uppercase tracking-wider w-max">
+                            Psychological / Drama
+                        </span>
+<div>
+<h3 class="font-headline text-2xl font-bold text-on-surface mb-2 leading-tight">Self preservation Looks like ego</h3>
+<p class="font-label text-sm text-outline">Mohd Suhaib Bhat</p>
+</div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-surface-container-low rounded-lg overflow-hidden group hover:bg-surface-container-high transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.02] cursor-pointer relative">
+<div class="h-48 w-full bg-gradient-to-br from-surface-container-highest to-surface-container-low relative overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center opacity-40 group-hover:scale-110 transition-transform duration-700" data-alt="dark misty forest path at twilight with subtle ethereal purple glow" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC7A4-ulqSuiTDhl3QD7hv8-5nmGInWkH_eg72iif_LKUpv7z1TMw0ES5iWItYjkf3q_92WGHxPBCNsGpVw2xUbEyA_bMaqAHzInZFQWtgbcZeNsJZFlv0iltPemdwCRGZgGQ2T2B-YcsrhiE9I2s08jWfrzoFuyRdJZAJjFSLVX5vfaFHWTcXiR_mzoP5tA2OmJJ5zG9OJ-eCV1o4y18M_MUC2YCq94KD3ampkTSHn_wL1tcRGZOoQMe2RjHt4DHQZZaMJ0J-XyJg')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"></div>
+</div>
+<div class="p-8 flex flex-col gap-6 relative z-10">
+<span class="inline-flex items-center px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-xs font-label uppercase tracking-wider w-max">
+                            Mystery
+                        </span>
+<div>
+<h3 class="font-headline text-2xl font-bold text-on-surface mb-2 leading-tight">The Silent Watcher</h3>
+<p class="font-label text-sm text-outline">Anonymous</p>
+</div>
+</div>
+</article>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#1c1b1d] w-full py-12 px-8 mt-auto z-10 relative">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6 max-w-7xl mx-auto">
+<div class="text-lg font-bold text-[#8B5CF6] font-headline">
+                STORYVERSE
+            </div>
+<div class="text-[#f5f7fa]/50 font-label text-sm tracking-tight text-center md:text-left">
+                © 2024 STORYVERSE. Crafted for high-end storytelling.
+            </div>
+<div class="flex gap-6">
+<a class="text-[#f5f7fa]/50 hover:text-white transition-all font-label text-sm" href="#">Terms of Service</a>
+<a class="text-[#f5f7fa]/50 hover:text-white transition-all font-label text-sm" href="#">Privacy Policy</a>
+<a class="text-[#f5f7fa]/50 hover:text-white transition-all font-label text-sm" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</body></html>
