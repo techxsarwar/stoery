@@ -45,6 +45,7 @@ export async function signUp(formData: FormData) {
           id: data.user.id, // Use the Supabase UID as our ID
           name,
           email,
+          password: null, // Manually passing null tells Prisma "I meant to leave this blank"
         },
       });
     } catch (e) {
