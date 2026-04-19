@@ -17,8 +17,13 @@ model User {
   email     String   @unique
   password  String?   // The ? makes it optional
   avatar    String?
-  provider  String   @default("spotify")
-  createdAt DateTime @default(now())
+  provider           String   @default("spotify")
+  age                Int?
+  penName            String?  @unique
+  parentage          String?
+  guardianApproved   Boolean  @default(false)
+  onboardingComplete Boolean  @default(false)
+  createdAt          DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   stories  Story[]

@@ -134,3 +134,49 @@ export async function updatePassword(formData: FormData) {
 
   return { success: true };
 }
+
+export async function completeOnboarding(formData: FormData) {
+  const age = parseInt(formData.get("age") as string);
+  const penName = formData.get("penName") as string;
+  const fullName = formData.get("fullName") as string;
+  const parentage = formData.get("parentage") as string;
+  const guardianApproved = formData.get("guardianApproved") === "on";
+
+  if (!age || !penName || !fullName) {
+    return { error: "Age, Pen Name, and Full Name are required" };
+  }
+
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Unauthorized" };
+  }
+
+  try {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        name: fullName,
+        age,
+        penName,
+        parentage,
+        guardianApproved,
+        onboardingComplete: true,
+      },
+    });
+
+    // Update Supabase metadata for fast middleware checks
+    await supabase.auth.updateUser({
+      data: { onboarding_complete: true }
+    });
+
+    return { success: true };
+  } catch (e: any) {
+    if (e.code === 'P2002') {
+      return { error: "This Pen Name is already taken." };
+    }
+    return { error: "Failed to update profile" };
+  }
+}
