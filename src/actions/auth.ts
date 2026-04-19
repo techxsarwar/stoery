@@ -45,7 +45,6 @@ export async function signUp(formData: FormData) {
           id: data.user.id, // Use the Supabase UID as our ID
           name,
           email,
-          provider: "credentials",
         },
       });
     } catch (e) {
