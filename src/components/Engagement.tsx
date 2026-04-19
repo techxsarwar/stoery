@@ -35,7 +35,7 @@ export function LikeButton({ storyId, initialLiked, initialCount }: { storyId: s
     <button 
       onClick={handleLike} 
       disabled={loading}
-      className={`flex items-center gap-2 px-6 py-2 rounded-full font-headline font-bold transition-all duration-300 ${liked ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest'}`}
+      className={`flex items-center gap-2 px-8 py-3 border-2 border-on-surface uppercase rounded font-headline font-black transition-all duration-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none ${liked ? 'bg-primary text-on-primary' : 'bg-white text-on-surface hover:bg-surface-container'}`}
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill={liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
@@ -69,9 +69,9 @@ export function CommentForm({ storyId }: { storyId: string }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full mt-8">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full mt-4 bg-white p-6 rounded border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
       <textarea
-        className="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg p-4 text-on-surface font-body resize-none focus:outline-none focus:border-primary transition-colors"
+        className="w-full bg-surface border-2 border-on-surface rounded p-4 text-on-surface font-body resize-none focus:outline-none focus:ring-4 focus:ring-primary/50 transition-colors"
         rows={4}
         placeholder={session ? "Share your thoughts on this chapter..." : "Sign in to leave a comment"}
         value={content}
@@ -82,7 +82,7 @@ export function CommentForm({ storyId }: { storyId: string }) {
         <button 
           type="submit" 
           disabled={!session || loading || !content.trim()}
-          className="bg-primary text-on-primary font-headline px-6 py-2 rounded-full font-semibold hover:bg-primary-container transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-primary text-on-primary border-2 border-on-surface font-headline px-8 py-3 uppercase rounded font-black hover:bg-primary-container transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Posting..." : "Post Comment"}
         </button>

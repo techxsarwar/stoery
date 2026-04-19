@@ -43,25 +43,25 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center pt-24 px-6 md:px-12 w-full max-w-7xl mx-auto">
-      <div className="bg-surface-container-low p-8 rounded-xl w-full max-w-md shadow-2xl relative z-10">
-        <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
-        <h2 className="text-3xl font-headline font-bold text-on-surface mb-6 text-center tracking-tight">
+    <div className="min-h-screen bg-surface flex items-center justify-center pt-24 px-6 md:px-12 w-full mx-auto relative">
+      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-70"></div>
+      <div className="bg-white p-8 rounded-lg w-full max-w-md shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] border-4 border-on-surface relative z-10">
+        <h2 className="text-4xl font-headline font-black text-on-surface mb-8 text-center tracking-tighter uppercase">
           Join Storyverse
         </h2>
         {error && (
-          <div className="bg-error-container text-on-error-container p-3 rounded-lg text-sm mb-4 font-label text-center border border-error/20">
+          <div className="bg-error font-headline font-bold text-on-error p-3 rounded-lg text-sm mb-6 text-center border-2 border-on-surface">
             {error}
           </div>
         )}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">
-            <label className="font-label text-sm text-on-surface-variant font-medium">
+            <label className="font-headline font-bold text-sm text-on-surface uppercase tracking-wide">
               Pen Name
             </label>
             <input
               type="text"
-              className="bg-surface border-b-2 border-outline-variant/30 text-on-surface px-4 py-3 focus:outline-none focus:border-primary focus:bg-surface-container-highest transition-all duration-300 font-label placeholder:text-outline-variant/70"
+              className="bg-surface border-2 border-on-surface text-on-surface px-4 py-3 rounded focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 font-label placeholder:text-outline-variant"
               placeholder="John Doe"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -69,12 +69,12 @@ export default function SignUp() {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="font-label text-sm text-on-surface-variant font-medium">
+            <label className="font-headline font-bold text-sm text-on-surface uppercase tracking-wide">
               Email
             </label>
             <input
               type="email"
-              className="bg-surface border-b-2 border-outline-variant/30 text-on-surface px-4 py-3 focus:outline-none focus:border-primary focus:bg-surface-container-highest transition-all duration-300 font-label placeholder:text-outline-variant/70"
+              className="bg-surface border-2 border-on-surface text-on-surface px-4 py-3 rounded focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 font-label placeholder:text-outline-variant"
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -82,12 +82,12 @@ export default function SignUp() {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="font-label text-sm text-on-surface-variant font-medium">
+            <label className="font-headline font-bold text-sm text-on-surface uppercase tracking-wide">
               Password
             </label>
             <input
               type="password"
-              className="bg-surface border-b-2 border-outline-variant/30 text-on-surface px-4 py-3 focus:outline-none focus:border-primary focus:bg-surface-container-highest transition-all duration-300 font-label placeholder:text-outline-variant/70"
+              className="bg-surface border-2 border-on-surface text-on-surface px-4 py-3 rounded focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 font-label placeholder:text-outline-variant"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -96,16 +96,16 @@ export default function SignUp() {
           </div>
           <button
             type="submit"
-            className="mt-4 bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline text-lg px-8 py-3 rounded-full hover:scale-[1.02] transition-all duration-300 glow-hover font-semibold w-full"
+            className="mt-4 bg-primary text-on-primary border-2 border-on-surface font-headline text-xl px-8 py-4 rounded hover:bg-primary-container transition-all duration-300 glow-hover font-black w-full uppercase tracking-wider"
           >
             Create Account
           </button>
         </form>
-        <p className="mt-8 text-center text-sm font-label text-on-surface-variant">
+        <p className="mt-8 text-center text-sm font-label font-bold text-on-surface-variant">
           Already have an account?{" "}
           <Link
             href="/auth/signin"
-            className="text-primary hover:text-primary-container transition-colors font-medium underline underline-offset-4 decoration-primary/30 hover:decoration-primary"
+            className="text-on-surface hover:text-primary transition-colors hover:underline underline-offset-4 decoration-primary decoration-4"
           >
             Sign in
           </Link>

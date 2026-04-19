@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${newsreader.variable} ${inter.variable} dark`}
+      className={`${spaceGrotesk.variable} ${newsreader.variable} ${inter.variable}`}
     >
       <body className="font-body antialiased min-h-screen flex flex-col relative overflow-x-hidden">
         <Providers>{children}</Providers>
