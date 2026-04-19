@@ -4,6 +4,7 @@ import { signUp, signIn } from "@/actions/auth";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import LoginButton from "@/components/LoginButton";
 
 export default function SignUp() {
   const [name, setName] = useState("");
