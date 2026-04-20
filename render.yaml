@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: storyverse-platform
+    env: node
+    plan: starter # Starter plan ensures "Always On" for zero-lag reading
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: node .next/standalone/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false # You'll add this in the Render Dashboard
+      - key: NEXTAUTH_SECRET
+        sync: false
+      - key: SPOTIFY_CLIENT_ID
+        sync: false
+      - key: SPOTIFY_CLIENT_SECRET
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_ENDPOINT
+        sync: false
+      - key: R2_BUCKET_NAME
+        sync: false
