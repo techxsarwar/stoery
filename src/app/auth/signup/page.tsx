@@ -1,47 +1,9 @@
 "use client";
 
-import { signUp, signIn } from "@/actions/auth";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
 import Link from "next/link";
 import LoginButton from "@/components/LoginButton";
 
 export default function SignUp() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isPending, startTransition] = useTransition();
-  const router = useRouter();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    startTransition(async () => {
-        const formData = new FormData();
-        formData.append("name", name);
-        formData.append("email", email);
-        formData.append("password", password);
-
-        const res = await signUp(formData);
-
-        if (res.error) {
-          setError(res.error);
-        } else {
-          // Attempt auto sign-in after successful sign up
-          const signInRes = await signIn(formData);
-          if (signInRes?.error) {
-            // If auto-signin fails (e.g. email verification required), go to signin
-            router.push("/auth/signin");
-          } else {
-            router.push("/");
-            router.refresh();
-          }
-        }
-    });
-  };
-
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center pt-24 px-6 md:px-12 w-full mx-auto relative">
       <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-70"></div>

@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import Editor from "@/components/Editor";
 import { createStory } from "@/actions/story";
+import { uploadStoryCover } from "@/actions/storage";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/utils/supabase/client";
+import { useSession } from "next-auth/react";
 
 export default function WritePage() {
   const [content, setContent] = useState("");
@@ -13,38 +14,52 @@ export default function WritePage() {
   const [description, setDescription] = useState("");
   const [genre, setGenre] = useState("");
   const [coverImage, setCoverImage] = useState("");
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: session, status } = useSession();
   const router = useRouter();
-  const supabase = createClient();
 
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push("/auth/signin");
-      } else {
-        setIsLoading(false);
-      }
-    };
-    checkUser();
-  }, [router, supabase.auth]);
+    if (status === "unauthenticated") {
+      router.push("/auth/signin");
+    }
+  }, [status, router]);
 
-  if (isLoading) {
+  if (status === "loading") {
     return <div className="min-h-screen flex items-center justify-center font-headline font-bold text-on-surface uppercase tracking-wide text-xl">Loading...</div>;
   }
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError("");
 
+    let finalCoverUrl = coverImage;
+
+    // 1. Upload image to R2 if a file was selected
+    if (coverFile) {
+      const uploadData = new FormData();
+      uploadData.append("file", coverFile);
+      const uploadRes = await uploadStoryCover(uploadData);
+      
+      if (uploadRes.error) {
+        setError(uploadRes.error);
+        setIsSubmitting(false);
+        return;
+      }
+      
+      finalCoverUrl = uploadRes.url || "";
+    }
+
+    // 2. Create the story
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
     formData.append("genre", genre);
-    formData.append("coverImage", coverImage);
+    formData.append("coverImage", finalCoverUrl);
     formData.append("content", content);
 
     const res = await createStory(formData);
@@ -111,14 +126,40 @@ export default function WritePage() {
               </select>
             </div>
             <div className="flex flex-col gap-2">
-              <label className="font-headline font-bold text-sm text-on-surface uppercase tracking-wide">Cover Image URL</label>
-              <input
-                type="text"
-                className="bg-surface border-2 border-on-surface text-on-surface px-4 py-3 rounded focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 font-label placeholder:text-outline-variant"
-                placeholder="https://..."
-                value={coverImage}
-                onChange={(e) => setCoverImage(e.target.value)}
-              />
+              <label className="font-headline font-bold text-sm text-on-surface uppercase tracking-wide">Cover Image</label>
+              <div className="flex flex-col gap-4">
+                {coverPreview && (
+                  <div className="relative w-full h-48 border-4 border-on-surface rounded overflow-hidden bg-surface-variant">
+                    <img 
+                      src={coverPreview} 
+                      alt="Cover Preview" 
+                      className="w-full h-full object-cover"
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        setCoverFile(null);
+                        setCoverPreview(null);
+                      }}
+                      className="absolute top-2 right-2 bg-error text-on-error border-2 border-on-surface px-2 py-1 font-headline font-bold text-xs uppercase"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="bg-surface border-2 border-on-surface text-on-surface px-4 py-3 rounded focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 font-label file:mr-4 file:py-2 file:px-4 file:rounded file:border-2 file:border-on-surface file:text-sm file:font-headline file:font-black file:bg-primary file:text-on-primary hover:file:bg-primary-container"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setCoverFile(file);
+                      setCoverPreview(URL.createObjectURL(file));
+                    }
+                  }}
+                />
+              </div>
             </div>
           </div>
 

@@ -1,26 +1,25 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Navbar from "@/components/Navbar";
 
 export default async function CommunityPage() {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
 
   const recentComments = await prisma.comment.findMany({
     take: 10,
     orderBy: { createdAt: "desc" },
     include: {
-      user: true,
+      profile: true,
       story: true,
     },
   });
 
   return (
     <div className="min-h-screen bg-surface flex flex-col items-center pt-24 px-6 md:px-12 w-full mx-auto relative">
-      <Navbar user={user} />
+      <Navbar user={user ?? null} />
 
       <main className="w-full max-w-7xl flex flex-col gap-12 mt-8 pb-32">
         <header className="w-full flex flex-col gap-4 border-b-8 border-primary pb-8">
@@ -42,7 +41,7 @@ export default async function CommunityPage() {
                                 <div className="p-8 bg-white border-4 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all cursor-pointer relative group">
                                     <div className="flex flex-col mb-4">
                                         <div className="flex items-center gap-2">
-                                            <span className="font-headline font-black text-xl text-on-surface uppercase">{comment.user.name}</span>
+                                            <span className="font-headline font-black text-xl text-on-surface uppercase">{comment.profile.full_name || "Anonymous"}</span>
                                             <span className="font-label font-bold text-on-surface-variant uppercase text-sm">on</span>
                                             <span className="font-headline font-bold text-primary uppercase text-lg group-hover:underline">{comment.story.title}</span>
                                         </div>

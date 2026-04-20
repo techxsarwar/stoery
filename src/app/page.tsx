@@ -1,13 +1,12 @@
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export default async function Home() {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
 
   const stories = await prisma.story.findMany({
     take: 6,
@@ -17,7 +16,7 @@ export default async function Home() {
 
   return (
     <>
-      <Navbar user={user} />
+      <Navbar user={user ?? null} />
 
       <main className="flex-grow pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto w-full flex flex-col gap-32">
         <section className="flex flex-col items-center justify-center text-center min-h-[500px] relative z-10">
@@ -60,7 +59,7 @@ export default async function Home() {
                       <div
                         className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500 will-change-transform"
                         style={{
-                          backgroundImage: `url('${story.coverImage || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"}')`,
+                          backgroundImage: `url('${story.cover_url || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"}')`,
                         }}
                       ></div>
                     </div>
@@ -75,7 +74,7 @@ export default async function Home() {
                           {story.title}
                         </h3>
                         <p className="font-label text-sm text-on-surface-variant font-medium mt-2 uppercase">
-                          By <span className="text-on-surface font-bold">{story.author.name}</span>
+                          By <span className="text-on-surface font-bold">{story.author.full_name || "Unknown Author"}</span>
                         </p>
                       </div>
                     </div>

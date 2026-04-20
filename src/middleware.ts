@@ -1,28 +1,27 @@
-import { type NextRequest } from "next/server";
-import { createClient } from "@/utils/supabase/middleware";
+import { getToken } from "next-auth/jwt";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  const { supabase, response } = await createClient(request);
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const { pathname } = request.nextUrl;
 
-  // If user is logged in but onboarding is not complete
-  // Redirect to /onboarding unless they are already there or on an auth route
-  if (user && !user.user_metadata?.onboarding_complete) {
-    const isAuthRoute = request.nextUrl.pathname.startsWith('/auth');
-    const isOnboardingRoute = request.nextUrl.pathname === '/onboarding';
+  // 1. If user is logged in but onboarding is not complete
+  if (token && !token.onboardingComplete) {
+    const isAuthRoute = pathname.startsWith('/api/auth') || pathname.startsWith('/auth');
+    const isOnboardingRoute = pathname === '/onboarding';
     
     if (!isAuthRoute && !isOnboardingRoute) {
       return NextResponse.redirect(new URL('/onboarding', request.url));
     }
   }
 
-  // If user is NOT logged in and trying to access /onboarding, redirect to signin
-  if (!user && request.nextUrl.pathname === '/onboarding') {
+  // 2. If user is NOT logged in and trying to access /onboarding, redirect to signin
+  if (!token && pathname === '/onboarding') {
     return NextResponse.redirect(new URL('/auth/signin', request.url));
   }
 
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {

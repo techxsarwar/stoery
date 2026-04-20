@@ -1,5 +1,5 @@
-"use client";
+import { NextAuthProvider } from "./NextAuthProvider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <NextAuthProvider>{children}</NextAuthProvider>;
 }

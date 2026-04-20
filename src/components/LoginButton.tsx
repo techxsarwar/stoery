@@ -1,22 +1,14 @@
 "use client";
 
-import { createClient } from "@/utils/supabase/client";
+import { signIn, signOut } from "next-auth/react";
 
 export default function LoginButton() {
-  const supabase = createClient();
-
   const handleLogin = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "spotify",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    await signIn("spotify", { callbackUrl: "/onboarding" });
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/";
+    await signOut({ callbackUrl: "/" });
   };
 
   return (

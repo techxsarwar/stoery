@@ -1,13 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { User } from "@supabase/supabase-js";
-import { signOut } from "@/actions/auth";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 
 interface NavbarProps {
-  user: User | null;
+  user: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  } | null;
 }
 
 export default function Navbar({ user }: NavbarProps) {

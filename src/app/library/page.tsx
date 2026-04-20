@@ -1,32 +1,35 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 
 export default async function LibraryPage() {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
+  
+  if (!session?.user?.email) {
     redirect("/auth/signin");
   }
 
-  const likedStories = await prisma.like.findMany({
-    where: { userId: user.id },
+  const profile = await prisma.profile.findFirst({
+    where: { user: { email: session.user.email } }
+  });
+
+  const likedStories = profile ? await prisma.like.findMany({
+    where: { profileId: profile.id },
     include: {
       story: {
         include: { author: true, _count: { select: { likes: true } } },
       },
     },
     orderBy: { createdAt: "desc" },
-  });
+  }) : [];
 
   return (
     <div className="min-h-screen bg-surface flex flex-col items-center pt-24 px-6 md:px-12 w-full mx-auto relative">
-      <Navbar user={user} />
+      <Navbar user={user ?? null} />
 
       <main className="w-full max-w-7xl flex flex-col gap-12 mt-8 pb-32">
         <header className="w-full flex flex-col gap-4 border-b-8 border-primary pb-8">
@@ -49,7 +52,7 @@ export default async function LibraryPage() {
                           <div
                             className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500 will-change-transform"
                             style={{
-                              backgroundImage: `url('${story.coverImage || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"}')`,
+                              backgroundImage: `url('${story.cover_url || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"}')`,
                             }}
                           ></div>
                         </div>
@@ -64,7 +67,7 @@ export default async function LibraryPage() {
                               {story.title}
                             </h3>
                             <p className="font-label text-sm text-on-surface-variant font-bold mt-2 uppercase flex justify-between">
-                              <span>{story.author.name}</span>
+                              <span>{story.author.full_name || "Unknown Author"}</span>
                               <span className="text-primary font-black">LIKED</span>
                             </p>
                           </div>

@@ -2,16 +2,20 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { LikeButton, CommentForm } from "@/components/Engagement";
-import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Navbar from "@/components/Navbar";
 
 export default async function ReadStoryPage({ params }: { params: Promise<{ storyId: string }> }) {
   const { storyId } = await params;
   
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
+
+  // Get current user's profile for interaction checks
+  const currentProfile = user ? await prisma.profile.findFirst({
+    where: { user: { email: user.email } }
+  }) : null;
 
   const story = await prisma.story.findUnique({
     where: { id: storyId },
@@ -22,7 +26,7 @@ export default async function ReadStoryPage({ params }: { params: Promise<{ stor
       },
       likes: true,
       comments: {
-        include: { user: true },
+        include: { profile: true },
         orderBy: { createdAt: "desc" },
       },
     },
@@ -33,14 +37,14 @@ export default async function ReadStoryPage({ params }: { params: Promise<{ stor
   }
 
   const firstChapter = story.chapters[0];
-  const isLiked = user ? story.likes.some(l => l.userId === user.id) : false;
+  const isLiked = currentProfile ? story.likes.some(l => l.profileId === currentProfile.id) : false;
 
   return (
     <div className="min-h-screen bg-surface flex flex-col items-center pt-24 px-6 md:px-12 w-full mx-auto pb-32 relative">
       <div className="fixed inset-0 bg-[#fdfdfa] -z-20"></div>
       <div className="fixed inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50 -z-10"></div>
       
-      <Navbar user={user} />
+      <Navbar user={user ?? null} />
 
       <main className="w-full max-w-3xl flex flex-col gap-12 mt-8">
         <header className="flex flex-col gap-6 items-center text-center pb-12 border-b-8 border-primary">
@@ -53,7 +57,7 @@ export default async function ReadStoryPage({ params }: { params: Promise<{ stor
                 {story.title}
             </h1>
             <p className="font-label font-bold text-on-surface-variant text-xl uppercase tracking-wider">
-                By <span className="text-on-surface border-b-4 border-primary pb-1">{story.author.name}</span>
+                By <span className="text-on-surface border-b-4 border-primary pb-1">{story.author.full_name || "Unknown Author"}</span>
             </p>
         </header>
 
@@ -73,7 +77,7 @@ export default async function ReadStoryPage({ params }: { params: Promise<{ stor
                         <div key={comment.id} className="flex flex-col gap-3 p-6 bg-surface border-2 border-outline-variant relative">
                             <div className="absolute top-0 left-0 w-2 h-full bg-primary"></div>
                             <div className="flex items-center justify-between pl-4">
-                                <span className="font-headline font-bold text-lg text-on-surface uppercase">{comment.user.name}</span>
+                                <span className="font-headline font-bold text-lg text-on-surface uppercase">{comment.profile.full_name || "Anonymous"}</span>
                                 <span className="font-label font-medium text-sm text-outline-variant">
                                     {new Date(comment.createdAt).toLocaleDateString()}
                                 </span>

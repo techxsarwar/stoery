@@ -1,23 +1,29 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { revalidatePath } from "next/cache";
 
 export async function toggleLike(storyId: string) {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
+  const session = await getServerSession(authOptions);
 
-  if (!user) {
+  if (!session?.user?.email) {
     return { error: "Must be logged in to like" };
+  }
+
+  const profile = await prisma.profile.findFirst({
+    where: { user: { email: session.user.email } }
+  });
+
+  if (!profile) {
+    return { error: "Profile not found" };
   }
 
   const existingLike = await prisma.like.findUnique({
     where: {
-      userId_storyId: {
-        userId: user.id,
+      profileId_storyId: {
+        profileId: profile.id,
         storyId: storyId,
       },
     },
@@ -30,7 +36,7 @@ export async function toggleLike(storyId: string) {
   } else {
     await prisma.like.create({
       data: {
-        userId: user.id,
+        profileId: profile.id,
         storyId: storyId,
       },
     });
@@ -41,12 +47,18 @@ export async function toggleLike(storyId: string) {
 }
 
 export async function addComment(storyId: string, content: string) {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
+  const session = await getServerSession(authOptions);
 
-  if (!user) {
+  if (!session?.user?.email) {
     return { error: "Must be logged in to comment" };
+  }
+
+  const profile = await prisma.profile.findFirst({
+    where: { user: { email: session.user.email } }
+  });
+
+  if (!profile) {
+    return { error: "Profile not found" };
   }
 
   if (!content.trim()) {
@@ -56,7 +68,7 @@ export async function addComment(storyId: string, content: string) {
   await prisma.comment.create({
     data: {
       content: content.trim(),
-      userId: user.id,
+      profileId: profile.id,
       storyId: storyId,
     },
   });

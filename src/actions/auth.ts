@@ -1,182 +1,78 @@
 "use server";
 
-import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-
-export async function signUp(formData: FormData) {
-  const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  if (!email || !password || !name) {
-    return { error: "Email, password and name are required" };
-  }
-
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-
-  // 1. Sign up in Supabase Auth
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        full_name: name,
-      },
-      emailRedirectTo: `${siteUrl}/auth/callback`,
-    },
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  if (data.user) {
-    // 2. Create entry in our public.User table via Prisma
-    // This allows us to keep using Prisma relations for Stories, Likes, etc.
-    try {
-      await prisma.user.upsert({
-        where: { email },
-        update: { name },
-        create: {
-          id: data.user.id, // Use the Supabase UID as our ID
-          name,
-          email,
-          // @ts-ignore - Bypass strict password check for Spotify OAuth
-          password: "", 
-        },
-      });
-    } catch (e) {
-      console.error("Prisma sync error:", e);
-      // Even if prisma fails, the auth user exists in Supabase
-    }
-  }
-
-  return { success: true };
-}
-
-export async function signIn(formData: FormData) {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  if (!email || !password) {
-    return { error: "Email and password are required" };
-  }
-
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  return { success: true };
-}
-
-export async function signOut() {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  await supabase.auth.signOut();
-}
-
-export async function forgotPassword(formData: FormData) {
-  const email = formData.get("email") as string;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-
-  if (!email) {
-    return { error: "Email is required" };
-  }
-
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${siteUrl}/auth/callback?next=/auth/reset-password`,
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  return { success: true };
-}
-
-export async function updatePassword(formData: FormData) {
-  const password = formData.get("password") as string;
-  const confirmPassword = formData.get("confirmPassword") as string;
-
-  if (!password || !confirmPassword) {
-    return { error: "Both password fields are required" };
-  }
-
-  if (password !== confirmPassword) {
-    return { error: "Passwords do not match" };
-  }
-
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-
-  const { error } = await supabase.auth.updateUser({
-    password: password,
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  return { success: true };
-}
+import { revalidatePath } from "next/cache";
 
 export async function completeOnboarding(formData: FormData) {
-  const age = parseInt(formData.get("age") as string);
-  const penName = formData.get("penName") as string;
-  const fullName = formData.get("fullName") as string;
-  const parentage = formData.get("parentage") as string;
-  const guardianApproved = formData.get("guardianApproved") === "on";
+  const session = await getServerSession(authOptions);
 
-  if (!age || !penName || !fullName) {
-    return { error: "Age, Pen Name, and Full Name are required" };
-  }
-
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!session?.user?.email) {
     return { error: "Unauthorized" };
   }
 
+  const ageData = formData.get("age") as string;
+  const age = parseInt(ageData);
+  const pen_name = formData.get("penName") as string;
+  const full_name = formData.get("fullName") as string;
+  const parentage = formData.get("parentage") as string;
+  const guardian_approved = formData.get("guardianApproved") === "on";
+
+  if (!age || !pen_name || !full_name) {
+    return { error: "Age, Pen Name, and Full Name are required" };
+  }
+
   try {
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        name: fullName,
+    // 1. Find the user by email (next-auth email)
+    const dbUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!dbUser) {
+      return { error: "User not found in database" };
+    }
+
+    // 2. Upsert the profile
+    await prisma.profile.upsert({
+      where: { userId: dbUser.id },
+      update: {
+        full_name,
         age,
-        penName,
+        pen_name,
         parentage,
-        guardianApproved,
-        onboardingComplete: true,
+        guardian_approved,
+      },
+      create: {
+        userId: dbUser.id,
+        full_name,
+        age,
+        pen_name,
+        parentage,
+        guardian_approved,
       },
     });
 
-    // Update Supabase metadata for fast middleware checks
-    await supabase.auth.updateUser({
-      data: { onboarding_complete: true }
-    });
-
+    revalidatePath("/");
     return { success: true };
   } catch (e: any) {
     if (e.code === 'P2002') {
       return { error: "This Pen Name is already taken." };
     }
+    console.error("Onboarding error:", e);
     return { error: "Failed to update profile" };
   }
+}
+
+export async function getProfile() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) return null;
+
+  return prisma.profile.findFirst({
+    where: {
+      user: {
+        email: session.user.email
+      }
+    }
+  });
 }
