@@ -1,38 +1,38 @@
-import { getToken } from "next-auth/jwt";
-import { type NextRequest, NextResponse } from "next/server";
+import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
 
-export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+export default withAuth(
+  function middleware(req) {
+    const token = req.nextauth.token;
+    const { pathname } = req.nextUrl;
 
-  const { pathname } = request.nextUrl;
-
-  // 1. If user is logged in but onboarding is not complete
-  if (token && !token.onboardingComplete) {
-    const isAuthRoute = pathname.startsWith('/api/auth') || pathname.startsWith('/auth');
-    const isOnboardingRoute = pathname === '/onboarding';
-    
-    if (!isAuthRoute && !isOnboardingRoute) {
-      return NextResponse.redirect(new URL('/onboarding', request.url));
+    // 1. If they are logged in but haven't finished onboarding
+    // AND they aren't already on the onboarding page
+    if (token && !token.onboardingComplete && pathname !== "/onboarding") {
+      return NextResponse.redirect(new URL("/onboarding", req.url));
     }
+  },
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token, // Only runs for matched routes
+    },
+    pages: {
+      signIn: "/auth/signin", // Your custom sign-in page
+    },
   }
+);
 
-  // 2. If user is NOT logged in and trying to access /onboarding, redirect to signin
-  if (!token && pathname === '/onboarding') {
-    return NextResponse.redirect(new URL('/auth/signin', request.url));
-  }
-
-  return NextResponse.next();
-}
-
+// 2. THIS IS THE CRUCIAL PART
 export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
+     * - api/auth (NextAuth internals)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
+     * - public (public assets)
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)",
   ],
 };
