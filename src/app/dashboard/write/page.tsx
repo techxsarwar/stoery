@@ -6,7 +6,7 @@ import { createStory } from "@/actions/story";
 import { uploadStoryCover } from "@/actions/storage";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { createClient } from "@/utils/supabase/client";
 
 export default function WritePage() {
   const [content, setContent] = useState("");
@@ -18,16 +18,23 @@ export default function WritePage() {
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { data: session, status } = useSession();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/signin");
-    }
-  }, [status, router]);
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUser(user);
+        setLoading(false);
+      } else {
+        router.push("/auth/signin");
+      }
+    });
+  }, [router]);
 
-  if (status === "loading") {
+  if (loading) {
     return <div className="min-h-screen flex items-center justify-center font-headline font-bold text-on-surface uppercase tracking-wide text-xl">Loading...</div>;
   }
 

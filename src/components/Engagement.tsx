@@ -3,15 +3,21 @@
 import { useState, useEffect } from "react";
 import { toggleLike, addComment } from "@/actions/engage";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { createClient } from "@/utils/supabase/client";
 
 export function LikeButton({ storyId, initialLiked, initialCount }: { storyId: string, initialLiked: boolean, initialCount: number }) {
   const [liked, setLiked] = useState(initialLiked);
   const [count, setCount] = useState(initialCount);
   const [loading, setLoading] = useState(false);
-  const { data: session } = useSession();
-  const user = session?.user;
+  const [user, setUser] = useState<any>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+  }, []);
 
   const handleLike = async () => {
     if (!user) {
@@ -49,9 +55,15 @@ export function LikeButton({ storyId, initialLiked, initialCount }: { storyId: s
 export function CommentForm({ storyId }: { storyId: string }) {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
-  const { data: session } = useSession();
-  const user = session?.user;
+  const [user, setUser] = useState<any>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

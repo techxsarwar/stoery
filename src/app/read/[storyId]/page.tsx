@@ -2,15 +2,14 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { LikeButton, CommentForm } from "@/components/Engagement";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { createClient } from "@/utils/supabase/server";
 import Navbar from "@/components/Navbar";
 
 export default async function ReadStoryPage({ params }: { params: Promise<{ storyId: string }> }) {
   const { storyId } = await params;
   
-  const session = await getServerSession(authOptions);
-  const user = session?.user;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   // Get current user's profile for interaction checks
   const currentProfile = user ? await prisma.profile.findFirst({

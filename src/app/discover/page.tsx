@@ -1,12 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { createClient } from "@/utils/supabase/server";
 import Navbar from "@/components/Navbar";
 
 export default async function DiscoverPage() {
-  const session = await getServerSession(authOptions);
-  const user = session?.user;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   const stories = await prisma.story.findMany({
     orderBy: { createdAt: "desc" },

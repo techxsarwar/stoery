@@ -1,20 +1,19 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 
 export default async function LibraryPage() {
-  const session = await getServerSession(authOptions);
-  const user = session?.user;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
   
-  if (!session?.user?.email) {
+  if (!user?.email) {
     redirect("/auth/signin");
   }
 
   const profile = await prisma.profile.findFirst({
-    where: { user: { email: session.user.email } }
+    where: { user: { email: user.email } }
   });
 
   const likedStories = profile ? await prisma.like.findMany({

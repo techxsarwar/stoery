@@ -1,14 +1,16 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
 export async function createStory(formData: FormData) {
-  const session = await getServerSession(authOptions);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session?.user?.email) {
+  if (!user?.email) {
     return { error: "Unauthorized" };
   }
 
@@ -26,7 +28,7 @@ export async function createStory(formData: FormData) {
     const profile = await prisma.profile.findFirst({
       where: {
         user: {
-          email: session.user.email
+          email: user.email
         }
       }
     });
