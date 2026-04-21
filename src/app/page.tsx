@@ -94,25 +94,27 @@ export default async function Home() {
           <div className="text-surface-variant/70 font-label text-sm tracking-tight text-left md:text-center">
             © 2024 STORYVERSE. Crafted for high-contrast storytelling.
           </div>
-          <div className="flex flex-wrap gap-6">
-            <Link
-              className="text-primary hover:text-primary-container transition-all font-headline font-bold uppercase"
-              href="/about"
-            >
-              About
-            </Link>
-            <Link
-              className="text-surface hover:text-primary transition-all font-headline font-bold uppercase"
-              href="/terms"
-            >
-              Terms of Service
-            </Link>
-            <Link
-              className="text-surface hover:text-primary transition-all font-headline font-bold uppercase"
-              href="/privacy"
-            >
-              Privacy Policy
-            </Link>
+          <div className="flex flex-col sm:flex-row flex-wrap gap-x-12 gap-y-6 max-w-2xl">
+            <div className="flex flex-col gap-3">
+              <span className="font-headline font-black text-surface text-lg uppercase tracking-wider mb-2 border-b-2 border-primary pb-1">Platform</span>
+              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/about">About Us</Link>
+              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/changelog">Changelog</Link>
+              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/faq">FAQ</Link>
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              <span className="font-headline font-black text-surface text-lg uppercase tracking-wider mb-2 border-b-2 border-primary pb-1">Community</span>
+              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/guidelines">Content Guidelines</Link>
+              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="https://discord.gg/storyverse" target="_blank" rel="noopener noreferrer">Discord Server</Link>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <span className="font-headline font-black text-surface text-lg uppercase tracking-wider mb-2 border-b-2 border-primary pb-1">Legal & Support</span>
+              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/terms">Terms of Service</Link>
+              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/privacy">Privacy Policy</Link>
+              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/contact">Contact Support</Link>
+            </div>
+          </div>
           </div>
         </div>
       </footer>
