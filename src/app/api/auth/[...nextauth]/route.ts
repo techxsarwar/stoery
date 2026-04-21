@@ -10,8 +10,8 @@ export const authOptions: NextAuthOptions = {
   },
   providers: [
     SpotifyProvider({
-      clientId: process.env.SPOTIFY_CLIENT_ID!,
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET!,
+      clientId: process.env.SPOTIFY_CLIENT_ID as string,
+      clientSecret: process.env.SPOTIFY_CLIENT_SECRET as string,
       authorization: "https://accounts.spotify.com/authorize?scope=user-read-email,user-read-private",
     }),
   ],
@@ -50,6 +50,14 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 };
 
-const handler = NextAuth(authOptions);
+export async function GET(req: Request, { params }: { params: Promise<{ nextauth: string[] }> }) {
+  const awaitedParams = await params;
+  // @ts-ignore
+  return NextAuth(req, { params: awaitedParams }, authOptions);
+}
 
-export { handler as GET, handler as POST };
+export async function POST(req: Request, { params }: { params: Promise<{ nextauth: string[] }> }) {
+  const awaitedParams = await params;
+  // @ts-ignore
+  return NextAuth(req, { params: awaitedParams }, authOptions);
+}
