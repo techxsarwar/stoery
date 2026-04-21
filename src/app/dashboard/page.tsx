@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import DashboardClient from "@/components/DashboardClient";
+import Sidebar from "@/components/Sidebar";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -30,38 +31,39 @@ export default async function DashboardPage() {
     }
   });
 
+  const comments = await prisma.comment.findMany({
+    where: { story: { authorId: profile.id } },
+    orderBy: { createdAt: "desc" },
+    take: 10,
+    include: {
+        profile: true,
+        story: true
+    }
+  });
+
   const totalLikes = stories.reduce((sum, story) => sum + story._count.likes, 0);
   const totalComments = stories.reduce((sum, story) => sum + story._count.comments, 0);
+  const totalReads = stories.reduce((sum, story) => sum + (story.reads || 0), 0);
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col items-center pt-24 px-6 md:px-12 w-full mx-auto relative cursor-default">
-      <Navbar user={user ?? null} />
+    <div className="min-h-screen bg-[#131315] flex cursor-default overflow-hidden">
+      <Sidebar />
+      
+      <main className="flex-grow ml-20 md:ml-64 h-screen overflow-y-auto bg-[radial-gradient(circle_at_top_right,#1c1b1d,transparent)] custom-scrollbar">
+        <Navbar user={user ?? null} />
 
-      <main className="w-full max-w-7xl flex flex-col gap-12 mt-8 pb-32">
-        <header className="w-full flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b-8 border-primary pb-8">
-            <div>
-                <h1 className="font-headline text-5xl md:text-7xl font-black text-on-surface tracking-tighter uppercase leading-none">Dashboard</h1>
-                <p className="font-label font-bold text-on-surface-variant text-xl uppercase tracking-wider mt-4">Welcome back, <span className="text-primary">{profile.full_name || profile.pen_name || "Author"}</span></p>
-            </div>
-            <div className="flex gap-4">
-                <div className="bg-surface border-4 border-on-surface p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-center min-w-[100px]">
-                    <span className="block font-headline font-black text-3xl">{stories.length}</span>
-                    <span className="font-label font-bold text-xs uppercase tracking-widest text-on-surface-variant">Stories</span>
-                </div>
-                <div className="bg-surface border-4 border-on-surface p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-center min-w-[100px]">
-                    <span className="block font-headline font-black text-3xl">{totalLikes}</span>
-                    <span className="font-label font-bold text-xs uppercase tracking-widest text-on-surface-variant">Likes</span>
-                </div>
-                <div className="bg-surface border-4 border-on-surface p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-center min-w-[100px]">
-                    <span className="block font-headline font-black text-3xl">{totalComments}</span>
-                    <span className="font-label font-bold text-xs uppercase tracking-widest text-on-surface-variant">Comments</span>
-                </div>
-            </div>
-        </header>
-
-        <section className="flex flex-col w-full">
-            <DashboardClient stories={stories} />
-        </section>
+        <div className="max-w-7xl mx-auto px-6 md:px-12 pt-24 pb-32 flex flex-col gap-12">
+            <DashboardClient 
+                stories={stories} 
+                profile={profile} 
+                comments={comments}
+                stats={{
+                    totalLikes,
+                    totalComments,
+                    totalReads
+                }}
+            />
+        </div>
       </main>
     </div>
   );

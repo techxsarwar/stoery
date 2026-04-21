@@ -90,6 +90,7 @@ model Story {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   authorId    String
+  reads       Int      @default(0)
 
   author   Profile   @relation(fields: [authorId], references: [id], onDelete: Cascade)
   chapters Chapter[]
@@ -128,6 +129,7 @@ model Comment {
   updatedAt DateTime @updatedAt
   profileId String
   storyId   String
+  isShadowBanned Boolean @default(false)
 
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   story   Story   @relation(fields: [storyId], references: [id], onDelete: Cascade)

@@ -125,3 +125,31 @@ export async function updateStoryStatus(storyId: string, status: any) {
     return { error: "Failed to update status." };
   }
 }
+export async function getStory(storyId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user?.email) return { error: "Unauthorized" };
+
+  const profile = await prisma.profile.findFirst({
+    where: { user: { email: user.email } }
+  });
+
+  if (!profile) return { error: "Profile not found" };
+
+  const story = await prisma.story.findUnique({
+    where: { id: storyId },
+    include: {
+        chapters: {
+            orderBy: { order: "asc" },
+            take: 1
+        }
+    }
+  });
+
+  if (!story || story.authorId !== profile.id) {
+    return { error: "Chronicle not found or unauthorized access." };
+  }
+
+  return { success: true, story };
+}

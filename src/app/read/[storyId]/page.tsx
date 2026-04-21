@@ -11,6 +11,16 @@ export default async function ReadStoryPage({ params }: { params: Promise<{ stor
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  // Increment reads
+  try {
+      await prisma.story.update({
+          where: { id: storyId },
+          data: { reads: { increment: 1 } }
+      });
+  } catch (e) {
+      console.error("Failed to increment reads", e);
+  }
+
   // Get current user's profile for interaction checks
   const currentProfile = user ? await prisma.profile.findFirst({
     where: { user: { email: user.email } }
@@ -25,6 +35,12 @@ export default async function ReadStoryPage({ params }: { params: Promise<{ stor
       },
       likes: true,
       comments: {
+        where: {
+            OR: [
+                { isShadowBanned: false },
+                { profileId: currentProfile?.id || "none" }
+            ]
+        },
         include: { profile: true },
         orderBy: { createdAt: "desc" },
       },
