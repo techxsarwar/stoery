@@ -21,6 +21,7 @@ export function LikeButton({ storyId, initialLiked, initialCount }: { storyId: s
 
   const handleLike = async () => {
     if (!user) {
+      alert("You need to be a 'Slayer of Stars' to do that. Sign in first!");
       router.push("/auth/signin");
       return;
     }
@@ -68,6 +69,7 @@ export function CommentForm({ storyId }: { storyId: string }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
+      alert("You need to be a 'Slayer of Stars' to do that. Sign in first!");
       router.push("/auth/signin");
       return;
     }

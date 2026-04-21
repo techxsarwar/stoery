@@ -60,3 +60,68 @@ export async function createStory(formData: FormData) {
     return { error: "Failed to create story" };
   }
 }
+
+export async function deleteStory(storyId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return { error: "Unauthorized" };
+  }
+
+  const profile = await prisma.profile.findFirst({
+    where: { user: { email: user.email } }
+  });
+
+  if (!profile) return { error: "Profile not found" };
+
+  const story = await prisma.story.findUnique({ where: { id: storyId } });
+
+  if (!story || story.authorId !== profile.id) {
+    return { error: "Unauthorized! This isn't your tale to end." };
+  }
+
+  try {
+    await prisma.story.delete({ where: { id: storyId } });
+    revalidatePath("/dashboard");
+    revalidatePath("/");
+    revalidatePath("/discover");
+    return { success: true };
+  } catch (err) {
+    console.error(err);
+    return { error: "Failed to delete story." };
+  }
+}
+
+export async function updateStoryStatus(storyId: string, status: any) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user?.email) return { error: "Unauthorized" };
+
+  const profile = await prisma.profile.findFirst({
+    where: { user: { email: user.email } }
+  });
+
+  if (!profile) return { error: "Profile not found" };
+
+  const story = await prisma.story.findUnique({ where: { id: storyId } });
+
+  if (!story || story.authorId !== profile.id) {
+    return { error: "Unauthorized to modify this story." };
+  }
+
+  try {
+    await prisma.story.update({
+      where: { id: storyId },
+      data: { status }
+    });
+    revalidatePath("/dashboard");
+    revalidatePath("/");
+    revalidatePath("/discover");
+    return { success: true };
+  } catch (err) {
+    console.error(err);
+    return { error: "Failed to update status." };
+  }
+}
