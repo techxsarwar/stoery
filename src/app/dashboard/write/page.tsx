@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Editor from "@/components/Editor";
 import { createStory, getStory } from "@/actions/story";
 import { uploadStoryCover } from "@/actions/storage";
@@ -9,7 +9,7 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import Navbar from "@/components/Navbar";
 
-export default function WritePage() {
+function WriteContent() {
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -244,5 +244,17 @@ export default function WritePage() {
 function Plus({ className, size = 24 }: { className?: string; size?: number }) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+    );
+}
+
+export default function WritePage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-[#131315] flex flex-col items-center justify-center font-headline font-black text-on-surface uppercase tracking-[0.5em]">
+                Ink is Flowing...
+            </div>
+        }>
+            <WriteContent />
+        </Suspense>
     );
 }
