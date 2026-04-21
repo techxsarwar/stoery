@@ -82,17 +82,18 @@ export default function DashboardClient({ stories }: { stories: any[] }) {
                 <button
                   onClick={() => handleToggleStatus(story.id, story.status)}
                   disabled={isPending}
-                  className={`flex-grow border-2 border-on-surface px-4 py-2 font-headline font-bold uppercase transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:shadow-none disabled:opacity-50 text-xs sm:text-sm ${story.status === "PUBLISHED" ? "bg-surface-variant text-on-surface" : "bg-primary text-on-primary glow-hover"}`}
+                  className={`flex-grow border-2 border-on-surface px-4 py-2 font-headline font-bold uppercase transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-none disabled:opacity-50 text-xs sm:text-sm ${story.status === "PUBLISHED" ? "bg-surface-variant text-on-surface" : "bg-primary text-on-primary"}`}
                 >
                   {story.status === "PUBLISHED" ? "Pause" : "Publish"}
                 </button>
                 <button
                   onClick={() => handleDelete(story.id)}
                   disabled={isPending}
-                  className="bg-error text-on-error border-2 border-on-surface px-4 py-2 font-headline font-bold uppercase transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] disabled:opacity-50 text-xs sm:text-sm flex-shrink-0"
+                  className="bg-error text-on-error border-2 border-on-surface px-4 py-2 font-headline font-bold uppercase transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-none disabled:opacity-50 text-xs sm:text-sm flex items-center gap-2"
                   title="Delete Forever"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                    <span>Delete</span>
                 </button>
               </div>
             </div>
