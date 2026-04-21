@@ -1,14 +1,16 @@
 "use server";
 
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { createClient } from "@/utils/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function completeOnboarding(formData: FormData) {
-  const session = await getServerSession(authOptions);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session?.user?.email) {
+  if (!user?.email) {
     return { error: "Unauthorized" };
   }
 
@@ -24,16 +26,18 @@ export async function completeOnboarding(formData: FormData) {
   }
 
   try {
-    // 1. Find the user by email (next-auth email)
-    const dbUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
+    // Find or create the user in Prisma (bridge between Supabase UID and Prisma)
+    const dbUser = await prisma.user.upsert({
+      where: { email: user.email },
+      update: {},
+      create: {
+        email: user.email,
+        name: user.user_metadata?.full_name ?? null,
+        image: user.user_metadata?.avatar_url ?? null,
+      },
     });
 
-    if (!dbUser) {
-      return { error: "User not found in database" };
-    }
-
-    // 2. Upsert the profile
+    // Upsert the profile
     await prisma.profile.upsert({
       where: { userId: dbUser.id },
       update: {
@@ -56,7 +60,7 @@ export async function completeOnboarding(formData: FormData) {
     revalidatePath("/");
     return { success: true };
   } catch (e: any) {
-    if (e.code === 'P2002') {
+    if (e.code === "P2002") {
       return { error: "This Pen Name is already taken." };
     }
     console.error("Onboarding error:", e);
@@ -65,14 +69,24 @@ export async function completeOnboarding(formData: FormData) {
 }
 
 export async function getProfile() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) return null;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) return null;
 
   return prisma.profile.findFirst({
     where: {
       user: {
-        email: session.user.email
-      }
-    }
+        email: user.email,
+      },
+    },
   });
+}
+
+export async function signOut() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  revalidatePath("/");
 }

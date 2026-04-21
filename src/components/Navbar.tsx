@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { createClient } from "@/utils/supabase/client";
 
 interface NavbarProps {
   user: {
-    name?: string | null;
+    id?: string;
     email?: string | null;
-    image?: string | null;
+    user_metadata?: { full_name?: string; avatar_url?: string };
   } | null;
 }
 
@@ -19,7 +19,8 @@ export default function Navbar({ user }: NavbarProps) {
 
   const handleSignOut = async () => {
     startTransition(async () => {
-      await signOut();
+      const supabase = createClient();
+      await supabase.auth.signOut();
       router.refresh();
       router.push("/");
     });
@@ -58,16 +59,16 @@ export default function Navbar({ user }: NavbarProps) {
         </div>
         <div className="flex gap-4 items-center">
           {!user ? (
-            <Link 
-              href="/auth/signin" 
+            <Link
+              href="/auth/signin"
               className="bg-white text-on-surface font-headline px-6 py-2 rounded font-bold border-2 border-on-surface transition-all duration-300 hover:bg-surface-container uppercase tracking-wide"
             >
               Sign In
             </Link>
           ) : (
             <>
-              <Link 
-                href="/dashboard/write" 
+              <Link
+                href="/dashboard/write"
                 className="bg-primary text-on-primary font-headline px-6 py-2 rounded font-bold border-2 border-on-surface transition-all duration-300 glow-hover uppercase tracking-wide"
               >
                 Start Writing
