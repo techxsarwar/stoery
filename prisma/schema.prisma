@@ -83,6 +83,7 @@ model Profile {
 model Story {
   id          String   @id @default(cuid())
   title       String
+  description String?  @db.Text
   content     String?  @db.Text
   genre       String?
   cover_url   String?
