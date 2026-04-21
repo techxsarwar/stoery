@@ -4,8 +4,9 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id: storyId } = await params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -14,7 +15,6 @@ export async function PATCH(
   }
 
   const { status } = await request.json();
-  const storyId = params.id;
 
   try {
     const profile = await prisma.profile.findFirst({
@@ -46,16 +46,15 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id: storyId } = await params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const storyId = params.id;
 
   try {
     const profile = await prisma.profile.findFirst({
