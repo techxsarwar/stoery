@@ -115,7 +115,6 @@ export default async function Home() {
               <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/contact">Contact Support</Link>
             </div>
           </div>
-          </div>
         </div>
       </footer>
     </>
