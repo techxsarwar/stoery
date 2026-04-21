@@ -26,15 +26,12 @@ export const proxy = withAuth(
 export const config = {
   matcher: [
     /*
-     * Match all request paths that should be protected:
-     * - /onboarding
-     * - /dashboard (and subpaths)
-     * - /library (and subpaths)
-     * - /community (and subpaths)
+     * Match all request paths except for:
+     * 1. / (The landing page)
+     * 2. /api/auth (All NextAuth routes)
+     * 3. /discover, /community (Your public pages)
+     * 4. Static assets
      */
-    "/onboarding",
-    "/dashboard/:path*",
-    "/library/:path*",
-    "/community/:path*",
+    "/((?!api/auth|_next/static|_next/image|favicon.ico|public|discover|community|$).*)",
   ],
 };
