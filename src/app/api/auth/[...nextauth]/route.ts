@@ -59,14 +59,15 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 };
 
-export async function GET(req: Request, { params }: { params: Promise<{ nextauth: string[] }> }) {
-  const awaitedParams = await params;
-  // @ts-ignore
-  return NextAuth(req, { params: awaitedParams }, authOptions);
+const handler = NextAuth(authOptions);
+
+export async function GET(req: Request, { params }: { params: Promise<any> }) {
+  await params;
+  return handler(req);
 }
 
-export async function POST(req: Request, { params }: { params: Promise<{ nextauth: string[] }> }) {
-  const awaitedParams = await params;
-  // @ts-ignore
-  return NextAuth(req, { params: awaitedParams }, authOptions);
+export async function POST(req: Request, { params }: { params: Promise<any> }) {
+  await params;
+  return handler(req);
 }
+
