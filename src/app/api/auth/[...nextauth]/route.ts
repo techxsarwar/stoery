@@ -25,6 +25,12 @@ export const authOptions: NextAuthOptions = {
         });
         token.onboardingComplete = !!profile?.pen_name;
       }
+
+      // Support manual session updates (e.g. after onboarding)
+      if (trigger === "update" && session?.onboardingComplete !== undefined) {
+        token.onboardingComplete = session.onboardingComplete;
+      }
+
       return token;
     },
     async session({ session, token }) {

@@ -26,13 +26,15 @@ export const proxy = withAuth(
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - api/auth (NextAuth internals)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public (public assets)
+     * Match all request paths that should be protected:
+     * - /onboarding
+     * - /dashboard (and subpaths)
+     * - /library (and subpaths)
+     * - /community (and subpaths)
      */
-    "/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)",
+    "/onboarding",
+    "/dashboard/:path*",
+    "/library/:path*",
+    "/community/:path*",
   ],
 };
