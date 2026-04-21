@@ -81,3 +81,65 @@ export async function addComment(storyId: string, content: string) {
   revalidatePath(`/read/${storyId}`);
   return { success: true };
 }
+
+export async function shadowBanComment(commentId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user?.email) return { error: "Unauthorized" };
+
+  const profile = await prisma.profile.findFirst({
+    where: { user: { email: user.email } }
+  });
+
+  if (!profile) return { error: "Profile not found" };
+
+  const comment = await prisma.comment.findUnique({
+    where: { id: commentId },
+    include: { story: true }
+  });
+
+  if (!comment || comment.story.authorId !== profile.id) {
+    return { error: "Unauthorized! This is not your chamber." };
+  }
+
+  await prisma.comment.update({
+    where: { id: commentId },
+    data: { isShadowBanned: !comment.isShadowBanned }
+  });
+
+  revalidatePath("/dashboard/comments");
+  revalidatePath(`/read/${comment.storyId}`);
+  return { success: true };
+}
+
+export async function deleteComment(commentId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user?.email) return { error: "Unauthorized" };
+
+  const profile = await prisma.profile.findFirst({
+    where: { user: { email: user.email } }
+  });
+
+  if (!profile) return { error: "Profile not found" };
+
+  const comment = await prisma.comment.findUnique({
+    where: { id: commentId },
+    include: { story: true }
+  });
+
+  if (!comment || comment.story.authorId !== profile.id) {
+    return { error: "Unauthorized! You cannot purge these records." };
+  }
+
+  await prisma.comment.delete({
+    where: { id: commentId }
+  });
+
+  revalidatePath("/dashboard/comments");
+  revalidatePath(`/read/${comment.storyId}`);
+  return { success: true };
+}
+
