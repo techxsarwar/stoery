@@ -34,7 +34,7 @@ export default async function FAQPage() {
 
             <div className="bg-white p-8 border-4 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-4">
                 <h3 className="font-headline text-2xl font-black uppercase tracking-tighter">Do I own my work?</h3>
-                <p className="font-body text-lg font-medium text-on-surface">Absolutely. StoryVerse claims no copyright over your original fiction. You grant us permission strictly to host and display it. For more details, read our <Link href="/terms" className="text-primary hover:underline font-bold">Terms of Service</Link>.</p>
+                <p className="font-body text-lg font-medium text-on-surface">Absolutely. SOULPAD claims no copyright over your original fiction. You grant us permission strictly to host and display it. For more details, read our <Link href="/terms" className="text-primary hover:underline font-bold">Terms of Service</Link>.</p>
             </div>
         </section>
       </main>

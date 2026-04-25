@@ -74,7 +74,7 @@ Depth is achieved through **Tonal Layering** rather than structural lines.
 
 ### Do:
 *   **Do** use asymmetrical layouts. Let a title sit 40px further left than the body text to create editorial tension.
-*   **Do** use `Newsreader` for any long-form text to reduce eye strain and increase the "Storyverse" premium feel.
+*   **Do** use `Newsreader` for any long-form text to reduce eye strain and increase the "SOULPAD" premium feel.
 *   **Do** apply `backdrop-filter: blur(12px)` to any element that overlaps another.
 
 ### Don't:

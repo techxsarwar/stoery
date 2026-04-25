@@ -5,7 +5,7 @@ export default function AboutPage() {
     <div className="min-h-screen bg-surface flex flex-col items-center pt-24 px-6 md:px-12 w-full mx-auto relative">
       <nav className="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b-4 border-on-surface flex items-center justify-between px-8 py-4 px-6 md:px-12">
           <Link href="/" className="text-2xl font-black tracking-tighter text-on-surface font-headline uppercase">
-            STORYVERSE
+            SOULPAD
           </Link>
           <div className="hidden md:flex space-x-8 items-center">
             <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface transition-all duration-300 font-bold uppercase" href="/discover">Discover</Link>
@@ -26,7 +26,7 @@ export default function AboutPage() {
         <section className="flex flex-col gap-8 w-full bg-white p-12 border-4 border-on-surface shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
             <h2 className="font-headline text-3xl font-black text-on-surface uppercase">Our Mission</h2>
             <p className="font-body text-xl font-medium leading-loose text-on-surface">
-                Storyverse was born out of a desire to create a brutalist, clean, and entirely distraction-free reading experience that feels as raw as the stories being told. We strip away the complex algorithms and endless feeds, providing a stark white and yellow canvas for creators to write their masterpieces.
+                SOULPAD was born out of a desire to create a brutalist, clean, and entirely distraction-free reading experience that feels as raw as the stories being told. We strip away the complex algorithms and endless feeds, providing a stark white and yellow canvas for creators to write their masterpieces.
             </p>
 
             <h2 className="font-headline text-3xl font-black text-on-surface uppercase mt-8">For Writers</h2>

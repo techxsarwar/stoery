@@ -48,7 +48,7 @@ export async function uploadStoryCover(formData: FormData) {
     };
   } catch (e) {
     console.error("R2 Upload Error:", e);
-    return { error: "Failed to upload image to StoryVerse storage." };
+    return { error: "Failed to upload image to SOULPAD storage." };
   }
 }
 

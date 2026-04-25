@@ -4,8 +4,8 @@ import Navbar from "@/components/Navbar";
 import { BookOpen, Lightbulb, Clock } from "lucide-react";
 
 export const metadata = {
-  title: "Guidebook for Architects | StoryVerse",
-  description: "A 20-page masterclass for authors. Learn how to write, build worlds, grow your audience, and unlock monetization on StoryVerse.",
+  title: "Guidebook for Architects | SOULPAD",
+  description: "A 20-page masterclass for authors. Learn how to write, build worlds, grow your audience, and unlock monetization on SOULPAD.",
 };
 
 const volumes = [
@@ -23,7 +23,7 @@ export default function GuidebookIndex() {
         {/* Hero */}
         <section className="flex flex-col items-center text-center gap-6">
           <div className="inline-block bg-primary/10 text-primary border border-primary/20 px-4 py-1.5 rounded-full font-label font-black text-[10px] uppercase tracking-[0.4em]">
-            StoryVerse // Architect Series
+            SOULPAD // Architect Series
           </div>
           <h1 className="font-headline text-6xl md:text-8xl font-black tracking-tighter text-on-surface uppercase leading-none max-w-4xl">
             Guidebook for <span className="text-primary">Architects</span>
@@ -101,7 +101,7 @@ export default function GuidebookIndex() {
 
       <footer className="border-t-2 border-on-surface/5 py-8 px-6 text-center">
         <p className="font-label font-bold text-[10px] uppercase tracking-widest text-on-surface-variant opacity-40">
-          StoryVerse Guidebook for Architects — Crafted for the Builders of Worlds
+          SOULPAD Guidebook for Architects — Crafted for the Builders of Worlds
         </p>
       </footer>
     </div>

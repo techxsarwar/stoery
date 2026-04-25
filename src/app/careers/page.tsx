@@ -3,8 +3,8 @@ import Link from "next/link";
 import { MapPin, Clock, Zap, Heart, Globe, Shield } from "lucide-react";
 
 export const metadata = {
-  title: "Careers | StoryVerse",
-  description: "Join the StoryVerse team. We are building the future of storytelling — come help us shape it.",
+  title: "Careers | SOULPAD",
+  description: "Join the SOULPAD team. We are building the future of storytelling — come help us shape it.",
 };
 
 const openRoles = [
@@ -13,7 +13,7 @@ const openRoles = [
     department: "Trust & Safety",
     type: "Full-Time",
     location: "Remote (India)",
-    description: "Review author submissions, enforce community guidelines, and keep the StoryVerse ecosystem safe and inspiring for all creators.",
+    description: "Review author submissions, enforce community guidelines, and keep the SOULPAD ecosystem safe and inspiring for all creators.",
     skills: ["Strong written English", "Attention to detail", "Empathy", "Conflict resolution"],
     tag: "Hiring",
     tagColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
@@ -23,7 +23,7 @@ const openRoles = [
     department: "Growth",
     type: "Full-Time",
     location: "Remote (India)",
-    description: "Grow and engage our author and reader communities on Discord, social media, and within the platform. Be the voice of StoryVerse.",
+    description: "Grow and engage our author and reader communities on Discord, social media, and within the platform. Be the voice of SOULPAD.",
     skills: ["Social media fluency", "Event planning", "Creative writing", "Data-driven thinking"],
     tag: "Hiring",
     tagColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
@@ -53,7 +53,7 @@ const openRoles = [
     department: "Design",
     type: "Contract",
     location: "Remote",
-    description: "Create Noir Manga-style illustrations for platform features, marketing, and editorial content. Bring the StoryVerse aesthetic to life.",
+    description: "Create Noir Manga-style illustrations for platform features, marketing, and editorial content. Bring the SOULPAD aesthetic to life.",
     skills: ["Digital illustration", "Manga/comic style", "Adobe Suite or Procreate", "High-contrast aesthetics"],
     tag: "Contract",
     tagColor: "bg-primary/10 text-primary border-primary/20",
@@ -93,7 +93,7 @@ export default function CareersPage() {
             Build the Future of <span className="text-primary">Storytelling</span>
           </h1>
           <p className="font-body text-xl text-on-surface-variant leading-relaxed max-w-2xl">
-            StoryVerse is building the platform where the world's most creative voices are heard, supported, and rewarded. We are a small, ambitious team with a massive vision — and we are looking for people who believe that stories can change the world.
+            SOULPAD is building the platform where the world's most creative voices are heard, supported, and rewarded. We are a small, ambitious team with a massive vision — and we are looking for people who believe that stories can change the world.
           </p>
           <div className="flex items-center gap-8">
             <div className="text-center">
@@ -183,7 +183,7 @@ export default function CareersPage() {
                       <span className="font-label font-bold text-[10px] uppercase tracking-widest">{role.type}</span>
                     </div>
                     <a
-                      href={`mailto:careers@storyverse.in?subject=Application: ${role.title}`}
+                      href={`mailto:careers@soulpad.in?subject=Application: ${role.title}`}
                       className="mt-2 bg-primary text-on-primary font-headline font-black text-sm uppercase tracking-tighter px-6 py-3 rounded-xl hover:bg-on-surface hover:text-surface transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,0.15)] hover:shadow-none hover:translate-x-1 hover:translate-y-1"
                     >
                       Apply Now →
@@ -202,11 +202,11 @@ export default function CareersPage() {
               Don't See Your <span className="text-primary">Role?</span>
             </h2>
             <p className="font-body text-surface/60 max-w-lg">
-              We are always looking for exceptional people. Send us your story — what you do, what you believe in, and why StoryVerse matters to you.
+              We are always looking for exceptional people. Send us your story — what you do, what you believe in, and why SOULPAD matters to you.
             </p>
           </div>
           <a
-            href="mailto:careers@storyverse.in?subject=Open Application"
+            href="mailto:careers@soulpad.in?subject=Open Application"
             className="flex-shrink-0 bg-primary text-on-primary font-headline font-black text-lg uppercase tracking-tighter px-10 py-5 rounded-2xl hover:bg-yellow-300 transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,0.4)]"
           >
             Send an Open Application
@@ -217,7 +217,7 @@ export default function CareersPage() {
 
       <footer className="border-t-2 border-on-surface/5 py-8 px-6 text-center">
         <p className="font-label font-bold text-[10px] uppercase tracking-widest text-on-surface-variant opacity-40">
-          StoryVerse Careers — Building a world where every story finds its reader.
+          SOULPAD Careers — Building a world where every story finds its reader.
         </p>
       </footer>
     </div>

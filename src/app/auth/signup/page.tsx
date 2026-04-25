@@ -9,7 +9,7 @@ export default function SignUp() {
       <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-70"></div>
       <div className="bg-white p-8 rounded-lg w-full max-w-md shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] border-4 border-on-surface relative z-10">
         <h2 className="text-4xl font-headline font-black text-on-surface mb-2 text-center tracking-tighter uppercase">
-          Join Storyverse
+          Join SOULPAD
         </h2>
         <p className="text-center text-on-surface-variant font-body mb-8 text-sm">
           Create an account to start your journey

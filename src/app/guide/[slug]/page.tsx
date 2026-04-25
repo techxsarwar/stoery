@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const guide = guides.find((g) => g.slug === slug);
   if (!guide) return {};
   return {
-    title: `${guide.title} | Guidebook for Architects | StoryVerse`,
+    title: `${guide.title} | Guidebook for Architects | SOULPAD`,
     description: guide.excerpt,
   };
 }

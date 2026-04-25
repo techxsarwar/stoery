@@ -17,7 +17,7 @@ export default async function GuidelinesPage() {
 
         <article className="prose prose-p:font-body prose-headings:font-headline prose-p:text-lg prose-p:leading-relaxed max-w-none w-full bg-white p-8 md:p-12 border-4 border-on-surface shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] text-[#171717]">
             <h2>1. The Visual Tone</h2>
-            <p>StoryVerse embraces a bold, high-contrast, text-heavy aesthetic. We take inspiration from brutalist web design and Noir-style Manga serialization. Your cover images and story formatting should lean into stark lighting, heavy inks, and mature themes.</p>
+            <p>SOULPAD embraces a bold, high-contrast, text-heavy aesthetic. We take inspiration from brutalist web design and Noir-style Manga serialization. Your cover images and story formatting should lean into stark lighting, heavy inks, and mature themes.</p>
 
             <h2>2. Content Ratings & Maturity</h2>
             <p>We welcome psychological thrillers, dark fantasy, and complex character studies. However, content must remain distinct from reality. We operate a zero-tolerance policy for:</p>

@@ -15,7 +15,7 @@ export default function PrivacyPolicyPage() {
             <p><strong>Last Updated:</strong> April 21, 2026</p>
 
             <h2>1. Information We Collect</h2>
-            <p>At StoryVerse, we believe in minimal data footprint. We collect only what is strictly necessary to keep your identity secure and your stories safe.</p>
+            <p>At SOULPAD, we believe in minimal data footprint. We collect only what is strictly necessary to keep your identity secure and your stories safe.</p>
             <ul>
                 <li><strong>Email Addresses:</strong> Collected securely via Supabase solely for authentication (Magic Links).</li>
                 <li><strong>Profile Data:</strong> Usernames (Pen Names) and basic bio information you choose to provide.</li>
@@ -23,7 +23,7 @@ export default function PrivacyPolicyPage() {
             </ul>
 
             <h2>2. Cookie Policy (The Technical Essentials)</h2>
-            <p>We use essential cookies to keep your session alive and your stories secure. We do not use third-party tracking pixels, invasive ad networks, or data brokers. The cookies set by Supabase and Next.js are strictly necessary for the technical operation of StoryVerse.</p>
+            <p>We use essential cookies to keep your session alive and your stories secure. We do not use third-party tracking pixels, invasive ad networks, or data brokers. The cookies set by Supabase and Next.js are strictly necessary for the technical operation of SOULPAD.</p>
 
             <h2>3. Third-Party Infrastructure</h2>
             <p>To keep the universe running, we rely on trusted infrastructure providers who also adhere to strict security protocols:</p>
@@ -37,7 +37,7 @@ export default function PrivacyPolicyPage() {
             <p>You own your data. At any time, you have the right to request a full export of your stories or demand the complete, irreversible deletion of your account and all associated data from our servers. To execute this right, use the "Delete" functions in your dashboard or contact our administrative routing desk.</p>
 
             <hr className="border-t-2 border-on-surface my-8" />
-            <p className="italic">StoryVerse operates under the principle of creative freedom backed by technical privacy. Read. Write. Create safely.</p>
+            <p className="italic">SOULPAD operates under the principle of creative freedom backed by technical privacy. Read. Write. Create safely.</p>
         </article>
       </main>
     </div>

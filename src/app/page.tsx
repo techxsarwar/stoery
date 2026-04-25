@@ -89,10 +89,10 @@ export default async function Home() {
       <footer className="bg-on-surface w-full py-16 px-8 mt-auto z-10 relative border-t-8 border-primary">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 max-w-7xl mx-auto">
           <div className="text-4xl font-black text-surface font-headline uppercase tracking-tighter">
-            STORYVERSE
+            SOULPAD
           </div>
           <div className="text-surface-variant/70 font-label text-sm tracking-tight text-left md:text-center">
-            © 2024 STORYVERSE. Crafted for high-contrast storytelling.
+            © 2024 SOULPAD. Crafted for high-contrast storytelling.
           </div>
           <div className="flex flex-col sm:flex-row flex-wrap gap-x-12 gap-y-6 max-w-2xl">
             <div className="flex flex-col gap-3">
@@ -108,7 +108,7 @@ export default async function Home() {
             <div className="flex flex-col gap-3">
               <span className="font-headline font-black text-surface text-lg uppercase tracking-wider mb-2 border-b-2 border-primary pb-1">Community</span>
               <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/guidelines">Content Guidelines</Link>
-              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="https://discord.gg/storyverse" target="_blank" rel="noopener noreferrer">Discord Server</Link>
+              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="https://discord.gg/soulpad" target="_blank" rel="noopener noreferrer">Discord Server</Link>
             </div>
 
             <div className="flex flex-col gap-3">

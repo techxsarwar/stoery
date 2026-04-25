@@ -109,7 +109,7 @@ export default function StaffLoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                placeholder="operative@storyverse.com"
+                placeholder="operative@soulpad.com"
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 font-mono text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-yellow-400/50 focus:bg-yellow-400/5 transition-all"
               />
             </div>

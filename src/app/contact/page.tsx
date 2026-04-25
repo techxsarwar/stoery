@@ -25,13 +25,13 @@ export default async function ContactPage() {
                     <div className="border-4 border-on-surface p-6 bg-surface relative">
                         <div className="absolute top-0 left-0 w-full h-2 bg-error"></div>
                         <h2 className="font-headline text-2xl font-black uppercase tracking-widest mb-2">Technical Support & General Inquiries</h2>
-                        <a href="mailto:support@storyverse.app" className="font-body text-2xl font-bold text-primary hover:underline">support@storyverse.app</a>
+                        <a href="mailto:support@soulpad.app" className="font-body text-2xl font-bold text-primary hover:underline">support@soulpad.app</a>
                     </div>
 
                     <div className="border-4 border-on-surface p-6 bg-surface relative">
                         <div className="absolute top-0 left-0 w-full h-2 bg-primary"></div>
                         <h2 className="font-headline text-2xl font-black uppercase tracking-widest mb-2">Legal, Abuse & DMCA Claims</h2>
-                        <a href="mailto:legal@storyverse.app" className="font-body text-2xl font-bold text-primary hover:underline">legal@storyverse.app</a>
+                        <a href="mailto:legal@soulpad.app" className="font-body text-2xl font-bold text-primary hover:underline">legal@soulpad.app</a>
                     </div>
                 </div>
 

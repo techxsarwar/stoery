@@ -111,7 +111,7 @@ export default function OnboardingPage() {
               className="w-8 h-8 border-4 border-black checked:bg-black transition-all cursor-pointer"
             />
             <label htmlFor="guardian" className="font-body font-bold text-lg text-black leading-tight cursor-pointer selection:bg-black selection:text-[#FFFF00]">
-              If I am a minor, I confirm my guardian has approved my registration. I agree to the terms of the StoryVerse alliance.
+              If I am a minor, I confirm my guardian has approved my registration. I agree to the terms of the SOULPAD alliance.
             </label>
           </div>
 

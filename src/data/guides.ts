@@ -6,7 +6,7 @@ export const guides = [
     number: 1,
     tag: "How-To",
     excerpt: "Welcome to the Private Desk. Your journey as an Architect of worlds begins here.",
-    content: `The Private Desk is your command center — a noir-styled workspace built for one purpose: to help you write stories that outlast empires. When you first enter, you will see the Bento Grid: a living dashboard of your manuscripts, analytics, and creative tools. Every element is designed to minimize distraction and maximize creative output. Your first step is to complete your Author Profile — your pen name is your brand, your identity in the Storyverse. Choose it with intent. The Obsidian aesthetic you see around you is deliberate: dark backgrounds, high-contrast type, and golden accents are proven to reduce eye strain during long writing sessions. This guide series — the Guidebook for Architects — will walk you through all 20 pillars of mastery.`,
+    content: `The Private Desk is your command center — a noir-styled workspace built for one purpose: to help you write stories that outlast empires. When you first enter, you will see the Bento Grid: a living dashboard of your manuscripts, analytics, and creative tools. Every element is designed to minimize distraction and maximize creative output. Your first step is to complete your Author Profile — your pen name is your brand, your identity in the Soulpad. Choose it with intent. The Obsidian aesthetic you see around you is deliberate: dark backgrounds, high-contrast type, and golden accents are proven to reduce eye strain during long writing sessions. This guide series — the Guidebook for Architects — will walk you through all 20 pillars of mastery.`,
   },
   {
     slug: "setting-the-foundation",
@@ -33,7 +33,7 @@ export const guides = [
     number: 4,
     tag: "How-To",
     excerpt: "Use Void Mode and the rich text editor for distraction-free, high-output writing sessions.",
-    content: `The StoryVerse Editor is built for focus. The moment you open a chapter, the interface fades — only your words remain. Use the toolbar for formatting: bold for emphasis, italics for internal thought, headers to separate scenes. The editor autosaves every 30 seconds, so never fear a power outage stealing your words. For long sessions, try the 'Pomodoro Protocol': write for 25 minutes, rest for 5. Track your word count at the bottom. Aim for 500 words per session minimum — that is one chapter per week. The most important rule of the Editor: never edit while you draft. Write the whole chapter first. Edit on the second pass. The Editor is your forge — what you put in is what your readers will carry with them.`,
+    content: `The SOULPAD Editor is built for focus. The moment you open a chapter, the interface fades — only your words remain. Use the toolbar for formatting: bold for emphasis, italics for internal thought, headers to separate scenes. The editor autosaves every 30 seconds, so never fear a power outage stealing your words. For long sessions, try the 'Pomodoro Protocol': write for 25 minutes, rest for 5. Track your word count at the bottom. Aim for 500 words per session minimum — that is one chapter per week. The most important rule of the Editor: never edit while you draft. Write the whole chapter first. Edit on the second pass. The Editor is your forge — what you put in is what your readers will carry with them.`,
   },
   {
     slug: "designing-the-bestiary",
@@ -51,7 +51,7 @@ export const guides = [
     number: 6,
     tag: "How-To",
     excerpt: "Build a cult following by mastering your author profile and public identity.",
-    content: `Your author profile is your altar. Readers who love your work will visit it to understand who you are. Fill in your pen name with intention — it should reflect your genre's tone. Write your bio in first person and third person: the first person version connects, the third person version commands authority. Use a profile image that matches your aesthetic — if you write dark fantasy, don't use a beach photo. Link your social media. Pin your best story at the top of your profile. Update it every 90 days. The authors who build the largest followings on StoryVerse treat their profiles like a living document — always evolving, always authentic. Your presence is the first chapter your readers experience before they open any of your books.`,
+    content: `Your author profile is your altar. Readers who love your work will visit it to understand who you are. Fill in your pen name with intention — it should reflect your genre's tone. Write your bio in first person and third person: the first person version connects, the third person version commands authority. Use a profile image that matches your aesthetic — if you write dark fantasy, don't use a beach photo. Link your social media. Pin your best story at the top of your profile. Update it every 90 days. The authors who build the largest followings on SOULPAD treat their profiles like a living document — always evolving, always authentic. Your presence is the first chapter your readers experience before they open any of your books.`,
   },
   {
     slug: "seo-for-authors",
@@ -60,7 +60,7 @@ export const guides = [
     number: 7,
     tag: "How-To",
     excerpt: "How to name chapters and write descriptions so your stories appear on Google.",
-    content: `Search Engine Optimization is not just for businesses — it is for storytellers who want to be found. When naming your chapters, use descriptive titles that contain words real readers search for: 'The Betrayal of Kael' is better than 'Chapter 14'. Your story description should contain the genre, the core conflict, and a hook — all within 160 characters, which is what Google displays in search results. Use your story's genre tags wisely — they function as keywords. Internal linking within StoryVerse also helps: the more your story is linked to by other authors and readers, the more authority it gains. Treat every title, description, and tag as a signal to search engines. Consistency is what separates authors who are discovered from those who are hidden.`,
+    content: `Search Engine Optimization is not just for businesses — it is for storytellers who want to be found. When naming your chapters, use descriptive titles that contain words real readers search for: 'The Betrayal of Kael' is better than 'Chapter 14'. Your story description should contain the genre, the core conflict, and a hook — all within 160 characters, which is what Google displays in search results. Use your story's genre tags wisely — they function as keywords. Internal linking within SOULPAD also helps: the more your story is linked to by other authors and readers, the more authority it gains. Treat every title, description, and tag as a signal to search engines. Consistency is what separates authors who are discovered from those who are hidden.`,
   },
   {
     slug: "the-lowkey-villain",
@@ -158,7 +158,7 @@ export const guides = [
     volume: 3,
     number: 18,
     tag: "When-To",
-    excerpt: "When and where to share your story links to build an audience outside StoryVerse.",
+    excerpt: "When and where to share your story links to build an audience outside SOULPAD.",
     content: `The best time to promote a new story is after you have at least 3 chapters published. Promote too early and readers find an empty shelf. Wait too long and you miss the momentum window. Share your story link on platforms where your readers already live: Reddit communities like r/worldbuilding, r/writing, r/fantasy. Discord servers for your genre. Twitter/X threads where you share a single paragraph that hooks. Pinterest boards with your character aesthetics. Never spam — contribute to communities first, promote second. The 3:1 rule: for every promotional post, make three posts that give value — tips, lore, beautiful lines from your story. Readers who discover you through generosity are readers who stay. Track which platforms send the most traffic using your Analytics page.`,
   },
   {
@@ -176,8 +176,8 @@ export const guides = [
     volume: 3,
     number: 20,
     tag: "When-To",
-    excerpt: "Planning Volume 2, building a legacy, and what it means to become a StoryVerse Legend.",
-    content: `You have reached the final page of the Guidebook for Architects. But this is not an ending — it is an initiation. Every legendary author on StoryVerse started where you are now: with a single story and the will to see it through. Volume 2 of your chronicle should be planned before Volume 1 is finished. Your readers will feel the difference between a story that knows where it is going and one that is discovering its destination in real time. Leave breadcrumbs in Volume 1 that only make sense in Volume 2. Build your Codex as if you will be writing in this world for a decade. The authors who become Legends on StoryVerse are not the most talented — they are the most committed. They published when no one was reading. They refined when everyone was watching. The future of the Architect is already written. You just have to show up to write it.`,
+    excerpt: "Planning Volume 2, building a legacy, and what it means to become a SOULPAD Legend.",
+    content: `You have reached the final page of the Guidebook for Architects. But this is not an ending — it is an initiation. Every legendary author on SOULPAD started where you are now: with a single story and the will to see it through. Volume 2 of your chronicle should be planned before Volume 1 is finished. Your readers will feel the difference between a story that knows where it is going and one that is discovering its destination in real time. Leave breadcrumbs in Volume 1 that only make sense in Volume 2. Build your Codex as if you will be writing in this world for a decade. The authors who become Legends on SOULPAD are not the most talented — they are the most committed. They published when no one was reading. They refined when everyone was watching. The future of the Architect is already written. You just have to show up to write it.`,
   },
 ];
 

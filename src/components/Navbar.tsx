@@ -42,7 +42,7 @@ export default function Navbar({ user }: NavbarProps) {
           className="text-2xl font-black tracking-tighter text-on-surface font-headline uppercase"
           href="/"
         >
-          STORYVERSE
+          SOULPAD
         </Link>
         <div className="hidden md:flex space-x-8 items-center">
           <Link
