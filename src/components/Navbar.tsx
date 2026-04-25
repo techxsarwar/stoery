@@ -5,10 +5,14 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { createClient } from "@/utils/supabase/client";
 
+import { signOut as nextAuthSignOut } from "next-auth/react";
+
 interface NavbarProps {
   user: {
     id?: string;
     email?: string | null;
+    name?: string | null;
+    image?: string | null;
     user_metadata?: { full_name?: string; avatar_url?: string };
   } | null;
 }
@@ -19,8 +23,13 @@ export default function Navbar({ user }: NavbarProps) {
 
   const handleSignOut = async () => {
     startTransition(async () => {
+      // Sign out from Supabase if active
       const supabase = createClient();
       await supabase.auth.signOut();
+      
+      // Sign out from NextAuth
+      await nextAuthSignOut({ redirect: false });
+      
       router.refresh();
       router.push("/");
     });

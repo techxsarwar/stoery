@@ -32,7 +32,7 @@ export default async function StaffDashboard() {
       <Sidebar />
       
       <main className="flex-grow ml-20 md:ml-64 h-screen overflow-y-auto bg-[radial-gradient(circle_at_top_right,#eab30805,transparent)] custom-scrollbar">
-        <Navbar user={session.user} />
+        <Navbar user={session?.user || null} />
 
         <div className="max-w-7xl mx-auto px-6 md:px-12 pt-24 pb-32 flex flex-col gap-10">
           <header className="flex justify-between items-end">
