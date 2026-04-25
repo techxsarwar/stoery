@@ -51,3 +51,50 @@ export async function uploadStoryCover(formData: FormData) {
     return { error: "Failed to upload image to StoryVerse storage." };
   }
 }
+
+/**
+ * Uploads a codex entry image (Character, Map, Relic) to Cloudflare R2.
+ */
+export async function uploadCodexImage(formData: FormData) {
+  const file = formData.get("file") as File;
+  
+  if (!file) {
+    return { error: "No file provided" };
+  }
+
+  if (!file.type.startsWith("image/")) {
+    return { error: "Invalid file type." };
+  }
+
+  try {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    const fileExt = file.name.split(".").pop() || "jpg";
+    const fileName = `codex/${uuidv4()}.${fileExt}`;
+    
+    const publicUrlBase = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+
+    if (!publicUrlBase) {
+      throw new Error("NEXT_PUBLIC_R2_PUBLIC_URL is not configured.");
+    }
+
+    const command = new PutObjectCommand({
+      Bucket: R2_BUCKET_NAME,
+      Key: fileName,
+      Body: buffer,
+      ContentType: file.type,
+    });
+
+    await s3Client.send(command);
+
+    return { 
+      success: true, 
+      url: `${publicUrlBase}/${fileName}` 
+    };
+  } catch (e) {
+    console.error("R2 Codex Upload Error:", e);
+    return { error: "Failed to forge codex visual." };
+  }
+}
+

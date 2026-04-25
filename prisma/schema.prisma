@@ -75,9 +75,10 @@ model Profile {
   userId           String   @unique
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  stories  Story[]
-  likes    Like[]
-  comments Comment[]
+  stories      Story[]
+  likes        Like[]
+  comments     Comment[]
+  codexEntries CodexEntry[]
 }
 
 model Story {
@@ -134,4 +135,18 @@ model Comment {
 
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   story   Story   @relation(fields: [storyId], references: [id], onDelete: Cascade)
+}
+
+model CodexEntry {
+  id        String   @id @default(cuid())
+  profileId String
+  title     String
+  category  String   // "Character", "Location", "Artifact", "Lore"
+  content   String   @db.Text
+  image_url String?
+  isPrivate Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }

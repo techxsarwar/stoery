@@ -2,10 +2,11 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { BookOpen, BarChart3, MessageSquare, Settings, PenTool } from "lucide-react";
+import { BookOpen, BarChart3, MessageSquare, Settings, PenTool, Library } from "lucide-react";
 
 const navItems = [
   { name: "Manuscripts", icon: BookOpen, href: "/dashboard" },
+  { name: "The Codex", icon: Library, href: "/dashboard/codex" },
   { name: "Analytics", icon: BarChart3, href: "/dashboard/analytics" },
   { name: "Letters", icon: MessageSquare, href: "/dashboard/comments" },
   { name: "Settings", icon: Settings, href: "/dashboard/settings" },
