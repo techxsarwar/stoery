@@ -21,6 +21,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "SOULPAD - Where Every Story Finds Its Reader",
   description: "Join a community of creators and readers. Write your masterpiece, design your covers, and share your universe with the world.",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({

@@ -39,9 +39,10 @@ export default function Navbar({ user }: NavbarProps) {
     <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-surface-variant/50 shadow-sm">
       <div className="flex justify-between items-center px-8 py-4 max-w-full">
         <Link
-          className="text-2xl font-black tracking-tighter text-on-surface font-headline uppercase"
+          className="flex items-center gap-3 text-2xl font-black tracking-tighter text-on-surface font-headline uppercase"
           href="/"
         >
+          <img src="/logo.png" alt="SOULPAD Logo" className="w-8 h-8 object-contain" />
           SOULPAD
         </Link>
         <div className="hidden md:flex space-x-8 items-center">
