@@ -23,6 +23,7 @@ export default function Editor({ content, onChange, isSaving }: EditorProps) {
           "prose prose-p:font-body prose-headings:font-headline max-w-none focus:outline-none min-h-[500px] text-on-surface text-lg leading-relaxed",
       },
     },
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },

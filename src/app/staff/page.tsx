@@ -25,45 +25,46 @@ export default async function StaffDashboard() {
     redirect("/staff/login");
   }
 
-  // Fetch Global Stats
-  const [userCount, storyCount, commentCount, pendingApps, allProfiles, allStories, bannedComments, recentUsers] = await Promise.all([
-    prisma.user.count(),
-    prisma.story.count(),
-    prisma.comment.count(),
-    prisma.profile.findMany({
-      where: { monetization_status: "APPLIED" },
-      include: { user: { select: { email: true, image: true } } },
-      orderBy: { id: "desc" }
-    }),
-    prisma.profile.findMany({
-      take: 50,
-      orderBy: { id: "desc" },
-      include: { 
-        _count: { select: { stories: true } },
-        user: { select: { email: true, image: true, name: true } },
-        stories: {
-          select: {
-            _count: { select: { likes: true } }
-          }
+  // Fetch Global Stats sequentially to prevent connection exhaustion
+  const userCount = await prisma.user.count();
+  const storyCount = await prisma.story.count();
+  const commentCount = await prisma.comment.count();
+
+  const pendingApps = await prisma.profile.findMany({
+    where: { monetization_status: "APPLIED" },
+    include: { user: { select: { email: true, image: true, name: true } } }
+  });
+
+  const allProfiles = await prisma.profile.findMany({
+    take: 50,
+    orderBy: { id: "desc" },
+    include: { 
+      _count: { select: { stories: true } },
+      user: { select: { email: true, image: true, name: true } },
+      stories: {
+        select: {
+          _count: { select: { likes: true } }
         }
       }
-    }),
-    prisma.story.findMany({
-      take: 50,
-      orderBy: { createdAt: "desc" },
-      include: { author: true }
-    }),
-    prisma.comment.findMany({
-      where: { isShadowBanned: true },
-      take: 50,
-      include: { profile: true, story: true }
-    }),
-    prisma.user.findMany({
-      take: 10,
-      orderBy: { id: "desc" },
-      select: { name: true, email: true, image: true, id: true }
-    })
-  ]);
+    }
+  });
+
+  const allStories = await prisma.story.findMany({
+    take: 50,
+    orderBy: { createdAt: "desc" },
+    include: { author: true }
+  });
+
+  const bannedComments = await prisma.comment.findMany({
+    where: { isShadowBanned: true },
+    include: { profile: true, story: true }
+  });
+
+  const recentUsers = await prisma.user.findMany({
+    take: 20,
+    orderBy: { id: "desc" },
+    select: { id: true, name: true, email: true, image: true }
+  });
 
   return (
     <StaffDashboardClient 

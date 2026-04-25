@@ -46,9 +46,14 @@ export async function uploadStoryCover(formData: FormData) {
       success: true, 
       url: `${publicUrlBase}/${fileName}` 
     };
-  } catch (e) {
-    console.error("R2 Upload Error:", e);
-    return { error: "Failed to upload image to SOULPAD storage." };
+  } catch (e: any) {
+    console.error("R2 Upload Error Details:", {
+      message: e.message,
+      code: e.code,
+      name: e.name,
+      requestId: e.$metadata?.requestId
+    });
+    return { error: `Upload failed: ${e.message || "Unknown error"}` };
   }
 }
 
@@ -92,9 +97,14 @@ export async function uploadCodexImage(formData: FormData) {
       success: true, 
       url: `${publicUrlBase}/${fileName}` 
     };
-  } catch (e) {
-    console.error("R2 Codex Upload Error:", e);
-    return { error: "Failed to forge codex visual." };
+  } catch (e: any) {
+    console.error("R2 Codex Upload Error Details:", {
+      message: e.message,
+      code: e.code,
+      name: e.name,
+      requestId: e.$metadata?.requestId
+    });
+    return { error: `Codex forge failed: ${e.message || "Unknown error"}` };
   }
 }
 
