@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Plus, Book, Trash2, Pause, Play, Edit3, MessageCircle, BarChart, Ghost } from "lucide-react";
 import AnalyticsGrimoire from "./AnalyticsGrimoire";
 import InteractionChamber from "./InteractionChamber";
+import PillarsOfProsperity from "./PillarsOfProsperity";
 
 interface DashboardClientProps {
   stories: any[];
@@ -15,6 +16,8 @@ interface DashboardClientProps {
       totalLikes: number;
       totalComments: number;
       totalReads: number;
+      totalReadingHours: number;
+      monetizationStatus: string;
   }
 }
 
@@ -77,6 +80,16 @@ export default function DashboardClient({ stories, profile, comments, stats }: D
                 Performance Grimoire
             </h2>
             <AnalyticsGrimoire stories={stories} />
+        </section>
+
+        {/* The Three Pillars (Monetization Eligibility) */}
+        <section className="lg:col-span-12">
+            <PillarsOfProsperity 
+                reads={stats.totalReads} 
+                hours={stats.totalReadingHours} 
+                comments={stats.totalComments}
+                status={stats.monetizationStatus}
+            />
         </section>
 
         {/* Manuscript Management (Main Area) */}

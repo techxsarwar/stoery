@@ -44,6 +44,7 @@ export default async function DashboardPage() {
   const totalLikes = stories.reduce((sum, story) => sum + story._count.likes, 0);
   const totalComments = stories.reduce((sum, story) => sum + story._count.comments, 0);
   const totalReads = stories.reduce((sum, story) => sum + (story.reads || 0), 0);
+  const totalReadingHours = Number(profile.reading_time_seconds || 0) / 3600;
 
   return (
     <div className="min-h-screen bg-surface flex cursor-default overflow-hidden">
@@ -60,7 +61,9 @@ export default async function DashboardPage() {
                 stats={{
                     totalLikes,
                     totalComments,
-                    totalReads
+                    totalReads,
+                    totalReadingHours,
+                    monetizationStatus: profile.monetization_status
                 }}
             />
         </div>

@@ -64,6 +64,14 @@ enum StoryStatus {
   DRAFT
 }
 
+enum MonetizationStatus {
+  NONE
+  ELIGIBLE
+  APPLIED
+  APPROVED
+  REJECTED
+}
+
 // Business Domain Models
 model Profile {
   id               String   @id @default(cuid())
@@ -74,6 +82,16 @@ model Profile {
   guardian_approved Boolean @default(false)
   userId           String   @unique
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Monetization fields
+  reading_time_seconds BigInt @default(0)
+  monetization_status MonetizationStatus @default(NONE)
+  legal_name           String?
+  pan_number           String?
+  bank_account_number  String?
+  ifsc_code           String?
+  bank_account_holder  String?
+  phone_number         String?
 
   stories      Story[]
   likes        Like[]
@@ -93,6 +111,7 @@ model Story {
   updatedAt   DateTime @updatedAt
   authorId    String
   reads       Int      @default(0)
+  reading_time_seconds BigInt @default(0)
 
   author   Profile   @relation(fields: [authorId], references: [id], onDelete: Cascade)
   chapters Chapter[]
