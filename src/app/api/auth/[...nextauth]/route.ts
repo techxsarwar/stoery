@@ -21,6 +21,12 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { role: true }
+        });
+        token.role = dbUser?.role || "AUTHOR";
+
         const profile = await prisma.profile.findUnique({
           where: { userId: user.id },
           select: { pen_name: true }
@@ -39,6 +45,8 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         // @ts-ignore
         session.user.id = token.id;
+        // @ts-ignore
+        session.user.role = token.role;
         // @ts-ignore
         session.user.onboardingComplete = token.onboardingComplete;
       }
@@ -61,13 +69,5 @@ export const authOptions: NextAuthOptions = {
 
 const handler = NextAuth(authOptions);
 
-export async function GET(req: Request, { params }: { params: Promise<any> }) {
-  await params;
-  return handler(req);
-}
-
-export async function POST(req: Request, { params }: { params: Promise<any> }) {
-  await params;
-  return handler(req);
-}
+export { handler as GET, handler as POST };
 

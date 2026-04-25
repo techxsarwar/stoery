@@ -45,6 +45,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  role          UserRole  @default(AUTHOR)
   accounts      Account[]
   sessions      Session[]
   profile       Profile?
@@ -56,6 +57,12 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum UserRole {
+  AUTHOR
+  EMPLOYEE
+  ADMIN
 }
 
 enum StoryStatus {

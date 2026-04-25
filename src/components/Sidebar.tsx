@@ -2,18 +2,27 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { BookOpen, BarChart3, MessageSquare, Settings, PenTool, Library } from "lucide-react";
-
-const navItems = [
-  { name: "Manuscripts", icon: BookOpen, href: "/dashboard" },
-  { name: "The Codex", icon: Library, href: "/dashboard/codex" },
-  { name: "Analytics", icon: BarChart3, href: "/dashboard/analytics" },
-  { name: "Letters", icon: MessageSquare, href: "/dashboard/comments" },
-  { name: "Settings", icon: Settings, href: "/dashboard/settings" },
-];
+import { BookOpen, BarChart3, MessageSquare, Settings, PenTool, Library, DollarSign, Shield } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+
+  const navItems = [
+    { name: "Manuscripts", icon: BookOpen, href: "/dashboard" },
+    { name: "The Codex", icon: Library, href: "/dashboard/codex" },
+    { name: "Analytics", icon: BarChart3, href: "/dashboard/analytics" },
+    { name: "Monetization", icon: DollarSign, href: "/monetization" },
+    { name: "Letters", icon: MessageSquare, href: "/dashboard/comments" },
+    { name: "Settings", icon: Settings, href: "/dashboard/settings" },
+  ];
+
+  // Add Staff Portal if user is employee or admin
+  // @ts-ignore
+  if (session?.user?.role === "EMPLOYEE" || session?.user?.role === "ADMIN") {
+    navItems.push({ name: "Observatory", icon: Shield, href: "/staff" });
+  }
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-20 md:w-64 bg-gradient-to-b from-primary via-primary-container to-surface shadow-[10px_0_30px_-15px_rgba(0,0,0,0.5)] border-r border-on-surface/10 flex flex-col items-center md:items-start py-8 z-40 transition-all duration-300">
