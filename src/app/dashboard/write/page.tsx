@@ -101,15 +101,15 @@ function WriteContent() {
 
   if (loading) {
     return (
-        <div className="min-h-screen bg-[#131315] flex flex-col items-center justify-center font-headline font-black text-on-surface uppercase tracking-[0.5em] animate-pulse">
+        <div className="min-h-screen bg-surface flex flex-col items-center justify-center font-headline font-black text-on-surface uppercase tracking-[0.5em] animate-pulse">
             Ink is Flowing...
         </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#131315] flex flex-col items-center pt-24 px-6 md:px-12 w-full mx-auto relative overflow-x-hidden">
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top,#1c1b1d,transparent)] -z-10"></div>
+    <div className="min-h-screen bg-surface flex flex-col items-center pt-24 px-6 md:px-12 w-full mx-auto relative overflow-x-hidden">
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top,#e5e7eb,transparent)] -z-10"></div>
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:32px_32px]"></div>
       
       <Navbar user={user ?? null} />
@@ -250,7 +250,7 @@ function Plus({ className, size = 24 }: { className?: string; size?: number }) {
 export default function WritePage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-[#131315] flex flex-col items-center justify-center font-headline font-black text-on-surface uppercase tracking-[0.5em]">
+            <div className="min-h-screen bg-surface flex flex-col items-center justify-center font-headline font-black text-on-surface uppercase tracking-[0.5em]">
                 Ink is Flowing...
             </div>
         }>

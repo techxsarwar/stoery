@@ -27,9 +27,9 @@ export default async function CommentsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#131315] flex overflow-hidden">
+    <div className="min-h-screen bg-surface flex overflow-hidden">
       <Sidebar />
-      <main className="flex-grow ml-20 md:ml-64 h-screen overflow-y-auto bg-[radial-gradient(circle_at_top_left,#1c1b1d,transparent)] custom-scrollbar">
+      <main className="flex-grow ml-20 md:ml-64 h-screen overflow-y-auto bg-[radial-gradient(circle_at_top_left,#e5e7eb,transparent)] custom-scrollbar">
         <Navbar user={user ?? null} />
         <div className="max-w-7xl mx-auto px-6 md:px-12 pt-24 pb-32 flex flex-col gap-12">
             <header className="relative">
