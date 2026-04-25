@@ -89,14 +89,14 @@ export default function DashboardClient({ stories, profile, comments, stats }: D
             {stories.length === 0 ? <EmptyState /> : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {stories.map(story => (
-                        <div key={story.id} className="group bg-[#1c1b1d] border-2 border-on-surface/10 rounded-2xl overflow-hidden hover:border-primary/40 transition-all duration-500 relative flex flex-col">
+                        <div key={story.id} className="group bg-surface-container-high border-2 border-on-surface/10 rounded-2xl overflow-hidden hover:border-primary/40 transition-all duration-500 relative flex flex-col">
                             {/* Visual Indicator */}
                             <div className="h-40 relative overflow-hidden">
                                 <div 
                                     className={`absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 ${story.status === 'PAUSED' ? 'grayscale opacity-40' : ''}`}
                                     style={{ backgroundImage: `url('${story.cover_url || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"}')` }}
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#1c1b1d] to-transparent opacity-80" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-surface-container-high to-transparent opacity-80" />
                                 
                                 <div className="absolute top-4 left-4">
                                     <span className={`px-3 py-1 rounded-full font-label font-black text-[8px] uppercase tracking-widest border border-white/10 backdrop-blur-md ${
