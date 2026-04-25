@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import EmailLogin from "@/components/EmailLogin";
+import SignupForm from "@/components/SignupForm";
 
 export default function SignUp() {
   return (
@@ -12,10 +12,10 @@ export default function SignUp() {
           Join Storyverse
         </h2>
         <p className="text-center text-on-surface-variant font-body mb-8 text-sm">
-          Enter your email to receive your first magic link
+          Create an account to start your journey
         </p>
         <div className="flex flex-col gap-8">
-          <EmailLogin />
+          <SignupForm />
         </div>
 
         <div className="flex items-center gap-4 my-8">

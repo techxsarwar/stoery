@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import EmailLogin from "@/components/EmailLogin";
+import SigninForm from "@/components/SigninForm";
 
 export default function SignIn() {
   return (
@@ -12,10 +12,10 @@ export default function SignIn() {
           Welcome Back
         </h2>
         <p className="text-center text-on-surface-variant font-body mb-8 text-sm">
-          Enter your email to receive a magic link
+          Enter your email and password to sign in
         </p>
         <div className="flex flex-col gap-8">
-          <EmailLogin />
+          <SigninForm />
         </div>
 
         <div className="flex items-center gap-4 my-8">
