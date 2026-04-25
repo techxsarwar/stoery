@@ -16,7 +16,7 @@ export default async function StaffDashboard() {
   const userEmail = supabaseUser?.email || nextAuthSession?.user?.email;
 
   if (!userEmail) {
-    redirect("/auth/signin?callbackUrl=/staff");
+    redirect("/staff/login");
   }
 
   // Verify role in database
@@ -26,7 +26,7 @@ export default async function StaffDashboard() {
   });
 
   if (!dbUser || (dbUser.role !== "EMPLOYEE" && dbUser.role !== "ADMIN")) {
-    redirect("/dashboard");
+    redirect("/staff/login");
   }
 
   const applications = await prisma.profile.findMany({

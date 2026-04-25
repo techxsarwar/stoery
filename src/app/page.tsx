@@ -100,7 +100,7 @@ export default async function Home() {
               <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/about">About Us</Link>
               <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/changelog">Changelog</Link>
               <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/faq">FAQ</Link>
-              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/staff">Staff Portal</Link>
+              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/staff/login">Staff Portal</Link>
             </div>
             
             <div className="flex flex-col gap-3">

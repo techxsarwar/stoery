@@ -19,24 +19,28 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user, trigger, session }) {
-      if (user) {
-        token.id = user.id;
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { role: true }
-        });
-        token.role = dbUser?.role || "AUTHOR";
+      try {
+        if (user) {
+          token.id = user.id;
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { role: true }
+          });
+          token.role = dbUser?.role || "AUTHOR";
 
-        const profile = await prisma.profile.findUnique({
-          where: { userId: user.id },
-          select: { pen_name: true }
-        });
-        token.onboardingComplete = !!profile?.pen_name;
-      }
+          const profile = await prisma.profile.findUnique({
+            where: { userId: user.id },
+            select: { pen_name: true }
+          });
+          token.onboardingComplete = !!profile?.pen_name;
+        }
 
-      // Support manual session updates (e.g. after onboarding)
-      if (trigger === "update" && session?.onboardingComplete !== undefined) {
-        token.onboardingComplete = session.onboardingComplete;
+        // Support manual session updates (e.g. after onboarding)
+        if (trigger === "update" && session?.onboardingComplete !== undefined) {
+          token.onboardingComplete = session.onboardingComplete;
+        }
+      } catch (error) {
+        console.error("JWT Callback Error:", error);
       }
 
       return token;
