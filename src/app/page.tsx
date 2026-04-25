@@ -98,8 +98,10 @@ export default async function Home() {
             <div className="flex flex-col gap-3">
               <span className="font-headline font-black text-surface text-lg uppercase tracking-wider mb-2 border-b-2 border-primary pb-1">Platform</span>
               <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/about">About Us</Link>
+              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/careers">Careers</Link>
               <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/changelog">Changelog</Link>
               <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/faq">FAQ</Link>
+              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/guide">Architect's Guidebook</Link>
               <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/staff/login">Staff Portal</Link>
             </div>
             
