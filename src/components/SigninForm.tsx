@@ -36,7 +36,11 @@ export default function SigninForm() {
       setStatus("error");
       setErrorMsg(error.message);
     } else {
-      router.push("/dashboard");
+      // Check for callbackUrl in searchParams
+      const searchParams = new URLSearchParams(window.location.search);
+      const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+      
+      router.push(callbackUrl);
       router.refresh(); // Refresh to strictly ensure server state is updated
     }
   };

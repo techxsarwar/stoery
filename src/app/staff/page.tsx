@@ -2,16 +2,31 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
+import { createClient } from "@/utils/supabase/server";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import { Shield, FileText, CheckCircle, XCircle, Search, UserCheck } from "lucide-react";
 
 export default async function StaffDashboard() {
-  const session = await getServerSession(authOptions);
+  // Check both Auth systems (Supabase and NextAuth)
+  const supabase = await createClient();
+  const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+  const nextAuthSession = await getServerSession(authOptions);
 
-  // @ts-ignore
-  if (!session || (session.user.role !== "EMPLOYEE" && session.user.role !== "ADMIN")) {
-    redirect("/");
+  const userEmail = supabaseUser?.email || nextAuthSession?.user?.email;
+
+  if (!userEmail) {
+    redirect("/auth/signin?callbackUrl=/staff");
+  }
+
+  // Verify role in database
+  const dbUser = await prisma.user.findUnique({
+    where: { email: userEmail },
+    select: { role: true }
+  });
+
+  if (!dbUser || (dbUser.role !== "EMPLOYEE" && dbUser.role !== "ADMIN")) {
+    redirect("/dashboard");
   }
 
   const applications = await prisma.profile.findMany({
@@ -32,7 +47,7 @@ export default async function StaffDashboard() {
       <Sidebar />
       
       <main className="flex-grow ml-20 md:ml-64 h-screen overflow-y-auto bg-[radial-gradient(circle_at_top_right,#eab30805,transparent)] custom-scrollbar">
-        <Navbar user={session?.user || null} />
+        <Navbar user={supabaseUser || nextAuthSession?.user || null} />
 
         <div className="max-w-7xl mx-auto px-6 md:px-12 pt-24 pb-32 flex flex-col gap-10">
           <header className="flex justify-between items-end">

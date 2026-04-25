@@ -68,7 +68,13 @@ export default function InteractionChamber({ comments }: InteractionChamberProps
                         <h4 className="font-headline font-bold text-on-surface text-sm uppercase tracking-wider">{comment.profile?.pen_name || "Unknown Soul"}</h4>
                         <p className="text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-widest">on <span className="text-primary italic">"{comment.story?.title}"</span></p>
                    </div>
-                   <span className="text-[10px] font-label font-bold text-on-surface-variant/40 uppercase">{new Date(comment.createdAt).toLocaleDateString()}</span>
+                   <span className="text-[10px] font-label font-bold text-on-surface-variant/40 uppercase" suppressHydrationWarning>
+                     {new Date(comment.createdAt).toLocaleDateString('en-GB', {
+                       day: '2-digit',
+                       month: '2-digit',
+                       year: 'numeric'
+                     })}
+                   </span>
                 </div>
                 <p className="font-body text-on-surface text-lg leading-relaxed mb-4 line-clamp-2 italic">"{comment.content}"</p>
                 <div className="flex gap-4 opacity-0 group-hover:opacity-100 transition-opacity">

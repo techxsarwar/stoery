@@ -90,3 +90,20 @@ export async function signOut() {
   await supabase.auth.signOut();
   revalidatePath("/");
 }
+
+export async function getUserRole() {
+  const supabase = await createClient();
+  const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+  
+  // Try to get email from Supabase or potentially NextAuth (if we had access to it here)
+  const email = supabaseUser?.email;
+
+  if (!email) return "AUTHOR";
+
+  const dbUser = await prisma.user.findUnique({
+    where: { email },
+    select: { role: true }
+  });
+
+  return dbUser?.role || "AUTHOR";
+}
