@@ -4,6 +4,7 @@ import Link from "next/link";
 import { LikeButton, CommentForm } from "@/components/Engagement";
 import { createClient } from "@/utils/supabase/server";
 import Navbar from "@/components/Navbar";
+import ReadingHeartbeat from "@/components/ReadingHeartbeat";
 
 export default async function ReadStoryPage({ params }: { params: Promise<{ storyId: string }> }) {
   const { storyId } = await params;
@@ -60,6 +61,9 @@ export default async function ReadStoryPage({ params }: { params: Promise<{ stor
       <div className="fixed inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50 -z-10"></div>
       
       <Navbar user={user ?? null} />
+
+      {/* Reading Heartbeat for Pillar of Time tracking */}
+      <ReadingHeartbeat storyId={story.id} />
 
       <main className="w-full max-w-3xl flex flex-col gap-12 mt-8">
         <header className="flex flex-col gap-6 items-center text-center pb-12 border-b-8 border-primary">
