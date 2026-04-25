@@ -48,7 +48,7 @@ export default async function ReadStoryPage({ params }: { params: Promise<{ stor
     },
   });
 
-  if (!story || story.chapters.length === 0) {
+  if (!story || story.chapters.length === 0 || story.isBanned) {
     notFound();
   }
 

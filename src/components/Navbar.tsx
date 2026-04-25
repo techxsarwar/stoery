@@ -59,12 +59,26 @@ export default function Navbar({ user }: NavbarProps) {
             Community
           </Link>
           {user && (
-            <Link
-              className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase"
-              href="/library"
-            >
-              My Library
-            </Link>
+            <>
+              <Link
+                className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase"
+                href="/library"
+              >
+                My Library
+              </Link>
+              <Link
+                className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase"
+                href="/dashboard/settings"
+              >
+                My Profile
+              </Link>
+              <Link
+                className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase"
+                href="/dashboard"
+              >
+                Dashboard
+              </Link>
+            </>
           )}
         </div>
         <div className="flex gap-4 items-center">

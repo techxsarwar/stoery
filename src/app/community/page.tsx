@@ -2,10 +2,21 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import Navbar from "@/components/Navbar";
+import NexusChat from "@/components/NexusChat";
 
 export default async function CommunityPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+
+  const currentProfile = user ? await prisma.profile.findUnique({
+    where: { userId: user.id }
+  }) : null;
+
+  const nexusMessages = await prisma.nexusMessage.findMany({
+    take: 50,
+    orderBy: { createdAt: "asc" },
+    include: { profile: true }
+  });
 
   const recentComments = await prisma.comment.findMany({
     take: 10,
@@ -36,7 +47,7 @@ export default async function CommunityPage() {
   const topAuthors = profiles
     .map(profile => ({
       name: profile.pen_name || profile.full_name || "Anonymous",
-      totalLikes: profile.stories.reduce((acc, story) => acc + story._count.likes, 0)
+      totalLikes: profile.stories.reduce((acc, story) => acc + (story._count?.likes || 0), 0)
     }))
     .sort((a, b) => b.totalLikes - a.totalLikes)
     .slice(0, 5);
@@ -51,10 +62,16 @@ export default async function CommunityPage() {
             <p className="font-label font-bold text-on-surface-variant text-xl uppercase tracking-wider">Join the Conversation</p>
         </header>
 
-        <section className="flex flex-col md:flex-row gap-12 w-full">
-            <div className="w-full md:w-2/3 flex flex-col gap-8">
-                <h2 className="font-headline text-3xl font-black text-on-surface uppercase border-b-4 border-on-surface pb-2 w-max">Recent Thoughts</h2>
-                {recentComments.length === 0 ? (
+        <section className="flex flex-col lg:flex-row gap-12 w-full">
+            <div className="w-full lg:w-2/3 flex flex-col gap-12">
+                <div className="flex flex-col gap-6">
+                    <h2 className="font-headline text-3xl font-black text-on-surface uppercase border-b-4 border-on-surface pb-2 w-max">Nexus Chat</h2>
+                    <NexusChat initialMessages={nexusMessages} currentProfile={currentProfile} />
+                </div>
+
+                <div className="flex flex-col gap-8">
+                    <h2 className="font-headline text-3xl font-black text-on-surface uppercase border-b-4 border-on-surface pb-2 w-max">Recent Thoughts</h2>
+                    {recentComments.length === 0 ? (
                     <div className="p-12 border-4 border-dashed border-outline-variant text-center bg-white">
                         <p className="text-on-surface-variant font-headline font-bold text-xl uppercase tracking-wide">It's quiet here. Go read and comment!</p>
                     </div>
@@ -77,8 +94,9 @@ export default async function CommunityPage() {
                     </div>
                 )}
             </div>
+        </div>
 
-            <aside className="w-full md:w-1/3 flex flex-col gap-8">
+        <aside className="w-full md:w-1/3 flex flex-col gap-8">
                <div className="bg-primary border-4 border-on-surface p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                    <h3 className="font-headline text-2xl font-black text-on-surface uppercase mb-4">Top Authors</h3>
                    {topAuthors.length === 0 ? (

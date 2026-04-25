@@ -9,7 +9,10 @@ export default async function Home() {
 
   const stories = await prisma.story.findMany({
     take: 6,
-    where: { status: "PUBLISHED" },
+    where: { 
+      status: "PUBLISHED",
+      isBanned: false
+    },
     orderBy: { createdAt: "desc" },
     include: { author: true },
   });

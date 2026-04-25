@@ -99,11 +99,13 @@ model Profile {
   ifsc_code           String?
   bank_account_holder  String?
   phone_number         String?
+  isVerified           Boolean @default(false)
 
   stories      Story[]
   likes        Like[]
   comments     Comment[]
   codexEntries CodexEntry[]
+  nexusMessages NexusMessage[]
 }
 
 model Story {
@@ -119,6 +121,7 @@ model Story {
   authorId    String
   reads       Int      @default(0)
   reading_time_seconds BigInt @default(0)
+  isBanned    Boolean  @default(false)
 
   author   Profile   @relation(fields: [authorId], references: [id], onDelete: Cascade)
   chapters Chapter[]
@@ -175,4 +178,12 @@ model CodexEntry {
   updatedAt DateTime @updatedAt
 
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model NexusMessage {
+  id        String   @id @default(cuid())
+  content   String
+  profileId String
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
