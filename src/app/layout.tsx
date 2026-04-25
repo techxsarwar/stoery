@@ -23,6 +23,8 @@ export const metadata: Metadata = {
   description: "Join a community of creators and readers. Write your masterpiece, design your covers, and share your universe with the world.",
   icons: {
     icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
   },
 };
 
