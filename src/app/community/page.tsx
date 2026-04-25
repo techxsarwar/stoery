@@ -16,6 +16,31 @@ export default async function CommunityPage() {
     },
   });
 
+  const profiles = await prisma.profile.findMany({
+    where: {
+      stories: {
+        some: {}
+      }
+    },
+    include: {
+      stories: {
+        select: {
+          _count: {
+            select: { likes: true }
+          }
+        }
+      }
+    }
+  });
+
+  const topAuthors = profiles
+    .map(profile => ({
+      name: profile.pen_name || profile.full_name || "Anonymous",
+      totalLikes: profile.stories.reduce((acc, story) => acc + story._count.likes, 0)
+    }))
+    .sort((a, b) => b.totalLikes - a.totalLikes)
+    .slice(0, 5);
+
   return (
     <div className="min-h-screen bg-surface flex flex-col items-center pt-24 px-6 md:px-12 w-full mx-auto relative">
       <Navbar user={user ?? null} />
@@ -56,11 +81,18 @@ export default async function CommunityPage() {
             <aside className="w-full md:w-1/3 flex flex-col gap-8">
                <div className="bg-primary border-4 border-on-surface p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                    <h3 className="font-headline text-2xl font-black text-on-surface uppercase mb-4">Top Authors</h3>
-                   <ul className="flex flex-col gap-4 font-headline font-bold text-lg">
-                       <li className="flex justify-between items-center border-b-2 border-on-surface/20 pb-2"><span>1. John Doe</span> <span>★ 142</span></li>
-                       <li className="flex justify-between items-center border-b-2 border-on-surface/20 pb-2"><span>2. Jane Smith</span> <span>★ 98</span></li>
-                       <li className="flex justify-between items-center pb-2"><span>3. Alex West</span> <span>★ 45</span></li>
-                   </ul>
+                   {topAuthors.length === 0 ? (
+                       <p className="font-label font-bold text-on-surface-variant uppercase text-sm">No authors yet</p>
+                   ) : (
+                       <ul className="flex flex-col gap-4 font-headline font-bold text-lg">
+                           {topAuthors.map((author, index) => (
+                               <li key={index} className={`flex justify-between items-center ${index === topAuthors.length - 1 ? '' : 'border-b-2 border-on-surface/20 pb-2'}`}>
+                                   <span>{index + 1}. {author.name}</span>
+                                   <span>★ {author.totalLikes}</span>
+                               </li>
+                           ))}
+                       </ul>
+                   )}
                </div>
             </aside>
         </section>
