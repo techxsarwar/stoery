@@ -95,7 +95,7 @@ export default function SigninForm() {
       </button>
       
       <div className="text-center mt-2">
-         <a href="/auth/reset-password" className="text-sm font-label font-bold text-on-surface-variant hover:text-primary transition-colors underline underline-offset-2">
+         <a href="/auth/forgot-password" className="text-sm font-label font-bold text-on-surface-variant hover:text-primary transition-colors underline underline-offset-2">
             Forgot Password?
          </a>
       </div>
