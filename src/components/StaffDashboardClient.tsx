@@ -19,7 +19,9 @@ import {
   Scale,
   Gavel,
   ShieldAlert,
-  ChevronDown
+  ChevronDown,
+  Unlock,
+  AlertOctagon
 } from "lucide-react";
 import Link from "next/link";
 import { banStory, unbanStory, updateMonetizationStatus, toggleVerification, resolveReport, handleAppeal } from "@/actions/staff";
