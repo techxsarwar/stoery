@@ -3,13 +3,11 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { BookOpen, BarChart3, MessageSquare, Settings, PenTool, Library, DollarSign, Shield } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { getUserRole } from "@/actions/auth";
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { data: session } = useSession();
   const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
@@ -18,7 +16,7 @@ export default function Sidebar() {
       setUserRole(role);
     };
     fetchRole();
-  }, [session]);
+  }, []);
 
   const navItems = [
     { name: "Manuscripts", icon: BookOpen, href: "/dashboard" },

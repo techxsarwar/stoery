@@ -21,10 +21,12 @@ import {
   ShieldAlert,
   ChevronDown,
   Unlock,
-  AlertOctagon
+  AlertOctagon,
+  Award
 } from "lucide-react";
 import Link from "next/link";
 import { banStory, unbanStory, updateMonetizationStatus, toggleVerification, resolveReport, handleAppeal } from "@/actions/staff";
+import { reviewLicense } from "@/actions/licenses";
 
 interface StaffDashboardClientProps {
   user: { name: string | null; role: string };
@@ -40,6 +42,7 @@ interface StaffDashboardClientProps {
   recentUsers: any[];
   allReports: any[];
   pendingAppeals: any[];
+  allLicenses: any[];
 }
 
 export default function StaffDashboardClient({ 
@@ -50,7 +53,8 @@ export default function StaffDashboardClient({
   bannedComments, 
   recentUsers,
   allReports,
-  pendingAppeals
+  pendingAppeals,
+  allLicenses
 }: StaffDashboardClientProps) {
   const [activeTab, setActiveTab] = useState("Command Hub");
 
@@ -59,6 +63,7 @@ export default function StaffDashboardClient({
     { name: "Verification", icon: CheckCircle },
     { name: "Reports", icon: Flag },
     { name: "Appeals", icon: Gavel },
+    { name: "Licenses", icon: Award },
     { name: "Creators", icon: Users },
     { name: "Chronicles", icon: FileText },
     { name: "Moderation", icon: Shield },
@@ -219,6 +224,76 @@ export default function StaffDashboardClient({
                         <XCircle size={14} /> Reject Appeal
                        </button>
                     </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        );
+
+      case "Licenses":
+        return (
+          <div className="flex flex-col gap-6">
+            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-on-surface/60 flex items-center gap-3">
+              <Award size={14} className="text-primary" />
+              Codex Registry // License Management: {allLicenses.filter(l => l.status === 'PENDING').length} Pending
+            </h2>
+
+            <div className="flex flex-col gap-4">
+              {allLicenses.length === 0 ? (
+                <div className="p-16 rounded-3xl border-4 border-dashed border-on-surface/5 flex items-center justify-center bg-white">
+                  <p className="text-on-surface/20 font-black uppercase tracking-widest text-center">No license applications in the system.</p>
+                </div>
+              ) : (
+                allLicenses.map((license) => (
+                  <div key={license.id} className={`bg-white border-4 border-on-surface p-6 rounded-2xl flex flex-col gap-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all ${license.status !== 'PENDING' ? 'opacity-60' : ''}`}>
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 bg-primary/10 rounded-xl border-2 border-primary/20 text-primary">
+                          <Award size={20} />
+                        </div>
+                        <div>
+                          <h3 className="font-black text-sm uppercase tracking-tight">Application: {license.story.title}</h3>
+                          <p className="text-[9px] text-on-surface/40 uppercase tracking-widest font-bold">Applicant: {license.legalName} // Pen: {license.applicant.pen_name}</p>
+                        </div>
+                      </div>
+                      <span className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full border-2 ${
+                        license.status === 'APPROVED' ? 'bg-emerald-500 text-white border-emerald-600' : 
+                        license.status === 'PENDING' ? 'bg-amber-500 text-white border-amber-600' : 
+                        'bg-red-500 text-white border-red-600'
+                      }`}>
+                        {license.status}
+                      </span>
+                    </div>
+
+                    <div className="p-4 bg-on-surface/5 border-2 border-on-surface rounded-xl flex flex-col gap-2">
+                       <p className="text-[10px] font-black uppercase tracking-widest text-on-surface/40">Tier: {license.licenseType}</p>
+                       <p className="font-medium text-sm text-on-surface">"{license.details || "No additional creative details provided."}"</p>
+                    </div>
+
+                    {license.status === 'PENDING' && (
+                      <div className="flex justify-end gap-3 pt-2">
+                         <button 
+                          onClick={() => handleAction(() => reviewLicense(license.id, "APPROVED"))}
+                          className="bg-emerald-500 text-white px-6 py-2 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-2"
+                         >
+                          <CheckCircle size={14} /> Issue License
+                         </button>
+                         <button 
+                          onClick={() => handleAction(() => reviewLicense(license.id, "REJECTED"))}
+                          className="bg-red-500 text-white px-6 py-2 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-red-600 transition-all flex items-center gap-2"
+                         >
+                          <XCircle size={14} /> Reject Request
+                         </button>
+                      </div>
+                    )}
+
+                    {license.status === 'APPROVED' && (
+                        <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-on-surface/40 pt-2">
+                            <span>License Number: {license.licenseNumber}</span>
+                            <span>Issued On: {formatDate(license.issuedAt)}</span>
+                        </div>
+                    )}
                   </div>
                 ))
               )}

@@ -3,8 +3,10 @@
 import { useTransition, useState } from "react";
 import { deleteStory, updateStoryStatus } from "@/actions/story";
 import Link from "next/link";
-import { Plus, Book, Trash2, Pause, Play, Edit3, MessageCircle, BarChart, Ghost, ShieldAlert, Flag, Send, Gavel, Scale } from "lucide-react";
+import { Plus, Book, Trash2, Pause, Play, Edit3, MessageCircle, BarChart, Ghost, ShieldAlert, Flag, Send, Gavel, Scale, Award, Download, Printer } from "lucide-react";
 import { respondToReport, submitAppeal } from "@/actions/moderation";
+import { applyForLicense } from "@/actions/licenses";
+import LicenseCertificate from "./LicenseCertificate";
 import AnalyticsGrimoire from "./AnalyticsGrimoire";
 import InteractionChamber from "./InteractionChamber";
 import PillarsOfProsperity from "./PillarsOfProsperity";
@@ -14,6 +16,7 @@ interface DashboardClientProps {
   profile: any;
   comments: any[];
   reports: any[];
+  licenses: any[];
   stats: {
       totalLikes: number;
       totalComments: number;
@@ -23,9 +26,10 @@ interface DashboardClientProps {
   }
 }
 
-export default function DashboardClient({ stories, profile, comments, reports, stats }: DashboardClientProps) {
+export default function DashboardClient({ stories, profile, comments, reports, licenses, stats }: DashboardClientProps) {
   const [isPending, startTransition] = useTransition();
   const [deleteRitualId, setDeleteRitualId] = useState<string | null>(null);
+  const [showCertificateId, setShowCertificateId] = useState<string | null>(null);
 
   const formatDate = (date: string | Date) => {
     const d = new Date(date);
@@ -294,6 +298,132 @@ export default function DashboardClient({ stories, profile, comments, reports, s
                 </div>
             </div>
         </section>
+
+        {/* License Center */}
+        <section className="lg:col-span-12 flex flex-col gap-8 mt-12 mb-20">
+            <h2 className="font-label font-black text-[10px] uppercase tracking-[0.5em] text-on-surface-variant mb-2 flex items-center gap-4">
+                <Award size={14} className="text-primary" />
+                Codex Registry // License Center
+            </h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Apply for License */}
+                <div className="lg:col-span-4 bg-white border-4 border-on-surface p-8 rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                    <h3 className="font-headline font-black text-2xl uppercase tracking-tighter mb-6">Register Chronicle</h3>
+                    <form className="flex flex-col gap-5" onSubmit={async (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(e.currentTarget);
+                        const data = {
+                            storyId: formData.get('storyId') as string,
+                            legalName: formData.get('legalName') as string,
+                            licenseType: formData.get('licenseType') as string,
+                            details: formData.get('details') as string,
+                        };
+                        const res = await applyForLicense(data);
+                        if (res.success) window.location.reload();
+                        else alert(res.error);
+                    }}>
+                        <div className="flex flex-col gap-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-on-surface/40">Select Manuscript</label>
+                            <select name="storyId" required className="w-full bg-on-surface/5 border-2 border-on-surface p-3 rounded-xl font-black uppercase text-xs outline-none focus:border-primary">
+                                {stories.filter(s => !licenses.some(l => l.storyId === s.id)).map(s => (
+                                    <option key={s.id} value={s.id}>{s.title}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-on-surface/40">Legal Full Name</label>
+                            <input name="legalName" required type="text" className="w-full bg-on-surface/5 border-2 border-on-surface p-3 rounded-xl font-black uppercase text-xs outline-none focus:border-primary" />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-on-surface/40">License Tier</label>
+                            <select name="licenseType" required className="w-full bg-on-surface/5 border-2 border-on-surface p-3 rounded-xl font-black uppercase text-xs outline-none focus:border-primary">
+                                <option value="Standard Chronicle License">Standard Chronicle License</option>
+                                <option value="Premium Author License">Premium Author License</option>
+                                <option value="Exclusive IP Registry">Exclusive IP Registry</option>
+                            </select>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-on-surface/40">Creative Details</label>
+                            <textarea name="details" className="w-full bg-on-surface/5 border-2 border-on-surface p-3 rounded-xl font-black text-xs outline-none focus:border-primary min-h-[100px]" placeholder="Briefly describe the unique aspects of this chronicle..."></textarea>
+                        </div>
+                        <button type="submit" className="bg-primary text-on-primary font-headline font-black py-4 uppercase tracking-tighter rounded-xl border-4 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all mt-4">
+                            Submit Application
+                        </button>
+                    </form>
+                </div>
+
+                {/* My Licenses */}
+                <div className="lg:col-span-8 bg-white border-4 border-on-surface p-8 rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                    <h3 className="font-headline font-black text-2xl uppercase tracking-tighter mb-6">Verified Certificates</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {licenses.length === 0 ? (
+                            <div className="md:col-span-2 p-12 text-center bg-on-surface/5 rounded-2xl border-4 border-dashed border-on-surface/10">
+                                <p className="text-on-surface/20 font-black uppercase tracking-widest italic">No licenses issued yet. Submit your first application.</p>
+                            </div>
+                        ) : (
+                            licenses.map(license => (
+                                <div key={license.id} className="group bg-on-surface/5 border-2 border-on-surface p-6 rounded-2xl flex flex-col gap-4 relative hover:bg-white transition-colors">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h4 className="font-black text-sm uppercase tracking-tight text-on-surface">{license.story.title}</h4>
+                                            <p className="text-[9px] font-bold text-on-surface/40 uppercase tracking-widest">{license.licenseType}</p>
+                                        </div>
+                                        <span className={`text-[8px] font-black uppercase px-2 py-1 rounded border-2 ${
+                                            license.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+                                            license.status === 'PENDING' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                                            'bg-red-100 text-red-700 border-red-200'
+                                        }`}>
+                                            {license.status}
+                                        </span>
+                                    </div>
+                                    
+                                    {license.status === 'APPROVED' && (
+                                        <div className="flex items-center justify-between mt-auto pt-4 border-t border-on-surface/10">
+                                            <p className="text-[8px] font-black uppercase text-on-surface/40 tracking-widest">ID: {license.licenseNumber}</p>
+                                            <button 
+                                                onClick={() => setShowCertificateId(license.id)}
+                                                className="flex items-center gap-2 bg-on-surface text-white px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-primary hover:text-on-surface transition-all"
+                                            >
+                                                <Award size={14} /> View Certificate
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {/* Certificate Modal */}
+        {showCertificateId && (
+            <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in zoom-in duration-300">
+                <div className="relative max-h-screen overflow-y-auto p-12 scrollbar-hide">
+                    <button 
+                        onClick={() => setShowCertificateId(null)}
+                        className="absolute top-4 right-4 bg-white text-on-surface w-12 h-12 rounded-full border-4 border-on-surface flex items-center justify-center font-black hover:scale-110 transition-transform z-10"
+                    >
+                        X
+                    </button>
+                    <div className="flex flex-col items-center gap-8">
+                        {(() => {
+                            const license = licenses.find(l => l.id === showCertificateId);
+                            return <LicenseCertificate license={license} story={license.story} profile={profile} />;
+                        })()}
+                        <div className="flex gap-4">
+                            <button 
+                                onClick={() => window.print()}
+                                className="bg-primary text-on-surface px-10 py-4 rounded-xl border-4 border-on-surface font-black uppercase tracking-widest shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all flex items-center gap-3"
+                            >
+                                <Printer size={20} /> Print Certificate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
 
       </div>
 

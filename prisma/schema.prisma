@@ -107,6 +107,7 @@ model Profile {
   codexEntries CodexEntry[]
   nexusMessages NexusMessage[]
   reports      Report[]
+  licenses     License[]
 }
 
 model Story {
@@ -134,6 +135,7 @@ model Story {
   likes    Like[]
   comments Comment[]
   reports  Report[]
+  license  License?
 }
 
 model Report {
@@ -223,4 +225,26 @@ model NexusMessage {
   profileId String
   profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+}
+
+model License {
+  id              String   @id @default(cuid())
+  storyId         String   @unique
+  story           Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  applicantId     String
+  applicant       Profile  @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  status          LicenseStatus @default(PENDING)
+  legalName       String
+  licenseType     String
+  details         String?  @db.Text
+  issuedAt        DateTime?
+  licenseNumber   String?  @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum LicenseStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

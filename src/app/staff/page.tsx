@@ -84,6 +84,14 @@ export default async function StaffDashboard() {
     include: { author: true }
   });
 
+  const allLicenses = await prisma.license.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+        story: true,
+        applicant: true
+    }
+  });
+
   return (
     <StaffDashboardClient 
       user={dbUser}
@@ -99,6 +107,7 @@ export default async function StaffDashboard() {
       recentUsers={recentUsers}
       allReports={allReports}
       pendingAppeals={pendingAppeals}
+      allLicenses={allLicenses}
     />
   );
 }

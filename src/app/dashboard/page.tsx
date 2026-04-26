@@ -52,6 +52,12 @@ export default async function DashboardPage() {
     orderBy: { createdAt: "desc" }
   });
 
+  const authorLicenses = await prisma.license.findMany({
+    where: { applicantId: profile.id },
+    include: { story: true },
+    orderBy: { createdAt: "desc" }
+  });
+
   return (
     <div className="min-h-screen bg-surface flex cursor-default overflow-hidden">
       <Sidebar />
@@ -65,6 +71,7 @@ export default async function DashboardPage() {
                 profile={profile} 
                 comments={comments}
                 reports={authorReports}
+                licenses={authorLicenses}
                 stats={{
                     totalLikes,
                     totalComments,
