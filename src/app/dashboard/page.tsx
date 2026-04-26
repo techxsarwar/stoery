@@ -46,6 +46,12 @@ export default async function DashboardPage() {
   const totalReads = stories.reduce((sum, story) => sum + (story.reads || 0), 0);
   const totalReadingHours = Number(profile.reading_time_seconds || 0) / 3600;
 
+  const authorReports = await prisma.report.findMany({
+    where: { story: { authorId: profile.id } },
+    include: { story: true, reporter: true },
+    orderBy: { createdAt: "desc" }
+  });
+
   return (
     <div className="min-h-screen bg-surface flex cursor-default overflow-hidden">
       <Sidebar />
@@ -58,6 +64,7 @@ export default async function DashboardPage() {
                 stories={stories} 
                 profile={profile} 
                 comments={comments}
+                reports={authorReports}
                 stats={{
                     totalLikes,
                     totalComments,

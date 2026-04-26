@@ -3,7 +3,8 @@
 import { useTransition, useState } from "react";
 import { deleteStory, updateStoryStatus } from "@/actions/story";
 import Link from "next/link";
-import { Plus, Book, Trash2, Pause, Play, Edit3, MessageCircle, BarChart, Ghost } from "lucide-react";
+import { Plus, Book, Trash2, Pause, Play, Edit3, MessageCircle, BarChart, Ghost, ShieldAlert, Flag, Send, Gavel, Scale } from "lucide-react";
+import { respondToReport, submitAppeal } from "@/actions/moderation";
 import AnalyticsGrimoire from "./AnalyticsGrimoire";
 import InteractionChamber from "./InteractionChamber";
 import PillarsOfProsperity from "./PillarsOfProsperity";
@@ -12,6 +13,7 @@ interface DashboardClientProps {
   stories: any[];
   profile: any;
   comments: any[];
+  reports: any[];
   stats: {
       totalLikes: number;
       totalComments: number;
@@ -21,9 +23,15 @@ interface DashboardClientProps {
   }
 }
 
-export default function DashboardClient({ stories, profile, comments, stats }: DashboardClientProps) {
+export default function DashboardClient({ stories, profile, comments, reports, stats }: DashboardClientProps) {
   const [isPending, startTransition] = useTransition();
   const [deleteRitualId, setDeleteRitualId] = useState<string | null>(null);
+
+  const formatDate = (date: string | Date) => {
+    const d = new Date(date);
+    const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  };
 
   const handleToggleStatus = (storyId: string, currentStatus: string) => {
     startTransition(async () => {
@@ -111,7 +119,7 @@ export default function DashboardClient({ stories, profile, comments, stats }: D
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-surface-container-high to-transparent opacity-80" />
                                 
-                                <div className="absolute top-4 left-4">
+                                <div className="absolute top-4 left-4 flex flex-col gap-2">
                                     <span className={`px-3 py-1 rounded-full font-label font-black text-[8px] uppercase tracking-widest border border-white/10 backdrop-blur-md ${
                                         story.status === 'PUBLISHED' ? 'bg-primary/20 text-primary border-primary/30' : 
                                         story.status === 'PAUSED' ? 'bg-orange-500/20 text-orange-400 border-orange-500/30' : 
@@ -119,6 +127,11 @@ export default function DashboardClient({ stories, profile, comments, stats }: D
                                     }`}>
                                         {story.status}
                                     </span>
+                                    {story.isBanned && (
+                                        <span className="px-3 py-1 rounded-full font-label font-black text-[8px] uppercase tracking-widest bg-red-500 text-white border border-red-600">
+                                            BANNED
+                                        </span>
+                                    )}
                                 </div>
                             </div>
 
@@ -166,6 +179,120 @@ export default function DashboardClient({ stories, profile, comments, stats }: D
                 Interaction Chamber
             </h2>
             <InteractionChamber comments={comments} />
+        </section>
+
+        {/* Moderation Center */}
+        <section className="lg:col-span-12 flex flex-col gap-8 mt-12">
+            <h2 className="font-label font-black text-[10px] uppercase tracking-[0.5em] text-on-surface-variant mb-2 flex items-center gap-4">
+                <ShieldAlert size={14} className="text-red-500" />
+                Moderation Center
+            </h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Reports on your stories */}
+                <div className="bg-white border-4 border-on-surface p-8 rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                    <h3 className="font-headline font-black text-2xl uppercase tracking-tighter mb-6 flex items-center gap-3">
+                        <Flag size={20} className="text-primary" />
+                        Incident Reports
+                    </h3>
+                    
+                    <div className="flex flex-col gap-4">
+                        {reports.length === 0 ? (
+                            <p className="text-on-surface/40 italic font-medium">No reports filed against your chronicles.</p>
+                        ) : (
+                            reports.map(report => (
+                                <div key={report.id} className="p-4 bg-on-surface/5 border-2 border-on-surface rounded-xl flex flex-col gap-3">
+                                    <div className="flex justify-between items-start">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-primary">{report.reason}</span>
+                                        <span className="text-[8px] font-bold text-on-surface/30">{formatDate(report.createdAt)}</span>
+                                    </div>
+                                    <p className="text-xs font-black uppercase text-on-surface/60">Story: {report.story.title}</p>
+                                    <p className="text-sm font-medium italic">"{report.details || "No details provided"}"</p>
+                                    
+                                    {report.authorResponse ? (
+                                        <div className="mt-2 p-3 bg-white border-2 border-on-surface/10 rounded-lg">
+                                            <p className="text-[9px] font-black uppercase text-primary mb-1">Your Response:</p>
+                                            <p className="text-xs italic">"{report.authorResponse}"</p>
+                                        </div>
+                                    ) : (
+                                        <button 
+                                            onClick={() => {
+                                                const response = window.prompt("Respond to this report (this will be seen by the staff):");
+                                                if (response) respondToReport(report.id, response).then(res => res.success && window.location.reload());
+                                            }}
+                                            className="mt-2 text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-2"
+                                        >
+                                            Respond to Report <Send size={12} />
+                                        </button>
+                                    )}
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+
+                {/* Banned Stories & Appeals */}
+                <div className="bg-white border-4 border-on-surface p-8 rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                    <h3 className="font-headline font-black text-2xl uppercase tracking-tighter mb-6 flex items-center gap-3">
+                        <Gavel size={20} className="text-red-500" />
+                        Restrictive Actions
+                    </h3>
+                    
+                    <div className="flex flex-col gap-4">
+                        {stories.filter(s => s.isBanned).length === 0 ? (
+                            <p className="text-on-surface/40 italic font-medium">All your chronicles are in good standing.</p>
+                        ) : (
+                            stories.filter(s => s.isBanned).map(story => (
+                                <div key={story.id} className="p-4 bg-red-50 border-2 border-red-500/20 rounded-xl flex flex-col gap-3">
+                                    <div className="flex justify-between items-start">
+                                        <h4 className="font-black text-sm uppercase text-red-700">{story.title}</h4>
+                                        <span className="bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full">BANNED</span>
+                                    </div>
+                                    <p className="text-xs font-medium text-red-900/60">Reason: {story.banReason}</p>
+                                    
+                                    {!story.isPermanentBan && (
+                                        <div className="mt-2 p-4 bg-white border-2 border-red-500/10 rounded-xl">
+                                            <p className="text-[10px] font-black uppercase text-red-500 mb-2 flex items-center gap-2">
+                                                <Scale size={12} /> Appeal Status: {story.appealStatus}
+                                            </p>
+                                            
+                                            {story.appealStatus === 'NONE' ? (
+                                                <div className="flex flex-col gap-3">
+                                                    <p className="text-[10px] font-medium text-on-surface/60">
+                                                        Appeal window closes: {story.banExpiresAt ? formatDate(story.banExpiresAt) : "N/A"}
+                                                    </p>
+                                                    <button 
+                                                        onClick={() => {
+                                                            const appeal = window.prompt("Enter your appeal (state why this story should be reinstated):");
+                                                            if (appeal) submitAppeal(story.id, appeal).then(res => res.success ? window.location.reload() : alert(res.error));
+                                                        }}
+                                                        className="bg-primary text-on-primary text-[10px] font-black uppercase py-2 rounded-lg border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+                                                    >
+                                                        Submit Appeal (180 Days)
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <p className="text-xs italic text-on-surface/60">
+                                                    {story.appealStatus === 'SUBMITTED' ? "Your appeal is currently under review by the High Council." : 
+                                                     story.appealStatus === 'REJECTED' ? "Your appeal was rejected. This chronicle is now under a permanent ban." : 
+                                                     "Your appeal was accepted. The chronicle should be reinstated shortly."}
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {story.isPermanentBan && (
+                                        <div className="mt-2 p-4 bg-red-100 border-2 border-red-500 rounded-xl text-center">
+                                            <p className="text-xs font-black uppercase text-red-700">PERMANENT BAN</p>
+                                            <p className="text-[10px] text-red-700/60 mt-1 italic">This chronicle has been struck from the records forever.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            </div>
         </section>
 
       </div>

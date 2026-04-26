@@ -66,6 +66,24 @@ export default async function StaffDashboard() {
     select: { id: true, name: true, email: true, image: true }
   });
 
+  const allReports = await prisma.report.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      story: {
+        include: { author: true }
+      },
+      reporter: true
+    }
+  });
+
+  const pendingAppeals = await prisma.story.findMany({
+    where: { 
+        isBanned: true,
+        appealStatus: "SUBMITTED"
+    },
+    include: { author: true }
+  });
+
   return (
     <StaffDashboardClient 
       user={dbUser}
@@ -79,6 +97,8 @@ export default async function StaffDashboard() {
       allStories={allStories}
       bannedComments={bannedComments}
       recentUsers={recentUsers}
+      allReports={allReports}
+      pendingAppeals={pendingAppeals}
     />
   );
 }

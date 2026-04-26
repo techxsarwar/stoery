@@ -8,7 +8,10 @@ export default async function DiscoverPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   const stories = await prisma.story.findMany({
-    where: { status: "PUBLISHED" },
+    where: { 
+      status: "PUBLISHED",
+      isBanned: false
+    },
     orderBy: { createdAt: "desc" },
     include: { author: true, _count: { select: { likes: true, comments: true } } },
   });

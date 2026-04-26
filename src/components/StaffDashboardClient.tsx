@@ -15,12 +15,14 @@ import {
   Settings,
   LogOut,
   Clock,
-  AlertOctagon,
-  Unlock,
+  Flag,
+  Scale,
+  Gavel,
+  ShieldAlert,
   ChevronDown
 } from "lucide-react";
 import Link from "next/link";
-import { banStory, unbanStory, updateMonetizationStatus, toggleVerification } from "@/actions/staff";
+import { banStory, unbanStory, updateMonetizationStatus, toggleVerification, resolveReport, handleAppeal } from "@/actions/staff";
 
 interface StaffDashboardClientProps {
   user: { name: string | null; role: string };
@@ -34,6 +36,8 @@ interface StaffDashboardClientProps {
   allStories: any[];
   bannedComments: any[];
   recentUsers: any[];
+  allReports: any[];
+  pendingAppeals: any[];
 }
 
 export default function StaffDashboardClient({ 
@@ -42,19 +46,29 @@ export default function StaffDashboardClient({
   allProfiles, 
   allStories, 
   bannedComments, 
-  recentUsers 
+  recentUsers,
+  allReports,
+  pendingAppeals
 }: StaffDashboardClientProps) {
   const [activeTab, setActiveTab] = useState("Command Hub");
 
   const tabs = [
     { name: "Command Hub", icon: Activity },
     { name: "Verification", icon: CheckCircle },
+    { name: "Reports", icon: Flag },
+    { name: "Appeals", icon: Gavel },
     { name: "Creators", icon: Users },
     { name: "Chronicles", icon: FileText },
     { name: "Moderation", icon: Shield },
     { name: "Economics", icon: Zap },
     { name: "Protocols", icon: Settings },
   ];
+  
+  const formatDate = (date: string | Date) => {
+    const d = new Date(date);
+    const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  };
 
   const handleAction = async (action: () => Promise<any>) => {
     const res = await action();
@@ -68,6 +82,148 @@ export default function StaffDashboardClient({
 
   const renderContent = () => {
     switch (activeTab) {
+      case "Reports":
+        return (
+          <div className="flex flex-col gap-6">
+            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-on-surface/60 flex items-center gap-3">
+              <Flag size={14} className="text-primary" />
+              Intelligence Reports // Total Active: {allReports.filter(r => r.status === 'PENDING').length}
+            </h2>
+
+            <div className="flex flex-col gap-4">
+              {allReports.length === 0 ? (
+                <div className="p-16 rounded-3xl border-4 border-dashed border-on-surface/5 flex items-center justify-center bg-white">
+                  <p className="text-on-surface/20 font-black uppercase tracking-widest text-center">Peace prevails. No incident reports.</p>
+                </div>
+              ) : (
+                allReports.map((report) => (
+                  <div key={report.id} className={`bg-white border-4 border-on-surface p-6 rounded-2xl flex flex-col gap-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all ${report.status !== 'PENDING' ? 'opacity-50' : ''}`}>
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 bg-red-500/10 rounded-xl border-2 border-red-500/20">
+                          <Flag size={20} className="text-red-500" />
+                        </div>
+                        <div>
+                          <h3 className="font-black text-sm uppercase tracking-tight">Reason: {report.reason}</h3>
+                          <p className="text-[9px] text-on-surface/40 uppercase tracking-widest font-bold">Reported By: {report.reporter.pen_name || "Anonymous"} // {formatDate(report.createdAt)}</p>
+                        </div>
+                      </div>
+                      <span className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full border-2 ${
+                        report.status === 'PENDING' ? 'bg-primary text-on-surface border-on-surface' : 'bg-on-surface/5 text-on-surface/40 border-on-surface/10'
+                      }`}>
+                        {report.status}
+                      </span>
+                    </div>
+
+                    <div className="p-4 bg-on-surface/5 border-2 border-on-surface rounded-xl">
+                       <p className="text-xs font-black uppercase tracking-widest text-on-surface/40 mb-2">Subject: {report.story.title}</p>
+                       <p className="font-medium text-sm text-on-surface">"{report.details || "No additional details provided."}"</p>
+                    </div>
+
+                    {report.authorResponse && (
+                      <div className="p-4 bg-primary/5 border-2 border-primary/20 rounded-xl">
+                         <p className="text-xs font-black uppercase tracking-widest text-primary mb-2">Author Response:</p>
+                         <p className="font-medium text-sm text-on-surface italic">"{report.authorResponse}"</p>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between items-center pt-2">
+                       <Link href={`/read/${report.storyId}`} target="_blank" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-2">
+                          Review Chronicle <ArrowUpRight size={12} />
+                       </Link>
+
+                       {report.status === 'PENDING' && (
+                         <div className="flex gap-3">
+                            <button 
+                              onClick={() => {
+                                const reason = window.prompt("Enter ban reason (this will be shown to the author and readers):", report.reason);
+                                if (reason) {
+                                  handleAction(async () => {
+                                    const banRes = await banStory(report.storyId, reason);
+                                    if (banRes.success) {
+                                      return resolveReport(report.id, "RESOLVED");
+                                    }
+                                    return banRes;
+                                  });
+                                }
+                              }}
+                              className="bg-red-500 text-white px-4 py-2 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-red-600 transition-all flex items-center gap-2"
+                            >
+                              <Shield size={14} /> Ban & Resolve
+                            </button>
+                            <button 
+                              onClick={() => handleAction(() => resolveReport(report.id, "DISMISSED"))}
+                              className="bg-on-surface text-white px-4 py-2 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-on-surface/80 transition-all"
+                            >
+                              Dismiss
+                            </button>
+                         </div>
+                       )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        );
+
+      case "Appeals":
+        return (
+          <div className="flex flex-col gap-6">
+            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-on-surface/60 flex items-center gap-3">
+              <Gavel size={14} className="text-primary" />
+              Justice Chamber // Pending Appeals: {pendingAppeals.length}
+            </h2>
+
+            <div className="flex flex-col gap-4">
+              {pendingAppeals.length === 0 ? (
+                <div className="p-16 rounded-3xl border-4 border-dashed border-on-surface/5 flex items-center justify-center bg-white">
+                  <p className="text-on-surface/20 font-black uppercase tracking-widest text-center">No pending appeals found.</p>
+                </div>
+              ) : (
+                pendingAppeals.map((story: any) => (
+                  <div key={story.id} className="bg-white border-4 border-on-surface p-6 rounded-2xl flex flex-col gap-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 bg-primary/10 rounded-xl border-2 border-primary/20">
+                          <Scale size={20} className="text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-black text-sm uppercase tracking-tight">Appeal for: {story.title}</h3>
+                          <p className="text-[9px] text-on-surface/40 uppercase tracking-widest font-bold">By: {story.author.pen_name || "Anonymous"}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 bg-on-surface/5 border-2 border-on-surface rounded-xl">
+                       <p className="text-xs font-black uppercase tracking-widest text-on-surface/40 mb-2">Ban Reason:</p>
+                       <p className="font-medium text-sm text-on-surface mb-4">"{story.banReason}"</p>
+                       <div className="h-0.5 bg-on-surface/10 mb-4"></div>
+                       <p className="text-xs font-black uppercase tracking-widest text-primary mb-2">Author's Appeal:</p>
+                       <p className="font-medium text-sm text-on-surface italic">"{story.appealText}"</p>
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-2">
+                       <button 
+                        onClick={() => handleAction(() => handleAppeal(story.id, "ACCEPTED"))}
+                        className="bg-emerald-500 text-white px-6 py-2 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-2"
+                       >
+                        <CheckCircle size={14} /> Accept Appeal
+                       </button>
+                       <button 
+                        onClick={() => handleAction(() => handleAppeal(story.id, "REJECTED"))}
+                        className="bg-red-500 text-white px-6 py-2 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-red-600 transition-all flex items-center gap-2"
+                       >
+                        <XCircle size={14} /> Reject Appeal
+                       </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        );
+
       case "Verification":
         return (
           <div className="flex flex-col gap-6">
@@ -249,7 +405,7 @@ export default function StaffDashboardClient({
                   <div className="flex items-center gap-3">
                     <span className="text-[9px] text-primary uppercase font-black tracking-widest">{story.author.pen_name || "Unknown"}</span>
                     <span className="text-[9px] text-on-surface/20 uppercase font-black tracking-widest flex items-center gap-1">
-                      <Clock size={10} /> {new Date(story.createdAt).toLocaleDateString()}
+                      <Clock size={10} /> {formatDate(story.createdAt)}
                     </span>
                   </div>
                 </div>
@@ -266,7 +422,10 @@ export default function StaffDashboardClient({
                     </button>
                   ) : (
                     <button 
-                      onClick={() => handleAction(() => banStory(story.id))}
+                      onClick={() => {
+                        const reason = window.prompt("Enter ban reason:");
+                        if (reason) handleAction(() => banStory(story.id, reason));
+                      }}
                       className="bg-red-500 text-white px-4 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-tighter hover:bg-red-600 transition-all flex items-center gap-2"
                     >
                       <AlertOctagon size={14} /> Ban Story
