@@ -101,7 +101,7 @@ export default function LicenseCertificate({ license, story, profile }: LicenseC
 
       {/* Footer Branding */}
       <div className="text-[10px] font-black uppercase tracking-[1em] text-on-surface/20 pb-4">
-        StoryVerse // Codex Registry
+        SOULPAD // Codex Registry
       </div>
 
       {/* Watermark */}

@@ -75,3 +75,44 @@ export async function reviewLicense(licenseId: string, status: "APPROVED" | "REJ
     return { success: false, error: "Failed to process application" };
   }
 }
+
+export async function verifyLicense(licenseNumber: string) {
+  try {
+    const license = await prisma.license.findUnique({
+      where: { licenseNumber: licenseNumber },
+      include: {
+        story: {
+          select: {
+            title: true,
+            description: true,
+            genre: true,
+            author: {
+              select: {
+                pen_name: true
+              }
+            }
+          }
+        },
+        applicant: {
+          select: {
+            pen_name: true,
+            full_name: true
+          }
+        }
+      }
+    });
+
+    if (!license) {
+      return { success: false, error: "License not found" };
+    }
+
+    if (license.status !== "APPROVED") {
+      return { success: false, error: "This license is not yet active" };
+    }
+
+    return { success: true, license };
+  } catch (error) {
+    console.error("Failed to verify license:", error);
+    return { success: false, error: "An error occurred during verification" };
+  }
+}

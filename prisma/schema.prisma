@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,22 +8,20 @@ datasource db {
   directUrl = env("DATABASE_URL")
 }
 
-// NextAuth Models
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -47,8 +42,8 @@ model User {
   image         String?
   role          UserRole  @default(AUTHOR)
   accounts      Account[]
-  sessions      Session[]
   profile       Profile?
+  sessions      Session[]
 }
 
 model VerificationToken {
@@ -57,6 +52,145 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Profile {
+  id                   String             @id @default(cuid())
+  full_name            String?
+  pen_name             String?            @unique
+  age                  Int?
+  parentage            String?
+  guardian_approved    Boolean            @default(false)
+  userId               String             @unique
+  bank_account_holder  String?
+  bank_account_number  String?
+  ifsc_code            String?
+  legal_name           String?
+  monetization_status  MonetizationStatus @default(NONE)
+  pan_number           String?
+  phone_number         String?
+  reading_time_seconds BigInt             @default(0)
+  isVerified           Boolean            @default(false)
+  codexEntries         CodexEntry[]
+  comments             Comment[]
+  licenses             License[]
+  likes                Like[]
+  nexusMessages        NexusMessage[]
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reports              Report[]
+  stories              Story[]
+}
+
+model Story {
+  id                   String       @id @default(cuid())
+  title                String
+  content              String?
+  genre                String?
+  cover_url            String?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  authorId             String
+  status               StoryStatus  @default(PUBLISHED)
+  description          String?
+  reads                Int          @default(0)
+  reading_time_seconds BigInt       @default(0)
+  isBanned             Boolean      @default(false)
+  banReason            String?
+  appealStatus         AppealStatus @default(NONE)
+  appealText           String?
+  banExpiresAt         DateTime?
+  isPermanentBan       Boolean      @default(false)
+  chapters             Chapter[]
+  comments             Comment[]
+  license              License?
+  likes                Like[]
+  reports              Report[]
+  author               Profile      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model Report {
+  id             String       @id @default(cuid())
+  reason         String
+  details        String?
+  status         ReportStatus @default(PENDING)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  storyId        String
+  reporterId     String
+  authorResponse String?
+  reporter       Profile      @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  story          Story        @relation(fields: [storyId], references: [id], onDelete: Cascade)
+}
+
+model Chapter {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  storyId   String
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  profileId String
+  storyId   String
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, storyId])
+}
+
+model Comment {
+  id             String   @id @default(cuid())
+  content        String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  profileId      String
+  storyId        String
+  isShadowBanned Boolean  @default(false)
+  profile        Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  story          Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+}
+
+model CodexEntry {
+  id        String   @id @default(cuid())
+  profileId String
+  title     String
+  category  String
+  content   String
+  image_url String?
+  isPrivate Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model NexusMessage {
+  id        String   @id @default(cuid())
+  content   String
+  profileId String
+  createdAt DateTime @default(now())
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model License {
+  id            String        @id @default(cuid())
+  storyId       String        @unique
+  applicantId   String
+  status        LicenseStatus @default(PENDING)
+  legalName     String
+  licenseType   String
+  details       String?
+  issuedAt      DateTime?
+  licenseNumber String?       @unique
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  applicant     Profile       @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  story         Story         @relation(fields: [storyId], references: [id], onDelete: Cascade)
 }
 
 enum UserRole {
@@ -79,81 +213,6 @@ enum MonetizationStatus {
   REJECTED
 }
 
-// Business Domain Models
-model Profile {
-  id               String   @id @default(cuid())
-  full_name        String?
-  pen_name         String?  @unique
-  age              Int?
-  parentage        String?
-  guardian_approved Boolean @default(false)
-  userId           String   @unique
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // Monetization fields
-  reading_time_seconds BigInt @default(0)
-  monetization_status MonetizationStatus @default(NONE)
-  legal_name           String?
-  pan_number           String?
-  bank_account_number  String?
-  ifsc_code           String?
-  bank_account_holder  String?
-  phone_number         String?
-  isVerified           Boolean @default(false)
-
-  stories      Story[]
-  likes        Like[]
-  comments     Comment[]
-  codexEntries CodexEntry[]
-  nexusMessages NexusMessage[]
-  reports      Report[]
-  licenses     License[]
-}
-
-model Story {
-  id          String   @id @default(cuid())
-  title       String
-  description String?  @db.Text
-  content     String?  @db.Text
-  genre       String?
-  cover_url   String?
-  status      StoryStatus @default(PUBLISHED)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  authorId    String
-  reads       Int      @default(0)
-  reading_time_seconds BigInt @default(0)
-  isBanned        Boolean  @default(false)
-  banReason       String?  @db.Text
-  banExpiresAt    DateTime?
-  appealText      String?  @db.Text
-  appealStatus    AppealStatus @default(NONE)
-  isPermanentBan  Boolean  @default(false)
-
-  author   Profile   @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  chapters Chapter[]
-  likes    Like[]
-  comments Comment[]
-  reports  Report[]
-  license  License?
-}
-
-model Report {
-  id              String   @id @default(cuid())
-  reason          String   @db.Text
-  details         String?  @db.Text
-  authorResponse  String?  @db.Text
-  status          ReportStatus @default(PENDING)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  storyId         String
-  story           Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
-  
-  reporterId      String
-  reporter        Profile  @relation(fields: [reporterId], references: [id], onDelete: Cascade)
-}
-
 enum ReportStatus {
   PENDING
   RESOLVED
@@ -165,82 +224,6 @@ enum AppealStatus {
   SUBMITTED
   ACCEPTED
   REJECTED
-}
-
-
-model Chapter {
-  id        String   @id @default(cuid())
-  title     String
-  content   String   @db.Text
-  order     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  storyId   String
-
-  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
-}
-
-model Like {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  profileId String
-  storyId   String
-
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  story   Story   @relation(fields: [storyId], references: [id], onDelete: Cascade)
-
-  @@unique([profileId, storyId])
-}
-
-model Comment {
-  id        String   @id @default(cuid())
-  content   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  profileId String
-  storyId   String
-  isShadowBanned Boolean @default(false)
-
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  story   Story   @relation(fields: [storyId], references: [id], onDelete: Cascade)
-}
-
-model CodexEntry {
-  id        String   @id @default(cuid())
-  profileId String
-  title     String
-  category  String   // "Character", "Location", "Artifact", "Lore"
-  content   String   @db.Text
-  image_url String?
-  isPrivate Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-}
-
-model NexusMessage {
-  id        String   @id @default(cuid())
-  content   String
-  profileId String
-  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-}
-
-model License {
-  id              String   @id @default(cuid())
-  storyId         String   @unique
-  story           Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
-  applicantId     String
-  applicant       Profile  @relation(fields: [applicantId], references: [id], onDelete: Cascade)
-  status          LicenseStatus @default(PENDING)
-  legalName       String
-  licenseType     String
-  details         String?  @db.Text
-  issuedAt        DateTime?
-  licenseNumber   String?  @unique
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 }
 
 enum LicenseStatus {

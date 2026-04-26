@@ -26,7 +26,7 @@ export default function ReportStory({ storyId }: ReportStoryProps) {
 
     setIsSubmitting(false);
     if (res.success) {
-      setMessage({ type: "success", text: "Report submitted successfully. Thank you for keeping StoryVerse safe." });
+      setMessage({ type: "success", text: "Report submitted successfully. Thank you for keeping SOULPAD safe." });
       setTimeout(() => {
         setIsOpen(false);
         setMessage(null);

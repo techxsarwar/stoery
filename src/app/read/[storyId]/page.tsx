@@ -79,7 +79,7 @@ export default async function ReadStoryPage({ params }: { params: Promise<{ stor
              <div className="flex flex-col gap-4 items-center">
                 <p className="font-headline font-black text-xs uppercase tracking-[0.3em] text-on-surface/40">Reason for Restriction</p>
                 <p className="font-body text-2xl font-bold text-on-surface italic max-w-lg">
-                    "{story.banReason || "This content has been restricted due to a violation of StoryVerse community guidelines."}"
+                    "{story.banReason || "This content has been restricted due to a violation of SOULPAD community guidelines."}"
                 </p>
                 
                 {!story.isPermanentBan && story.banExpiresAt && (
