@@ -57,6 +57,7 @@ export default function StaffDashboardClient({
   allLicenses
 }: StaffDashboardClientProps) {
   const [activeTab, setActiveTab] = useState("Command Hub");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const tabs = [
     { name: "Command Hub", icon: Activity },
@@ -471,7 +472,7 @@ export default function StaffDashboardClient({
         return (
           <div className="flex flex-col gap-4">
             {allStories.map((story) => (
-              <div key={story.id} className={`bg-white border-4 border-on-surface p-5 rounded-2xl flex items-center justify-between hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all ${story.isBanned ? 'opacity-70 grayscale' : ''}`}>
+              <div key={story.id} className={`bg-white border-4 border-on-surface p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all ${story.isBanned ? 'opacity-70 grayscale' : ''}`}>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
                     <h3 className="font-black text-base tracking-tight uppercase">{story.title}</h3>
@@ -548,7 +549,7 @@ export default function StaffDashboardClient({
             <h2 className="text-xs font-black uppercase tracking-[0.4em] text-on-surface/60">Monetization Protocols</h2>
             <div className="grid grid-cols-1 gap-4">
                 {stats.pendingApps.map((app) => (
-                  <div key={app.id} className="bg-white border-4 border-on-surface p-6 rounded-2xl flex items-center justify-between shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                  <div key={app.id} className="bg-white border-4 border-on-surface p-6 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                     <div className="flex items-center gap-6">
                        <div className="w-16 h-16 bg-on-surface/5 rounded-xl border-2 border-on-surface flex items-center justify-center overflow-hidden">
                           {app.user.image ? <img src={app.user.image} alt="" className="w-full h-full object-cover" /> : <Users className="text-on-surface/20" />}
@@ -624,13 +625,31 @@ export default function StaffDashboardClient({
 
   return (
     <div className="min-h-screen bg-surface text-on-surface flex overflow-hidden font-sans selection:bg-primary/30">
+
+      {/* Mobile hamburger */}
+      <button
+        onClick={() => setIsSidebarOpen(true)}
+        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-on-primary rounded-lg border-2 border-on-surface shadow-[3px_3px_0px_0px_rgba(0,0,0,0.8)]"
+        aria-label="Open menu"
+      >
+        <Shield className="w-5 h-5" />
+      </button>
+
+      {/* Backdrop */}
+      {isSidebarOpen && (
+        <div className="md:hidden fixed inset-0 z-40 bg-black/60" onClick={() => setIsSidebarOpen(false)} />
+      )}
+
       {/* Aegis Sidebar */}
-      <aside className="w-20 md:w-64 bg-primary border-r-4 border-on-surface flex flex-col items-center md:items-start py-8 transition-all duration-300">
+      <aside className={`fixed md:relative top-0 left-0 h-screen z-50 w-72 md:w-20 lg:w-64 bg-primary border-r-4 border-on-surface flex flex-col items-start py-8 transition-transform duration-300 ${
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+      }`}>
         <div className="px-6 mb-12 flex items-center gap-3">
           <div className="w-10 h-10 bg-on-surface flex items-center justify-center rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]">
             <Shield className="text-primary w-6 h-6" />
           </div>
-          <span className="hidden md:block font-black text-xl tracking-tighter uppercase text-on-surface">AEGIS</span>
+          <span className="md:hidden lg:block font-black text-xl tracking-tighter uppercase text-on-surface">AEGIS</span>
+          <button onClick={() => setIsSidebarOpen(false)} className="md:hidden ml-auto p-1 text-on-surface/60 hover:text-on-surface"><XCircle className="w-5 h-5" /></button>
         </div>
 
         <nav className="flex-grow w-full px-4 flex flex-col gap-2">
@@ -645,7 +664,7 @@ export default function StaffDashboardClient({
               }`}
             >
               <item.icon className={`w-5 h-5 ${activeTab === item.name ? "animate-pulse" : ""}`} />
-              <span className="hidden md:block font-black uppercase tracking-widest text-[10px]">
+              <span className="md:hidden lg:block font-black uppercase tracking-widest text-[10px]">
                 {item.name}
               </span>
             </button>
@@ -655,32 +674,31 @@ export default function StaffDashboardClient({
         <div className="px-4 w-full">
             <Link href="/" className="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface/70 hover:text-on-surface hover:bg-on-surface/10 transition-all w-full">
                 <LogOut className="w-5 h-5" />
-                <span className="hidden md:block font-black uppercase tracking-widest text-[10px]">Exit Portal</span>
+                <span className="md:hidden lg:block font-black uppercase tracking-widest text-[10px]">Exit Portal</span>
             </Link>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-grow h-screen overflow-y-auto custom-scrollbar bg-[radial-gradient(circle_at_top_right,#eab30805,transparent)]">
-        <div className="max-w-7xl mx-auto px-8 py-10 flex flex-col gap-10">
+      <main className="flex-grow ml-0 md:ml-20 lg:ml-0 h-screen overflow-y-auto custom-scrollbar bg-[radial-gradient(circle_at_top_right,#eab30805,transparent)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 md:py-10 flex flex-col gap-8 md:gap-10">
           
           {/* Header Area */}
-          <header className="flex justify-between items-center">
+          <header className="flex justify-between items-start gap-4 pl-12 md:pl-0">
             <div>
-              <h1 className="text-4xl font-black tracking-tighter uppercase italic">{activeTab} // Section</h1>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tighter uppercase italic">{activeTab} // Section</h1>
               <div className="flex items-center gap-2 mt-2">
                 <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-on-surface/40">Active Session: {user.name}</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-on-surface/40">Session: {user.name}</p>
               </div>
             </div>
-            
-            <div className="flex gap-4">
+            <div className="hidden sm:flex gap-4">
               <div className="bg-white border-2 border-on-surface px-4 py-2 rounded-lg flex items-center gap-3 group focus-within:border-primary transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <Search size={16} className="text-on-surface/30 group-focus-within:text-primary" />
                 <input 
                   type="text" 
                   placeholder="Query System..." 
-                  className="bg-transparent border-none outline-none text-xs font-black uppercase tracking-widest w-40 placeholder:text-on-surface/20"
+                  className="bg-transparent border-none outline-none text-xs font-black uppercase tracking-widest w-32 placeholder:text-on-surface/20"
                 />
               </div>
             </div>

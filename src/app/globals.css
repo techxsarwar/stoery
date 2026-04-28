@@ -49,8 +49,22 @@
   }
 }
 
+@utility custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #eab308 transparent;
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: #eab308; border-radius: 2px; }
+}
+
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
 @layer base {
-  body {
+  html, body {
+    overflow-x: hidden; /* Prevent horizontal scroll on mobile */
     background-color: var(--color-surface);
     color: var(--color-on-surface);
   }

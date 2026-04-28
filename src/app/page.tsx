@@ -21,13 +21,13 @@ export default async function Home() {
     <>
       <Navbar user={user ?? null} />
 
-      <main className="flex-grow pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto w-full flex flex-col gap-32">
+      <main className="flex-grow pt-28 sm:pt-32 pb-24 px-4 sm:px-6 md:px-12 max-w-7xl mx-auto w-full flex flex-col gap-20 md:gap-32">
         <section className="flex flex-col items-center justify-center text-center min-h-[500px] relative z-10">
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary-container/40 via-surface to-surface opacity-70"></div>
-          <h1 className="font-headline text-5xl md:text-8xl font-black tracking-tighter text-on-surface mb-6 max-w-4xl leading-[0.9] uppercase">
+          <h1 className="font-headline text-4xl sm:text-5xl md:text-8xl font-black tracking-tighter text-on-surface mb-4 sm:mb-6 max-w-4xl leading-[0.9] uppercase">
             Where Every Story Finds Its Reader
           </h1>
-          <p className="font-body text-xl md:text-2xl text-on-surface-variant max-w-2xl mb-12 italic">
+          <p className="font-body text-lg sm:text-xl md:text-2xl text-on-surface-variant max-w-2xl mb-8 sm:mb-12 italic px-2 sm:px-0">
             Join a vibrant community of creators and readers. Write your masterpiece,
             design your covers, and share your universe with the world.
           </p>

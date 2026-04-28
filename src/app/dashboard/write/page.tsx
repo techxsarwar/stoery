@@ -108,7 +108,7 @@ function WriteContent() {
   }
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col items-center pt-24 px-6 md:px-12 w-full mx-auto relative overflow-x-hidden">
+    <div className="min-h-screen bg-surface flex flex-col items-center pt-24 px-4 sm:px-6 md:px-12 w-full mx-auto relative overflow-x-hidden">
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_top,#e5e7eb,transparent)] -z-10"></div>
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:32px_32px]"></div>
       
@@ -118,7 +118,7 @@ function WriteContent() {
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-on-surface/5 pb-8 gap-6">
             <div className="relative">
                 <span className="absolute -left-4 top-0 w-1 h-full bg-primary/20"></span>
-                <h1 className="font-headline text-5xl md:text-7xl font-black text-on-surface uppercase tracking-tighter selection:bg-primary">
+                <h1 className="font-headline text-4xl md:text-5xl lg:text-7xl font-black text-on-surface uppercase tracking-tighter selection:bg-primary">
                     {storyId ? "Refine Mastery" : "Begin Chronicle"}
                 </h1>
                 <p className="font-label font-bold text-on-surface-variant text-[10px] uppercase tracking-[0.4em] mt-4 opacity-50">Transcription of the Unspoken Universe</p>
@@ -134,7 +134,7 @@ function WriteContent() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
           {/* Metadata Section - Left */}
           <div className="lg:col-span-4 flex flex-col gap-8 bg-surface/40 backdrop-blur-md p-8 rounded-2xl border-2 border-on-surface/5 shadow-2xl">
