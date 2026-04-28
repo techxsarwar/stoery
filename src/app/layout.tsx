@@ -21,6 +21,28 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "SOULPAD - Where Every Story Finds Its Reader",
   description: "Join a community of creators and readers. Write your masterpiece, design your covers, and share your universe with the world.",
+  metadataBase: new URL("https://www.globalpulse24.in"),
+  openGraph: {
+    title: "SOULPAD — Where Authors Come Alive",
+    description: "Follow your favourite authors, read their latest stories, and share your own universe. SOULPAD is the home for storytellers.",
+    url: "https://www.globalpulse24.in",
+    siteName: "SOULPAD",
+    images: [
+      {
+        url: "/og-banner.png",
+        width: 1792,
+        height: 1024,
+        alt: "SOULPAD — Where Authors Come Alive",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SOULPAD — Where Authors Come Alive",
+    description: "Follow your favourite authors, read their latest stories, and share your own universe.",
+    images: ["/og-banner.png"],
+  },
 };
 
 export default function RootLayout({
