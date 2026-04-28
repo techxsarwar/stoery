@@ -10,6 +10,7 @@ export const prisma =
     log: ["error"],
   });
 
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
+// Cache in ALL environments — prevents "prepared statement already exists"
+// (PG error 42P05) in serverless where the module cache is reused across
+// warm invocations but connection state may be stale.
+globalForPrisma.prisma = prisma;
