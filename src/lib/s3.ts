@@ -1,21 +1,34 @@
 import { S3Client } from "@aws-sdk/client-s3";
 
-const R2_ENDPOINT = process.env.R2_ENDPOINT;
-const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID;
-const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY;
+let _s3Client: S3Client | null = null;
 
-if (!R2_ENDPOINT || !R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY) {
-  console.warn("R2 storage credentials are not fully configured in environment variables.");
+/**
+ * Returns a lazily-initialized S3Client pointed at Cloudflare R2.
+ * Reading env vars here (instead of at module load) guarantees they are
+ * already set by Next.js before this code runs.
+ */
+export function getS3Client(): S3Client {
+  if (_s3Client) return _s3Client;
+
+  const endpoint = process.env.R2_ENDPOINT;
+  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
+
+  if (!endpoint || !accessKeyId || !secretAccessKey) {
+    throw new Error(
+      `R2 storage credentials missing. Check R2_ENDPOINT, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY.\n` +
+      `Current values: endpoint=${endpoint}, key=${accessKeyId ? "set" : "MISSING"}, secret=${secretAccessKey ? "set" : "MISSING"}`
+    );
+  }
+
+  _s3Client = new S3Client({
+    region: "auto",
+    endpoint,
+    forcePathStyle: true, // Required for Cloudflare R2
+    credentials: { accessKeyId, secretAccessKey },
+  });
+
+  return _s3Client;
 }
 
-export const s3Client = new S3Client({
-  region: "auto",
-  endpoint: R2_ENDPOINT!,
-  forcePathStyle: true, // Required for Cloudflare R2 — prevents virtual-hosted-style URL construction
-  credentials: {
-    accessKeyId: R2_ACCESS_KEY_ID!,
-    secretAccessKey: R2_SECRET_ACCESS_KEY!,
-  },
-});
-
-export const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || "globalpulse";
+export const R2_BUCKET_NAME = () => process.env.R2_BUCKET_NAME || "globalpulse";

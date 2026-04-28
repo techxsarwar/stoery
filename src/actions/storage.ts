@@ -1,7 +1,7 @@
 "use server";
 
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { s3Client, R2_BUCKET_NAME } from "@/lib/s3";
+import { getS3Client, R2_BUCKET_NAME } from "@/lib/s3";
 import { v4 as uuidv4 } from "uuid";
 
 /**
@@ -34,13 +34,13 @@ export async function uploadStoryCover(formData: FormData) {
     }
 
     const command = new PutObjectCommand({
-      Bucket: R2_BUCKET_NAME,
+      Bucket: R2_BUCKET_NAME(),
       Key: fileName,
       Body: buffer,
       ContentType: file.type, // Critical for browser rendering
     });
 
-    await s3Client.send(command);
+    await getS3Client().send(command);
 
     return { 
       success: true, 
@@ -85,13 +85,13 @@ export async function uploadCodexImage(formData: FormData) {
     }
 
     const command = new PutObjectCommand({
-      Bucket: R2_BUCKET_NAME,
+      Bucket: R2_BUCKET_NAME(),
       Key: fileName,
       Body: buffer,
       ContentType: file.type,
     });
 
-    await s3Client.send(command);
+    await getS3Client().send(command);
 
     return { 
       success: true, 
