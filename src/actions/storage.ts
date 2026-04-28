@@ -27,10 +27,10 @@ export async function uploadStoryCover(formData: FormData) {
     const fileExt = file.name.split(".").pop() || "jpg";
     const fileName = `covers/${uuidv4()}.${fileExt}`;
     
-    const publicUrlBase = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+    const publicUrlBase = process.env.R2_PUBLIC_URL;
 
     if (!publicUrlBase) {
-      throw new Error("NEXT_PUBLIC_R2_PUBLIC_URL is not configured.");
+      throw new Error("R2_PUBLIC_URL is not configured.");
     }
 
     const command = new PutObjectCommand({
@@ -78,10 +78,10 @@ export async function uploadCodexImage(formData: FormData) {
     const fileExt = file.name.split(".").pop() || "jpg";
     const fileName = `codex/${uuidv4()}.${fileExt}`;
     
-    const publicUrlBase = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+    const publicUrlBase = process.env.R2_PUBLIC_URL;
 
     if (!publicUrlBase) {
-      throw new Error("NEXT_PUBLIC_R2_PUBLIC_URL is not configured.");
+      throw new Error("R2_PUBLIC_URL is not configured.");
     }
 
     const command = new PutObjectCommand({

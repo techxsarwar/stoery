@@ -107,6 +107,7 @@ export default function SignupForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
+          autoComplete="new-password"
           placeholder="••••••••"
           className="w-full border-4 border-on-surface px-5 py-4 font-body font-bold text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface placeholder:text-on-surface-variant/50"
         />
@@ -122,6 +123,7 @@ export default function SignupForm() {
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
           minLength={6}
+          autoComplete="new-password"
           placeholder="••••••••"
           className="w-full border-4 border-on-surface px-5 py-4 font-body font-bold text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface placeholder:text-on-surface-variant/50"
         />
