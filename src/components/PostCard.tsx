@@ -10,6 +10,7 @@ interface PostCardProps {
   post: {
     id: string;
     content: string;
+    image_url?: string | null;
     createdAt: Date;
     likeCount: number;
     isLikedByMe: boolean;
@@ -166,7 +167,19 @@ export default function PostCard({
       </div>
 
       {/* Post Content — @mentions rendered as links */}
-      <RenderContent text={post.content} />
+      {post.content && <RenderContent text={post.content} />}
+
+      {/* Post Image */}
+      {post.image_url && (
+        <div className="border-4 border-on-surface overflow-hidden">
+          <img
+            src={post.image_url}
+            alt="Post image"
+            className="w-full max-h-96 object-cover"
+            loading="lazy"
+          />
+        </div>
+      )}
 
       {/* Attached Story Card */}
       {story && (

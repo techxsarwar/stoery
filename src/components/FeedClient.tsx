@@ -6,6 +6,7 @@ import PostCard from "@/components/PostCard";
 type Post = {
   id: string;
   content: string;
+  image_url?: string | null;
   createdAt: Date;
   likeCount: number;
   isLikedByMe: boolean;
