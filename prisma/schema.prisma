@@ -58,6 +58,7 @@ model Profile {
   id                   String             @id @default(cuid())
   full_name            String?
   pen_name             String?            @unique
+  username             String?            @unique
   bio                  String?
   avatar_url           String?
   age                  Int?

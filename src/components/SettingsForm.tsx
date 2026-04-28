@@ -4,6 +4,8 @@ import { useState, useTransition, useRef } from "react";
 import { updateProfileSettings } from "@/actions/profile";
 import { uploadProfileAvatar } from "@/actions/storage";
 
+const USERNAME_REGEX = /^[a-z0-9_]*$/;
+
 interface SettingsFormProps {
   profile: {
     pen_name: string | null;
@@ -11,6 +13,7 @@ interface SettingsFormProps {
     age: number | null;
     bio: string | null;
     avatar_url: string | null;
+    username: string | null;
   };
 }
 
@@ -20,23 +23,34 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
   const [age, setAge] = useState(profile.age?.toString() || "");
   const [bio, setBio] = useState(profile.bio || "");
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || "");
+  const [username, setUsername] = useState(profile.username || "");
+  const [usernameError, setUsernameError] = useState("");
   const [isPending, startTransition] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
   const [status, setStatus] = useState<{ type: "idle" | "success" | "error"; message: string }>({ type: "idle", message: "" });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleUsernameChange = (val: string) => {
+    const lower = val.toLowerCase();
+    setUsername(lower);
+    if (lower && !USERNAME_REGEX.test(lower)) {
+      setUsernameError("Only letters, numbers, and underscores");
+    } else if (lower.length > 14) {
+      setUsernameError("Max 14 characters");
+    } else {
+      setUsernameError("");
+    }
+  };
+
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setIsUploading(true);
     setStatus({ type: "idle", message: "" });
-
     try {
       const formData = new FormData();
       formData.append("file", file);
       const result = await uploadProfileAvatar(formData);
-
       if (result.error) {
         setStatus({ type: "error", message: result.error });
       } else if (result.url) {
@@ -52,12 +66,13 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
 
   const handleUpdate = (e: React.FormEvent) => {
     e.preventDefault();
+    if (usernameError) return;
     setStatus({ type: "idle", message: "" });
 
     const parsedAge = parseInt(age);
     if (isNaN(parsedAge) || parsedAge < 1) {
-       setStatus({ type: "error", message: "Please enter a valid age." });
-       return;
+      setStatus({ type: "error", message: "Please enter a valid age." });
+      return;
     }
 
     startTransition(async () => {
@@ -65,6 +80,7 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
         pen_name: penName,
         full_name: fullName,
         age: parsedAge,
+        username,
         bio: bio || undefined,
         avatar_url: avatarUrl || undefined,
       });
@@ -81,35 +97,24 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
 
   return (
     <form onSubmit={handleUpdate} className="flex flex-col gap-5 sm:gap-6 w-full max-w-2xl bg-white p-5 sm:p-8 rounded-xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] border-4 border-on-surface">
-      
+
       {status.type !== "idle" && (
         <div className={`border-4 p-4 font-headline font-bold uppercase tracking-tight shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
-            status.type === "error" ? "border-black bg-red-500 text-white" : "border-black bg-[#1DB954] text-black"
+          status.type === "error" ? "border-black bg-red-500 text-white" : "border-black bg-[#1DB954] text-black"
         }`}>
-          {status.type === "success" && "✓ "} {status.message}
+          {status.type === "success" && "✓ "}{status.message}
         </div>
       )}
 
       {/* Avatar Upload */}
       <div className="flex flex-col items-center gap-4">
-        <p className="font-headline font-black uppercase text-on-surface tracking-tighter text-sm self-start">
-          Profile Avatar
-        </p>
-        <div
-          className="relative group cursor-pointer"
-          onClick={() => fileInputRef.current?.click()}
-        >
+        <p className="font-headline font-black uppercase text-on-surface tracking-tighter text-sm self-start">Profile Avatar</p>
+        <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
           {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt="Your avatar"
-              className="w-28 h-28 rounded-full object-cover border-4 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:opacity-70 transition-opacity"
-            />
+            <img src={avatarUrl} alt="Your avatar" className="w-28 h-28 rounded-full object-cover border-4 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:opacity-70 transition-opacity" />
           ) : (
             <div className="w-28 h-28 rounded-full border-4 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-primary flex items-center justify-center group-hover:opacity-70 transition-opacity">
-              <span className="font-headline font-black text-4xl text-on-primary select-none">
-                {initial}
-              </span>
+              <span className="font-headline font-black text-4xl text-on-primary select-none">{initial}</span>
             </div>
           )}
           <div className="absolute inset-0 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -117,92 +122,78 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
               {isUploading ? "Uploading..." : "Change"}
             </span>
           </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleAvatarChange}
-            className="hidden"
-          />
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
         </div>
         <p className="text-xs font-label text-on-surface-variant font-bold">Click to upload. Max 5 MB.</p>
       </div>
 
+      {/* Username */}
       <div className="flex flex-col gap-2">
-        <label className="font-headline font-black uppercase text-on-surface tracking-tighter text-sm">
-          Pen Name
-        </label>
+        <label className="font-headline font-black uppercase text-on-surface tracking-tighter text-sm">Username</label>
+        <p className="text-xs font-label text-on-surface-variant font-bold">Max 14 characters · Letters, numbers, underscores only</p>
+        <div className="relative">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 font-headline font-black text-lg text-on-surface-variant select-none">@</span>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => handleUsernameChange(e.target.value)}
+            required
+            maxLength={14}
+            className={`w-full border-4 pl-9 pr-16 py-4 font-body font-bold text-lg focus:outline-none transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface ${
+              usernameError ? "border-red-500 bg-red-50" : "border-on-surface focus:bg-primary-container"
+            }`}
+            placeholder="your_handle"
+          />
+          <span className={`absolute right-4 top-1/2 -translate-y-1/2 font-label font-black text-xs ${username.length > 12 ? "text-red-500" : "text-on-surface-variant"}`}>
+            {username.length}/14
+          </span>
+        </div>
+        {usernameError && <p className="text-red-500 font-label font-bold text-xs">{usernameError}</p>}
+      </div>
+
+      {/* Pen Name */}
+      <div className="flex flex-col gap-2">
+        <label className="font-headline font-black uppercase text-on-surface tracking-tighter text-sm">Pen Name</label>
         <p className="text-xs font-label text-on-surface-variant font-bold">This is how you will be known to the universe.</p>
-        <input
-          type="text"
-          value={penName}
-          onChange={(e) => setPenName(e.target.value)}
-          required
-          maxLength={30}
-          className="w-full border-4 border-on-surface px-5 py-4 font-body font-bold text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface"
-        />
+        <input type="text" value={penName} onChange={(e) => setPenName(e.target.value)} required maxLength={30}
+          className="w-full border-4 border-on-surface px-5 py-4 font-body font-bold text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface" />
       </div>
 
+      {/* Full Name */}
       <div className="flex flex-col gap-2">
-        <label className="font-headline font-black uppercase text-on-surface tracking-tighter text-sm">
-          True Name (Full Name)
-        </label>
+        <label className="font-headline font-black uppercase text-on-surface tracking-tighter text-sm">True Name (Full Name)</label>
         <p className="text-xs font-label text-on-surface-variant font-bold">Kept strictly in the vault. For official records only.</p>
-        <input
-          type="text"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          required
-          className="w-full border-4 border-on-surface px-5 py-4 font-body font-bold text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface"
-        />
+        <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required
+          className="w-full border-4 border-on-surface px-5 py-4 font-body font-bold text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface" />
       </div>
 
+      {/* Age */}
       <div className="flex flex-col gap-2">
-        <label className="font-headline font-black uppercase text-on-surface tracking-tighter text-sm">
-          Chronological Age
-        </label>
-        <input
-          type="number"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
-          required
-          min={1}
-          className="w-full border-4 border-on-surface px-5 py-4 font-body font-bold text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface"
-        />
+        <label className="font-headline font-black uppercase text-on-surface tracking-tighter text-sm">Chronological Age</label>
+        <input type="number" value={age} onChange={(e) => setAge(e.target.value)} required min={1}
+          className="w-full border-4 border-on-surface px-5 py-4 font-body font-bold text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface" />
       </div>
 
       {/* Bio */}
       <div className="flex flex-col gap-2">
-        <label className="font-headline font-black uppercase text-on-surface tracking-tighter text-sm">
-          Bio
-        </label>
+        <label className="font-headline font-black uppercase text-on-surface tracking-tighter text-sm">Bio</label>
         <p className="text-xs font-label text-on-surface-variant font-bold">A short tagline about yourself. Visible on your public profile.</p>
-        <textarea
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-          maxLength={300}
-          rows={3}
+        <textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={300} rows={3}
           placeholder="Tell the world your story in 300 characters..."
-          className="w-full border-4 border-on-surface px-5 py-4 font-body font-bold text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface resize-none"
-        />
+          className="w-full border-4 border-on-surface px-5 py-4 font-body font-bold text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface resize-none" />
         <span className={`text-xs font-label font-bold self-end ${bio.length > 280 ? "text-red-500" : "text-on-surface-variant"}`}>
           {bio.length}/300
         </span>
       </div>
 
-      <button
-        type="submit"
-        disabled={isPending || isUploading}
-        className="mt-4 flex items-center justify-center gap-3 bg-primary text-on-primary border-4 border-on-surface px-10 py-5 font-headline font-black text-xl uppercase tracking-tighter shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all w-full disabled:opacity-50"
-      >
+      <button type="submit" disabled={isPending || isUploading || !!usernameError}
+        className="mt-4 flex items-center justify-center gap-3 bg-primary text-on-primary border-4 border-on-surface px-10 py-5 font-headline font-black text-xl uppercase tracking-tighter shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all w-full disabled:opacity-50">
         {isPending ? (
           <>
             <span className="animate-spin inline-block w-5 h-5 border-2 border-on-primary border-t-transparent rounded-full" />
             Engraving...
           </>
-        ) : (
-          "Save Changes"
-        )}
+        ) : "Save Changes"}
       </button>
     </form>
   );

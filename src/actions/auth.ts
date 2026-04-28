@@ -20,9 +20,20 @@ export async function completeOnboarding(formData: FormData) {
   const full_name = formData.get("fullName") as string;
   const parentage = formData.get("parentage") as string;
   const guardian_approved = formData.get("guardianApproved") === "on";
+  const username = (formData.get("username") as string || "").trim().toLowerCase();
 
   if (!age || !pen_name || !full_name) {
     return { error: "Age, Pen Name, and Full Name are required" };
+  }
+
+  if (!username) {
+    return { error: "Username is required" };
+  }
+  if (username.length > 14) {
+    return { error: "Username must be 14 characters or less" };
+  }
+  if (!/^[a-z0-9_]+$/.test(username)) {
+    return { error: "Username can only contain letters, numbers, and underscores" };
   }
 
   try {
@@ -44,6 +55,7 @@ export async function completeOnboarding(formData: FormData) {
         full_name,
         age,
         pen_name,
+        username,
         parentage,
         guardian_approved,
       },
@@ -52,6 +64,7 @@ export async function completeOnboarding(formData: FormData) {
         full_name,
         age,
         pen_name,
+        username,
         parentage,
         guardian_approved,
       },
@@ -61,6 +74,8 @@ export async function completeOnboarding(formData: FormData) {
     return { success: true };
   } catch (e: any) {
     if (e.code === "P2002") {
+      const target = e.meta?.target?.[0];
+      if (target === "username") return { error: "This username is already taken." };
       return { error: "This Pen Name is already taken." };
     }
     console.error("Onboarding error:", e);

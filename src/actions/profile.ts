@@ -8,6 +8,7 @@ export async function updateProfileSettings(data: {
   pen_name: string;
   full_name: string;
   age: number;
+  username: string;
   bio?: string;
   avatar_url?: string;
 }) {
@@ -23,6 +24,11 @@ export async function updateProfileSettings(data: {
   if (!data.age || !data.pen_name || !data.full_name) {
     return { error: "Age, Pen Name, and Full Name are required" };
   }
+
+  const username = (data.username || "").trim().toLowerCase();
+  if (!username) return { error: "Username is required" };
+  if (username.length > 14) return { error: "Username must be 14 characters or less" };
+  if (!/^[a-z0-9_]+$/.test(username)) return { error: "Username can only contain letters, numbers, and underscores" };
 
   // Bio character limit
   if (data.bio && data.bio.length > 300) {
@@ -44,6 +50,7 @@ export async function updateProfileSettings(data: {
         full_name: data.full_name,
         age: data.age,
         pen_name: data.pen_name,
+        username,
         bio: data.bio ?? undefined,
         avatar_url: data.avatar_url ?? undefined,
       },
@@ -55,6 +62,8 @@ export async function updateProfileSettings(data: {
     return { success: true };
   } catch (e: any) {
     if (e.code === "P2002") {
+      const target = e.meta?.target?.[0];
+      if (target === "username") return { error: "This username is already taken." };
       return { error: "This Pen Name is already taken." };
     }
     console.error("Profile update error:", e);
