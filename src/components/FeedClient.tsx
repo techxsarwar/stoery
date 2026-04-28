@@ -7,10 +7,13 @@ type Post = {
   id: string;
   content: string;
   createdAt: Date;
+  likeCount: number;
+  isLikedByMe: boolean;
   profile: {
     id: string;
     pen_name: string | null;
     full_name: string | null;
+    username: string | null;
     avatar_url: string | null;
     isVerified: boolean;
     _count: { followers: number };

@@ -82,6 +82,7 @@ model Profile {
   likes                Like[]
   nexusMessages        NexusMessage[]
   authorPosts          AuthorPost[]
+  postLikes            PostLike[]
   user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   reports              Report[]
   stories              Story[]
@@ -252,11 +253,23 @@ model Follow {
 }
 
 model AuthorPost {
-  id        String   @id @default(cuid())
+  id        String     @id @default(cuid())
   content   String
   profileId String
   storyId   String?
-  createdAt DateTime @default(now())
-  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  story     Story?   @relation(fields: [storyId], references: [id], onDelete: SetNull)
+  createdAt DateTime   @default(now())
+  profile   Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  story     Story?     @relation(fields: [storyId], references: [id], onDelete: SetNull)
+  likes     PostLike[]
+}
+
+model PostLike {
+  id        String     @id @default(cuid())
+  postId    String
+  profileId String
+  createdAt DateTime   @default(now())
+  post      AuthorPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  profile   Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, profileId])
 }

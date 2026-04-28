@@ -33,6 +33,30 @@ export async function createPost(content: string, storyId?: string) {
   return { success: true };
 }
 
+export async function likePost(postId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user?.email) return { error: "Must be logged in" };
+
+  const profile = await prisma.profile.findFirst({
+    where: { user: { email: user.email } },
+  });
+  if (!profile) return { error: "Profile not found" };
+
+  const existing = await prisma.postLike.findUnique({
+    where: { postId_profileId: { postId, profileId: profile.id } },
+  });
+
+  if (existing) {
+    await prisma.postLike.delete({ where: { id: existing.id } });
+    return { success: true, liked: false };
+  } else {
+    await prisma.postLike.create({ data: { postId, profileId: profile.id } });
+    return { success: true, liked: true };
+  }
+}
+
 export async function deletePost(postId: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -57,8 +81,8 @@ export async function deletePost(postId: string) {
   return { success: true };
 }
 
-export async function getAllFeedPosts() {
-  return prisma.authorPost.findMany({
+export async function getAllFeedPosts(currentProfileId?: string) {
+  const posts = await prisma.authorPost.findMany({
     orderBy: { createdAt: "desc" },
     take: 50,
     include: {
@@ -67,6 +91,7 @@ export async function getAllFeedPosts() {
           id: true,
           pen_name: true,
           full_name: true,
+          username: true,
           avatar_url: true,
           isVerified: true,
           _count: { select: { followers: true } },
@@ -81,22 +106,29 @@ export async function getAllFeedPosts() {
           _count: { select: { likes: true } },
         },
       },
+      _count: { select: { likes: true } },
+      ...(currentProfileId
+        ? { likes: { where: { profileId: currentProfileId }, select: { id: true } } }
+        : {}),
     },
   });
+
+  return posts.map((p) => ({
+    ...p,
+    likeCount: p._count.likes,
+    isLikedByMe: currentProfileId ? (p as any).likes?.length > 0 : false,
+  }));
 }
 
 export async function getFollowingFeedPosts(currentProfileId: string) {
-  // Get IDs of profiles the current user follows
   const following = await prisma.follow.findMany({
     where: { followerId: currentProfileId },
     select: { followingId: true },
   });
-
   const followingIds = following.map((f) => f.followingId);
-
   if (followingIds.length === 0) return [];
 
-  return prisma.authorPost.findMany({
+  const posts = await prisma.authorPost.findMany({
     where: { profileId: { in: followingIds } },
     orderBy: { createdAt: "desc" },
     take: 50,
@@ -106,6 +138,7 @@ export async function getFollowingFeedPosts(currentProfileId: string) {
           id: true,
           pen_name: true,
           full_name: true,
+          username: true,
           avatar_url: true,
           isVerified: true,
           _count: { select: { followers: true } },
@@ -120,8 +153,16 @@ export async function getFollowingFeedPosts(currentProfileId: string) {
           _count: { select: { likes: true } },
         },
       },
+      _count: { select: { likes: true } },
+      likes: { where: { profileId: currentProfileId }, select: { id: true } },
     },
   });
+
+  return posts.map((p) => ({
+    ...p,
+    likeCount: p._count.likes,
+    isLikedByMe: p.likes?.length > 0,
+  }));
 }
 
 export async function getSuggestedAuthors(currentProfileId?: string) {

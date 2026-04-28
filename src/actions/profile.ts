@@ -159,6 +159,7 @@ export async function getPublicProfile(penName: string) {
     id: profile.id,
     pen_name: profile.pen_name,
     full_name: profile.full_name,
+    username: profile.username,
     bio: profile.bio,
     avatar_url: profile.avatar_url,
     isVerified: profile.isVerified,

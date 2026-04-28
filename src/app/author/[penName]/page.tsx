@@ -141,6 +141,11 @@ export default async function AuthorProfilePage({ params }: Props) {
                     {safeProfile.full_name}
                   </p>
                 )}
+                {safeProfile.username && (
+                  <p className="font-headline font-black text-primary text-base sm:text-lg tracking-tight mt-1">
+                    @{safeProfile.username}
+                  </p>
+                )}
               </div>
 
               {safeProfile.bio && (

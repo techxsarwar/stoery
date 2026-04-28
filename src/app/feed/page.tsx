@@ -44,7 +44,7 @@ export default async function FeedPage() {
 
   // Data
   const [allPosts, followingPosts, suggestedAuthors] = await Promise.all([
-    getAllFeedPosts(),
+    getAllFeedPosts(currentProfile?.id),
     currentProfile ? getFollowingFeedPosts(currentProfile.id) : Promise.resolve([]),
     getSuggestedAuthors(currentProfile?.id),
   ]);
