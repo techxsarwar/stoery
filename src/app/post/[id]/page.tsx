@@ -89,8 +89,8 @@ export default async function SinglePostPage({ params }: Props) {
     isLikedByMe: currentProfile ? (p.likes?.length ?? 0) > 0 : false,
   };
 
-  const isOwn = post.profile.id === currentProfile?.id;
-  const isFollowing = followingIds.includes(post.profile.id);
+  const isOwn = p.profile.id === currentProfile?.id;
+  const isFollowing = followingIds.includes(p.profile.id);
 
   return (
     <div className="min-h-screen bg-surface pt-20 sm:pt-24">
