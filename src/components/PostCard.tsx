@@ -72,20 +72,20 @@ export default function PostCard({
           {/* Name + meta */}
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5 flex-wrap">
-              {profile.isVerified && (
-                <span
-                  title="Verified Author"
-                  className="inline-flex items-center justify-center w-[18px] h-[18px] bg-blue-500 text-white rounded-full text-[10px] font-black flex-shrink-0 shadow-sm"
-                >
-                  ✓
-                </span>
-              )}
               <Link
                 href={`/author/${encodeURIComponent(profile.pen_name || "")}`}
                 className="font-headline font-black text-sm sm:text-base text-on-surface uppercase tracking-tight hover:text-primary transition-colors"
               >
                 {profile.pen_name}
               </Link>
+              {profile.isVerified && (
+                <span
+                  title="Verified Author"
+                  className="inline-flex items-center justify-center w-[18px] h-[18px] bg-primary border-2 border-on-surface rounded-full text-[10px] font-black flex-shrink-0 shadow-sm text-on-surface"
+                >
+                  ✓
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-2 mt-0.5">
               <span className="font-label text-[10px] sm:text-xs text-on-surface-variant font-bold uppercase tracking-wider">

@@ -164,20 +164,20 @@ export default async function FeedPage() {
 
                         <div className="flex flex-col flex-1 min-w-0">
                           <div className="flex items-center gap-1">
-                            {author.isVerified && (
-                              <span
-                                title="Verified Author"
-                                className="inline-flex items-center justify-center w-3.5 h-3.5 bg-blue-500 text-white rounded-full text-[8px] font-black flex-shrink-0"
-                              >
-                                ✓
-                              </span>
-                            )}
                             <Link
                               href={`/author/${encodeURIComponent(author.pen_name || "")}`}
                               className="font-headline font-black text-xs text-on-surface uppercase truncate hover:text-primary transition-colors"
                             >
                               {author.pen_name}
                             </Link>
+                            {author.isVerified && (
+                              <span
+                                title="Verified Author"
+                                className="inline-flex items-center justify-center w-3.5 h-3.5 bg-primary border border-on-surface rounded-full text-[8px] font-black flex-shrink-0 text-on-surface"
+                              >
+                                ✓
+                              </span>
+                            )}
                           </div>
                           <span className="font-label text-[9px] font-bold text-on-surface-variant">
                             {author._count.followers} followers · {author._count.stories} stories
