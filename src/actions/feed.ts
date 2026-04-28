@@ -4,14 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export async function createPost(content: string, storyId?: string) {
+export async function createPost(content: string, storyId?: string, imageUrl?: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user?.email) return { error: "Must be logged in" };
 
   const trimmed = content.trim();
-  if (!trimmed) return { error: "Post cannot be empty" };
+  if (!trimmed && !imageUrl) return { error: "Post cannot be empty" };
   if (trimmed.length > 500) return { error: "Post must be 500 characters or less" };
 
   const profile = await prisma.profile.findFirst({
@@ -23,6 +23,7 @@ export async function createPost(content: string, storyId?: string) {
   await prisma.authorPost.create({
     data: {
       content: trimmed,
+      image_url: imageUrl || null,
       profileId: profile.id,
       storyId: storyId || null,
     },

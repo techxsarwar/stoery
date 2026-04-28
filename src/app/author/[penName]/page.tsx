@@ -5,6 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 import { getPublicProfile } from "@/actions/profile";
 import Navbar from "@/components/Navbar";
 import FollowButton from "@/components/FollowButton";
+import FollowersModal from "@/components/FollowersModal";
 import type { Metadata } from "next";
 
 // Always server-render at request time so cookies (Supabase session) are available
@@ -167,11 +168,14 @@ export default async function AuthorProfilePage({ params }: Props) {
           </div>
 
           {/* ─── STATS BAR ─── */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-8 sm:mt-10 pt-6 sm:pt-8 border-t-4 border-on-surface/10">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-8 sm:mt-10 pt-6 sm:pt-8 border-t-4 border-on-surface/10 items-start">
             <StatItem label="Stories" value={safeProfile.stories.length} />
             <StatItem label="Total Likes" value={safeProfile.totalLikes} icon="★" />
-            <StatItem label="Followers" value={safeProfile.followerCount} />
-            <StatItem label="Following" value={safeProfile.followingCount} />
+            <FollowersModal
+              penName={safeProfile.pen_name!}
+              followerCount={safeProfile.followerCount}
+              followingCount={safeProfile.followingCount}
+            />
           </div>
         </section>
 

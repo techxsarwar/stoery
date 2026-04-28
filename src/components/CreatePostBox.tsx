@@ -2,11 +2,13 @@
 
 import { useState, useTransition, useRef, useEffect, useCallback } from "react";
 import { createPost, deletePost } from "@/actions/feed";
+import { uploadPostImage } from "@/actions/storage";
 
 interface Story { id: string; title: string; }
 interface RecentPost {
   id: string;
   content: string;
+  image_url?: string | null;
   createdAt: Date;
   story: { id: string; title: string } | null;
 }
@@ -35,16 +37,19 @@ export default function CreatePostBox({
   const [content, setContent] = useState("");
   const [selectedStory, setSelectedStory] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [isUploading, setIsUploading] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [status, setStatus] = useState<{ type: "idle" | "success" | "error"; msg: string }>({
     type: "idle", msg: "",
   });
 
-  // Mention autocomplete state
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const [mentionResults, setMentionResults] = useState<MentionProfile[]>([]);
-  const [mentionPos, setMentionPos] = useState(0); // caret position where @ was typed
+  const [mentionPos, setMentionPos] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const mentionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const fetchMentions = useCallback(async (q: string) => {
     if (!q) { setMentionResults([]); return; }
@@ -62,7 +67,6 @@ export default function CreatePostBox({
     setContent(val);
 
     const caret = e.target.selectionStart ?? val.length;
-    // Find if we're currently inside an @mention being typed
     const textBeforeCaret = val.slice(0, caret);
     const mentionMatch = textBeforeCaret.match(/@([a-zA-Z0-9_]{0,14})$/);
 
@@ -88,17 +92,55 @@ export default function CreatePostBox({
     textareaRef.current?.focus();
   };
 
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Local preview
+    const reader = new FileReader();
+    reader.onload = (ev) => setImagePreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+
+    setIsUploading(true);
+    setStatus({ type: "idle", msg: "" });
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const result = await uploadPostImage(fd);
+      if (result.error) {
+        setStatus({ type: "error", msg: result.error });
+        setImagePreview(null);
+      } else if (result.url) {
+        setImageUrl(result.url);
+      }
+    } catch {
+      setStatus({ type: "error", msg: "Image upload failed." });
+      setImagePreview(null);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const removeImage = () => {
+    setImageUrl(null);
+    setImagePreview(null);
+    if (imageInputRef.current) imageInputRef.current.value = "";
+  };
+
   const handlePost = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim()) return;
+    if (!content.trim() && !imageUrl) return;
     startTransition(async () => {
-      const res = await createPost(content, selectedStory || undefined);
+      const res = await createPost(content, selectedStory || undefined, imageUrl || undefined);
       if (res.error) {
         setStatus({ type: "error", msg: res.error });
       } else {
         setStatus({ type: "success", msg: "Post published to the feed!" });
         setContent("");
         setSelectedStory("");
+        setImageUrl(null);
+        setImagePreview(null);
+        if (imageInputRef.current) imageInputRef.current.value = "";
         setTimeout(() => setStatus({ type: "idle", msg: "" }), 3000);
       }
     });
@@ -130,7 +172,7 @@ export default function CreatePostBox({
           </div>
         )}
 
-        {/* Textarea + mention dropdown wrapper */}
+        {/* Textarea + mention dropdown */}
         <div className="relative">
           <textarea
             ref={textareaRef}
@@ -142,7 +184,6 @@ export default function CreatePostBox({
             className="w-full border-4 border-on-surface px-4 py-3 font-body text-base text-on-surface bg-surface focus:outline-none focus:bg-primary-container transition-colors resize-none"
           />
 
-          {/* Mention dropdown */}
           {mentionQuery !== null && mentionResults.length > 0 && (
             <div className="absolute left-0 top-full mt-1 z-50 bg-white border-4 border-on-surface shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] w-full max-w-xs flex flex-col overflow-hidden">
               {mentionResults.map((profile) => (
@@ -176,8 +217,54 @@ export default function CreatePostBox({
           )}
         </div>
 
+        {/* Image Preview */}
+        {imagePreview && (
+          <div className="relative border-4 border-on-surface overflow-hidden">
+            <img
+              src={imagePreview}
+              alt="Post image preview"
+              className="w-full max-h-72 object-cover"
+            />
+            {isUploading && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <span className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+              </div>
+            )}
+            {!isUploading && (
+              <button
+                type="button"
+                onClick={removeImage}
+                className="absolute top-2 right-2 w-8 h-8 bg-on-surface text-white border-2 border-white flex items-center justify-center font-black text-sm hover:bg-red-500 transition-colors"
+                aria-label="Remove image"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto flex-wrap">
+            {/* Image upload button */}
+            <button
+              type="button"
+              onClick={() => imageInputRef.current?.click()}
+              disabled={isUploading || !!imageUrl}
+              className="border-4 border-on-surface bg-white px-3 py-2 font-label font-bold text-sm text-on-surface uppercase hover:bg-primary hover:text-on-primary transition-colors disabled:opacity-40 flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {isUploading ? "Uploading..." : "Add Image"}
+            </button>
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelect}
+              className="hidden"
+            />
+
             {stories.length > 0 && (
               <select
                 value={selectedStory}
@@ -197,7 +284,7 @@ export default function CreatePostBox({
 
           <button
             type="submit"
-            disabled={isPending || !content.trim()}
+            disabled={isPending || isUploading || (!content.trim() && !imageUrl)}
             className="w-full sm:w-auto bg-primary text-on-primary border-4 border-on-surface px-8 py-3 font-headline font-black uppercase tracking-tighter shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all disabled:opacity-40 flex items-center justify-center gap-2"
           >
             {isPending ? (
@@ -218,8 +305,17 @@ export default function CreatePostBox({
           </h4>
           {recentPosts.map((post) => (
             <div key={post.id} className="bg-white border-4 border-on-surface/30 p-4 flex flex-col sm:flex-row sm:items-start gap-3 sm:justify-between">
-              <div className="flex flex-col gap-1 flex-1 min-w-0">
-                <p className="font-body text-sm text-on-surface line-clamp-2">{post.content}</p>
+              <div className="flex flex-col gap-2 flex-1 min-w-0">
+                {post.image_url && (
+                  <img
+                    src={post.image_url}
+                    alt="Post image"
+                    className="w-full max-h-40 object-cover border-2 border-on-surface/20"
+                  />
+                )}
+                {post.content && (
+                  <p className="font-body text-sm text-on-surface line-clamp-2">{post.content}</p>
+                )}
                 <div className="flex items-center gap-2 flex-wrap">
                   {post.story && (
                     <span className="font-label text-[10px] font-black uppercase tracking-wider text-primary">

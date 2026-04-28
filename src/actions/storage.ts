@@ -171,3 +171,39 @@ export async function uploadProfileAvatar(formData: FormData) {
     return { error: `Avatar upload failed: ${e.message || "Unknown error"}` };
   }
 }
+
+/**
+ * Uploads a post image (with optional caption) to Cloudflare R2.
+ */
+export async function uploadPostImage(formData: FormData) {
+  const file = formData.get("file") as File;
+
+  if (!file) return { error: "No file provided" };
+  if (!file.type.startsWith("image/")) return { error: "Invalid file type." };
+  if (file.size > 8 * 1024 * 1024) return { error: "Image too large. Maximum size is 8 MB." };
+
+  try {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    const fileExt = file.name.split(".").pop() || "jpg";
+    const fileName = `posts/${uuidv4()}.${fileExt}`;
+
+    const publicUrlBase = process.env.R2_PUBLIC_URL;
+    if (!publicUrlBase) throw new Error("R2_PUBLIC_URL is not configured.");
+
+    const command = new PutObjectCommand({
+      Bucket: R2_BUCKET_NAME(),
+      Key: fileName,
+      Body: buffer,
+      ContentType: file.type,
+    });
+
+    await getS3Client().send(command);
+
+    return { success: true, url: `${publicUrlBase}/${fileName}` };
+  } catch (e: any) {
+    console.error("R2 Post Image Upload Error:", { message: e.message, code: e.code });
+    return { error: `Image upload failed: ${e.message || "Unknown error"}` };
+  }
+}

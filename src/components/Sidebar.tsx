@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { BookOpen, BarChart3, MessageSquare, Settings, PenTool, Library, DollarSign, Shield, Menu, X } from "lucide-react";
+import { BookOpen, BarChart3, MessageSquare, Settings, PenTool, Library, DollarSign, Shield, Menu, X, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getUserRole } from "@/actions/auth";
 
@@ -35,6 +35,7 @@ export default function Sidebar() {
   }, [isOpen]);
 
   const navItems = [
+    { name: "My Profile", icon: User, href: "/profile" },
     { name: "Manuscripts", icon: BookOpen, href: "/dashboard" },
     { name: "The Codex", icon: Library, href: "/dashboard/codex" },
     { name: "Analytics", icon: BarChart3, href: "/dashboard/analytics" },

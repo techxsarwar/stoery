@@ -254,7 +254,8 @@ model Follow {
 
 model AuthorPost {
   id        String     @id @default(cuid())
-  content   String
+  content   String     @default("")
+  image_url String?
   profileId String
   storyId   String?
   createdAt DateTime   @default(now())
