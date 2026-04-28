@@ -82,10 +82,11 @@ export default async function SinglePostPage({ params }: Props) {
 
   if (!post) notFound();
 
+  const p = post as any;
   const enrichedPost = {
-    ...post,
-    likeCount: post._count.likes,
-    isLikedByMe: currentProfile ? (post as any).likes?.length > 0 : false,
+    ...p,
+    likeCount: p._count?.likes ?? 0,
+    isLikedByMe: currentProfile ? (p.likes?.length ?? 0) > 0 : false,
   };
 
   const isOwn = post.profile.id === currentProfile?.id;
