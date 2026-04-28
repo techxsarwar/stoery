@@ -162,17 +162,23 @@ export default async function FeedPage() {
                           )}
                         </Link>
 
-                        {/* Name + stats */}
                         <div className="flex flex-col flex-1 min-w-0">
-                          <Link
-                            href={`/author/${encodeURIComponent(author.pen_name || "")}`}
-                            className="font-headline font-black text-xs text-on-surface uppercase truncate hover:text-primary transition-colors"
-                          >
-                            {author.pen_name}
+                          <div className="flex items-center gap-1">
                             {author.isVerified && (
-                              <span className="ml-1 text-primary">✓</span>
+                              <span
+                                title="Verified Author"
+                                className="inline-flex items-center justify-center w-3.5 h-3.5 bg-blue-500 text-white rounded-full text-[8px] font-black flex-shrink-0"
+                              >
+                                ✓
+                              </span>
                             )}
-                          </Link>
+                            <Link
+                              href={`/author/${encodeURIComponent(author.pen_name || "")}`}
+                              className="font-headline font-black text-xs text-on-surface uppercase truncate hover:text-primary transition-colors"
+                            >
+                              {author.pen_name}
+                            </Link>
+                          </div>
                           <span className="font-label text-[9px] font-bold text-on-surface-variant">
                             {author._count.followers} followers · {author._count.stories} stories
                           </span>

@@ -123,9 +123,19 @@ export default async function AuthorProfilePage({ params }: Props) {
             {/* Info */}
             <div className="flex-1 flex flex-col gap-3 sm:gap-4 text-center sm:text-left w-full">
               <div>
-                <h1 className="font-headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-on-surface tracking-tighter uppercase leading-none break-words">
-                  {safeProfile.pen_name}
-                </h1>
+                <div className="flex items-center gap-3 flex-wrap">
+                  {safeProfile.isVerified && (
+                    <span
+                      title="Verified Author"
+                      className="inline-flex items-center justify-center w-7 h-7 bg-blue-500 text-white rounded-full text-sm font-black flex-shrink-0 shadow-md"
+                    >
+                      ✓
+                    </span>
+                  )}
+                  <h1 className="font-headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-on-surface tracking-tighter uppercase leading-none break-words">
+                    {safeProfile.pen_name}
+                  </h1>
+                </div>
                 {safeProfile.full_name && (
                   <p className="font-label text-on-surface-variant font-bold uppercase tracking-wider mt-2 text-xs sm:text-sm">
                     {safeProfile.full_name}

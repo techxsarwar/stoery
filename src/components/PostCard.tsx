@@ -72,12 +72,6 @@ export default function PostCard({
           {/* Name + meta */}
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <Link
-                href={`/author/${encodeURIComponent(profile.pen_name || "")}`}
-                className="font-headline font-black text-sm sm:text-base text-on-surface uppercase tracking-tight hover:text-primary transition-colors"
-              >
-                {profile.pen_name}
-              </Link>
               {profile.isVerified && (
                 <span
                   title="Verified Author"
@@ -86,6 +80,12 @@ export default function PostCard({
                   ✓
                 </span>
               )}
+              <Link
+                href={`/author/${encodeURIComponent(profile.pen_name || "")}`}
+                className="font-headline font-black text-sm sm:text-base text-on-surface uppercase tracking-tight hover:text-primary transition-colors"
+              >
+                {profile.pen_name}
+              </Link>
             </div>
             <div className="flex items-center gap-2 mt-0.5">
               <span className="font-label text-[10px] sm:text-xs text-on-surface-variant font-bold uppercase tracking-wider">
