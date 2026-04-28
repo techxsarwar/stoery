@@ -78,8 +78,13 @@ export default function PostCard({
               >
                 {profile.pen_name}
               </Link>
-              {profile.isVerified && (
-                <span className="bg-on-surface text-primary text-[9px] font-black px-1.5 py-0.5 rounded-full">✓</span>
+            {profile.isVerified && (
+                <span
+                  title="Verified Author"
+                  className="inline-flex items-center justify-center w-4 h-4 bg-blue-500 text-white rounded-full text-[9px] font-black flex-shrink-0"
+                >
+                  ✓
+                </span>
               )}
             </div>
             <div className="flex items-center gap-2 mt-0.5">
