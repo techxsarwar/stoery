@@ -9,6 +9,7 @@ interface FollowButtonProps {
   initialIsFollowing: boolean;
   isOwnProfile: boolean;
   isLoggedIn: boolean;
+  compact?: boolean; // Smaller size for feed cards
 }
 
 export default function FollowButton({
@@ -16,20 +17,25 @@ export default function FollowButton({
   initialIsFollowing,
   isOwnProfile,
   isLoggedIn,
+  compact = false,
 }: FollowButtonProps) {
   const [following, setFollowing] = useState(initialIsFollowing);
   const [isHovering, setIsHovering] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
+  const sizeClasses = compact
+    ? "px-3 py-1.5 text-[10px] sm:text-xs min-w-[80px] border-2 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+    : "px-6 sm:px-8 py-3 text-base sm:text-lg min-w-[140px] sm:min-w-[160px] border-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]";
+
   // Own profile — show edit button
   if (isOwnProfile) {
     return (
       <a
         href="/dashboard/settings"
-        className="inline-flex items-center gap-2 bg-white text-on-surface border-4 border-on-surface px-6 sm:px-8 py-3 font-headline font-black text-base sm:text-lg uppercase tracking-tighter shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+        className={`inline-flex items-center justify-center gap-1 bg-white text-on-surface border-on-surface font-headline font-black uppercase tracking-tighter transition-all ${sizeClasses}`}
       >
-        ✎ Edit Profile
+        {compact ? "✎ Edit" : "✎ Edit Profile"}
       </a>
     );
   }
@@ -39,9 +45,9 @@ export default function FollowButton({
     return (
       <a
         href="/auth/signin"
-        className="inline-flex items-center gap-2 bg-on-surface text-white border-4 border-on-surface px-6 sm:px-8 py-3 font-headline font-black text-base sm:text-lg uppercase tracking-tighter shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+        className={`inline-flex items-center justify-center bg-on-surface text-white border-on-surface font-headline font-black uppercase tracking-tighter transition-all ${sizeClasses}`}
       >
-        Sign in to Follow
+        {compact ? "Follow" : "Sign in to Follow"}
       </a>
     );
   }
@@ -60,8 +66,8 @@ export default function FollowButton({
 
   const getLabel = () => {
     if (isPending) return "...";
-    if (following && isHovering) return "UNFOLLOW";
-    if (following) return "FOLLOWING ✓";
+    if (following && isHovering) return compact ? "Unfollow" : "UNFOLLOW";
+    if (following) return compact ? "Following ✓" : "FOLLOWING ✓";
     return "FOLLOW";
   };
 
@@ -77,7 +83,7 @@ export default function FollowButton({
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       disabled={isPending}
-      className={`inline-flex items-center justify-center min-w-[140px] sm:min-w-[160px] px-6 sm:px-8 py-3 font-headline font-black text-base sm:text-lg uppercase tracking-tighter border-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all disabled:opacity-50 ${getStyles()}`}
+      className={`inline-flex items-center justify-center font-headline font-black uppercase tracking-tighter transition-all disabled:opacity-50 ${sizeClasses} ${getStyles()}`}
     >
       {getLabel()}
     </button>

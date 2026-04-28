@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import DashboardClient from "@/components/DashboardClient";
 import Sidebar from "@/components/Sidebar";
+import CreatePostBox from "@/components/CreatePostBox";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -58,6 +59,13 @@ export default async function DashboardPage() {
     orderBy: { createdAt: "desc" }
   });
 
+  const recentPosts = await prisma.authorPost.findMany({
+    where: { profileId: profile.id },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+    include: { story: { select: { id: true, title: true } } },
+  });
+
   return (
     <div className="min-h-screen bg-surface flex cursor-default overflow-hidden">
       <Sidebar />
@@ -66,6 +74,19 @@ export default async function DashboardPage() {
         <Navbar user={user ?? null} />
 
         <div className="max-w-7xl mx-auto px-6 md:px-12 pt-24 pb-32 flex flex-col gap-12">
+            {/* Post Composer */}
+            <section>
+              <h2 className="font-headline font-black text-2xl sm:text-3xl uppercase tracking-tighter text-on-surface mb-4">
+                Your Feed
+              </h2>
+              <CreatePostBox
+                stories={stories
+                  .filter((s) => s.status === "PUBLISHED")
+                  .map((s) => ({ id: s.id, title: s.title }))}
+                recentPosts={recentPosts}
+              />
+            </section>
+
             <DashboardClient 
                 stories={stories} 
                 profile={profile} 

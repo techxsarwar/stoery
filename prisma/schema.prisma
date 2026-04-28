@@ -80,6 +80,7 @@ model Profile {
   licenses             License[]
   likes                Like[]
   nexusMessages        NexusMessage[]
+  authorPosts          AuthorPost[]
   user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   reports              Report[]
   stories              Story[]
@@ -109,6 +110,7 @@ model Story {
   license              License?
   likes                Like[]
   reports              Report[]
+  authorPosts          AuthorPost[]
   author               Profile      @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
@@ -246,4 +248,14 @@ model Follow {
   following   Profile  @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@unique([followerId, followingId])
+}
+
+model AuthorPost {
+  id        String   @id @default(cuid())
+  content   String
+  profileId String
+  storyId   String?
+  createdAt DateTime @default(now())
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  story     Story?   @relation(fields: [storyId], references: [id], onDelete: SetNull)
 }

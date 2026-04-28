@@ -88,6 +88,9 @@ export default function Navbar({ user }: NavbarProps) {
             <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase" href="/discover">
               Discover
             </Link>
+            <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase" href="/feed">
+              Feed
+            </Link>
             <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase" href="/community">
               Community
             </Link>
@@ -156,6 +159,9 @@ export default function Navbar({ user }: NavbarProps) {
               <p className="font-label font-black text-[10px] uppercase tracking-[0.3em] text-on-surface-variant opacity-50 mb-3 px-2">Explore</p>
               <Link href="/discover" className="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface font-headline font-black text-lg uppercase tracking-tight hover:bg-primary/10 hover:text-primary transition-all">
                 <Compass size={20} className="text-primary" /> Discover
+              </Link>
+              <Link href="/feed" className="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface font-headline font-black text-lg uppercase tracking-tight hover:bg-primary/10 hover:text-primary transition-all">
+                <BookOpen size={20} className="text-primary" /> Feed
               </Link>
               <Link href="/community" className="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface font-headline font-black text-lg uppercase tracking-tight hover:bg-primary/10 hover:text-primary transition-all">
                 <Users size={20} className="text-primary" /> Community
