@@ -197,6 +197,7 @@ enum UserRole {
   AUTHOR
   EMPLOYEE
   ADMIN
+  MANAGER
 }
 
 enum StoryStatus {
