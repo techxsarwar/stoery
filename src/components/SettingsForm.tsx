@@ -80,7 +80,7 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
   const initial = (penName || fullName || "?")[0]?.toUpperCase() || "?";
 
   return (
-    <form onSubmit={handleUpdate} className="flex flex-col gap-6 w-full max-w-2xl bg-white p-8 rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] border-4 border-on-surface">
+    <form onSubmit={handleUpdate} className="flex flex-col gap-5 sm:gap-6 w-full max-w-2xl bg-white p-5 sm:p-8 rounded-xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] border-4 border-on-surface">
       
       {status.type !== "idle" && (
         <div className={`border-4 p-4 font-headline font-bold uppercase tracking-tight shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
