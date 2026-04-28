@@ -22,6 +22,27 @@ export default function Navbar({ user }: NavbarProps) {
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [penName, setPenName] = useState<string | null>(null);
+
+  // Fetch pen_name for "My Profile" link
+  useEffect(() => {
+    if (!user?.email) return;
+    
+    async function fetchPenName() {
+      try {
+        const res = await fetch("/api/me/pen-name");
+        if (res.ok) {
+          const data = await res.json();
+          setPenName(data.penName);
+        }
+      } catch {
+        // silently fail — will fallback to /dashboard/settings
+      }
+    }
+    fetchPenName();
+  }, [user?.email]);
+
+  const profileLink = penName ? `/author/${encodeURIComponent(penName)}` : "/dashboard/settings";
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -75,7 +96,7 @@ export default function Navbar({ user }: NavbarProps) {
                 <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase" href="/library">
                   My Library
                 </Link>
-                <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase" href="/dashboard/settings">
+                <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase" href={profileLink}>
                   My Profile
                 </Link>
                 <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase" href="/dashboard">
@@ -148,7 +169,7 @@ export default function Navbar({ user }: NavbarProps) {
                 <Link href="/library" className="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface font-headline font-black text-lg uppercase tracking-tight hover:bg-primary/10 hover:text-primary transition-all">
                   <Library size={20} className="text-primary" /> My Library
                 </Link>
-                <Link href="/dashboard/settings" className="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface font-headline font-black text-lg uppercase tracking-tight hover:bg-primary/10 hover:text-primary transition-all">
+                <Link href={profileLink} className="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface font-headline font-black text-lg uppercase tracking-tight hover:bg-primary/10 hover:text-primary transition-all">
                   <User size={20} className="text-primary" /> My Profile
                 </Link>
                 <Link href="/dashboard" className="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface font-headline font-black text-lg uppercase tracking-tight hover:bg-primary/10 hover:text-primary transition-all">

@@ -58,6 +58,8 @@ model Profile {
   id                   String             @id @default(cuid())
   full_name            String?
   pen_name             String?            @unique
+  bio                  String?
+  avatar_url           String?
   age                  Int?
   parentage            String?
   guardian_approved    Boolean            @default(false)
@@ -73,6 +75,8 @@ model Profile {
   isVerified           Boolean            @default(false)
   codexEntries         CodexEntry[]
   comments             Comment[]
+  followers            Follow[]           @relation("Following")
+  following            Follow[]           @relation("Follower")
   licenses             License[]
   likes                Like[]
   nexusMessages        NexusMessage[]
@@ -231,4 +235,15 @@ enum LicenseStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    Profile  @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   Profile  @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
 }

@@ -118,3 +118,56 @@ export async function uploadCodexImage(formData: FormData) {
   }
 }
 
+/**
+ * Uploads a profile avatar image to Cloudflare R2.
+ */
+export async function uploadProfileAvatar(formData: FormData) {
+  const file = formData.get("file") as File;
+
+  if (!file) {
+    return { error: "No file provided" };
+  }
+
+  if (!file.type.startsWith("image/")) {
+    return { error: "Invalid file type." };
+  }
+
+  // Validate file size (max 5 MB for avatars)
+  if (file.size > 5 * 1024 * 1024) {
+    return { error: "Image too large. Maximum size is 5 MB." };
+  }
+
+  try {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    const fileExt = file.name.split(".").pop() || "jpg";
+    const fileName = `avatars/${uuidv4()}.${fileExt}`;
+
+    const publicUrlBase = process.env.R2_PUBLIC_URL;
+
+    if (!publicUrlBase) {
+      throw new Error("R2_PUBLIC_URL is not configured.");
+    }
+
+    const command = new PutObjectCommand({
+      Bucket: R2_BUCKET_NAME(),
+      Key: fileName,
+      Body: buffer,
+      ContentType: file.type,
+    });
+
+    await getS3Client().send(command);
+
+    return {
+      success: true,
+      url: `${publicUrlBase}/${fileName}`,
+    };
+  } catch (e: any) {
+    console.error("R2 Avatar Upload Error:", {
+      message: e.message,
+      code: e.code,
+    });
+    return { error: `Avatar upload failed: ${e.message || "Unknown error"}` };
+  }
+}

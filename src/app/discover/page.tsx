@@ -13,7 +13,7 @@ export default async function DiscoverPage() {
       isBanned: false
     },
     orderBy: { createdAt: "desc" },
-    include: { author: true, _count: { select: { likes: true, comments: true } } },
+    include: { author: { select: { full_name: true, pen_name: true } }, _count: { select: { likes: true, comments: true } } },
   });
 
   return (
