@@ -15,9 +15,14 @@ export async function uploadStoryCover(formData: FormData) {
     return { error: "No file provided" };
   }
 
-  // Validate file type (optional but recommended)
+  // Validate file type
   if (!file.type.startsWith("image/")) {
     return { error: "Invalid file type. Please upload an image." };
+  }
+
+  // Validate file size (max 10 MB to match server action bodySizeLimit)
+  if (file.size > 10 * 1024 * 1024) {
+    return { error: "Image too large. Maximum size is 10 MB." };
   }
 
   try {
@@ -69,6 +74,11 @@ export async function uploadCodexImage(formData: FormData) {
 
   if (!file.type.startsWith("image/")) {
     return { error: "Invalid file type." };
+  }
+
+  // Validate file size (max 10 MB)
+  if (file.size > 10 * 1024 * 1024) {
+    return { error: "Image too large. Maximum size is 10 MB." };
   }
 
   try {
