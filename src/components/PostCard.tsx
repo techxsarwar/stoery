@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import FollowButton from "@/components/FollowButton";
+import ShareButton from "@/components/ShareButton";
 import { likePost } from "@/actions/feed";
 
 interface PostCardProps {
@@ -43,6 +44,29 @@ function timeAgo(date: Date): string {
   return `${Math.floor(secs / 86400)}d ago`;
 }
 
+/** Renders post content, turning @username into clickable yellow links */
+function RenderContent({ text }: { text: string }) {
+  const parts = text.split(/(@[a-zA-Z0-9_]{1,14})/g);
+  return (
+    <p className="font-body text-base sm:text-lg text-on-surface leading-relaxed whitespace-pre-wrap">
+      {parts.map((part, i) => {
+        if (/^@[a-zA-Z0-9_]{1,14}$/.test(part)) {
+          return (
+            <Link
+              key={i}
+              href={`/u/${part.slice(1)}`}
+              className="text-primary font-black hover:underline"
+            >
+              {part}
+            </Link>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </p>
+  );
+}
+
 export default function PostCard({
   post,
   initialIsFollowing,
@@ -60,16 +84,13 @@ export default function PostCard({
       window.location.href = "/auth/signin";
       return;
     }
-    // Optimistic
     setLiked((prev) => !prev);
-    setLikeCount((prev) => liked ? prev - 1 : prev + 1);
-
+    setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
     startTransition(async () => {
       const result = await likePost(post.id);
       if (result.error) {
-        // Revert
         setLiked((prev) => !prev);
-        setLikeCount((prev) => liked ? prev + 1 : prev - 1);
+        setLikeCount((prev) => (liked ? prev + 1 : prev - 1));
       }
     });
   };
@@ -96,7 +117,6 @@ export default function PostCard({
 
           {/* Name + @username + meta */}
           <div className="flex flex-col">
-            {/* Pen Name + verified */}
             <div className="flex items-center gap-1.5 flex-wrap">
               <Link
                 href={`/author/${encodeURIComponent(profile.pen_name || "")}`}
@@ -113,14 +133,12 @@ export default function PostCard({
                 </span>
               )}
             </div>
-
-            {/* @username + followers + time */}
             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
               {profile.username && (
                 <>
-                  <span className="font-label text-[10px] sm:text-xs text-primary font-black tracking-wide">
+                  <Link href={`/u/${profile.username}`} className="font-label text-[10px] sm:text-xs text-primary font-black tracking-wide hover:underline">
                     @{profile.username}
-                  </span>
+                  </Link>
                   <span className="text-on-surface-variant/30">·</span>
                 </>
               )}
@@ -147,10 +165,8 @@ export default function PostCard({
         </div>
       </div>
 
-      {/* Post Content */}
-      <p className="font-body text-base sm:text-lg text-on-surface leading-relaxed whitespace-pre-wrap">
-        {post.content}
-      </p>
+      {/* Post Content — @mentions rendered as links */}
+      <RenderContent text={post.content} />
 
       {/* Attached Story Card */}
       {story && (
@@ -175,21 +191,28 @@ export default function PostCard({
         </Link>
       )}
 
-      {/* Footer — Like + View Profile */}
-      <div className="flex items-center justify-between pt-2 border-t-2 border-on-surface/10">
-        {/* Like Button */}
-        <button
-          onClick={handleLike}
-          disabled={isPending}
-          className={`flex items-center gap-2 px-4 py-2 border-2 border-on-surface font-headline font-black text-xs uppercase tracking-wider transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-50 ${
-            liked
-              ? "bg-primary text-on-surface"
-              : "bg-white text-on-surface hover:bg-primary"
-          }`}
-        >
-          <span className="text-sm">{liked ? "♥" : "♡"}</span>
-          <span>{likeCount}</span>
-        </button>
+      {/* Footer — Like + Share + View Profile */}
+      <div className="flex items-center justify-between pt-2 border-t-2 border-on-surface/10 gap-2 flex-wrap">
+        <div className="flex items-center gap-2">
+          {/* Like */}
+          <button
+            onClick={handleLike}
+            disabled={isPending}
+            className={`flex items-center gap-2 px-4 py-2 border-2 border-on-surface font-headline font-black text-xs uppercase tracking-wider transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-50 ${
+              liked ? "bg-primary text-on-surface" : "bg-white text-on-surface hover:bg-primary"
+            }`}
+          >
+            <span className="text-sm">{liked ? "♥" : "♡"}</span>
+            <span>{likeCount}</span>
+          </button>
+
+          {/* Share */}
+          <ShareButton
+            postId={post.id}
+            authorName={profile.username || profile.pen_name}
+            content={post.content}
+          />
+        </div>
 
         <Link
           href={`/author/${encodeURIComponent(profile.pen_name || "")}`}
