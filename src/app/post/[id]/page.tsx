@@ -48,34 +48,36 @@ export default async function SinglePostPage({ params }: Props) {
     }
   } catch {}
 
+  const include: any = {
+    profile: {
+      select: {
+        id: true,
+        pen_name: true,
+        full_name: true,
+        username: true,
+        avatar_url: true,
+        isVerified: true,
+        _count: { select: { followers: true } },
+      },
+    },
+    story: {
+      select: {
+        id: true,
+        title: true,
+        genre: true,
+        cover_url: true,
+        _count: { select: { likes: true } },
+      },
+    },
+    _count: { select: { likes: true } },
+  };
+  if (currentProfile) {
+    include.likes = { where: { profileId: currentProfile.id }, select: { id: true } };
+  }
+
   const post = await prisma.authorPost.findUnique({
     where: { id },
-    include: {
-      profile: {
-        select: {
-          id: true,
-          pen_name: true,
-          full_name: true,
-          username: true,
-          avatar_url: true,
-          isVerified: true,
-          _count: { select: { followers: true } },
-        },
-      },
-      story: {
-        select: {
-          id: true,
-          title: true,
-          genre: true,
-          cover_url: true,
-          _count: { select: { likes: true } },
-        },
-      },
-      _count: { select: { likes: true } },
-      ...(currentProfile
-        ? { likes: { where: { profileId: currentProfile.id }, select: { id: true } } }
-        : {}),
-    },
+    include,
   });
 
   if (!post) notFound();

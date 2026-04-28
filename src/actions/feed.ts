@@ -82,41 +82,43 @@ export async function deletePost(postId: string) {
 }
 
 export async function getAllFeedPosts(currentProfileId?: string) {
+  const include: any = {
+    profile: {
+      select: {
+        id: true,
+        pen_name: true,
+        full_name: true,
+        username: true,
+        avatar_url: true,
+        isVerified: true,
+        _count: { select: { followers: true } },
+      },
+    },
+    story: {
+      select: {
+        id: true,
+        title: true,
+        genre: true,
+        cover_url: true,
+        _count: { select: { likes: true } },
+      },
+    },
+    _count: { select: { likes: true } },
+  };
+  if (currentProfileId) {
+    include.likes = { where: { profileId: currentProfileId }, select: { id: true } };
+  }
+
   const posts = await prisma.authorPost.findMany({
     orderBy: { createdAt: "desc" },
     take: 50,
-    include: {
-      profile: {
-        select: {
-          id: true,
-          pen_name: true,
-          full_name: true,
-          username: true,
-          avatar_url: true,
-          isVerified: true,
-          _count: { select: { followers: true } },
-        },
-      },
-      story: {
-        select: {
-          id: true,
-          title: true,
-          genre: true,
-          cover_url: true,
-          _count: { select: { likes: true } },
-        },
-      },
-      _count: { select: { likes: true } },
-      ...(currentProfileId
-        ? { likes: { where: { profileId: currentProfileId }, select: { id: true } } }
-        : {}),
-    },
+    include,
   });
 
-  return posts.map((p) => ({
+  return posts.map((p: any) => ({
     ...p,
     likeCount: p._count.likes,
-    isLikedByMe: currentProfileId ? (p as any).likes?.length > 0 : false,
+    isLikedByMe: currentProfileId ? (p.likes?.length ?? 0) > 0 : false,
   }));
 }
 
@@ -128,40 +130,42 @@ export async function getFollowingFeedPosts(currentProfileId: string) {
   const followingIds = following.map((f) => f.followingId);
   if (followingIds.length === 0) return [];
 
+  const include: any = {
+    profile: {
+      select: {
+        id: true,
+        pen_name: true,
+        full_name: true,
+        username: true,
+        avatar_url: true,
+        isVerified: true,
+        _count: { select: { followers: true } },
+      },
+    },
+    story: {
+      select: {
+        id: true,
+        title: true,
+        genre: true,
+        cover_url: true,
+        _count: { select: { likes: true } },
+      },
+    },
+    _count: { select: { likes: true } },
+    likes: { where: { profileId: currentProfileId }, select: { id: true } },
+  };
+
   const posts = await prisma.authorPost.findMany({
     where: { profileId: { in: followingIds } },
     orderBy: { createdAt: "desc" },
     take: 50,
-    include: {
-      profile: {
-        select: {
-          id: true,
-          pen_name: true,
-          full_name: true,
-          username: true,
-          avatar_url: true,
-          isVerified: true,
-          _count: { select: { followers: true } },
-        },
-      },
-      story: {
-        select: {
-          id: true,
-          title: true,
-          genre: true,
-          cover_url: true,
-          _count: { select: { likes: true } },
-        },
-      },
-      _count: { select: { likes: true } },
-      likes: { where: { profileId: currentProfileId }, select: { id: true } },
-    },
+    include,
   });
 
-  return posts.map((p) => ({
+  return posts.map((p: any) => ({
     ...p,
     likeCount: p._count.likes,
-    isLikedByMe: p.likes?.length > 0,
+    isLikedByMe: (p.likes?.length ?? 0) > 0,
   }));
 }
 
