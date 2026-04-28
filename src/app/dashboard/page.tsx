@@ -6,6 +6,8 @@ import DashboardClient from "@/components/DashboardClient";
 import Sidebar from "@/components/Sidebar";
 import CreatePostBox from "@/components/CreatePostBox";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -59,12 +61,24 @@ export default async function DashboardPage() {
     orderBy: { createdAt: "desc" }
   });
 
-  const recentPosts = await prisma.authorPost.findMany({
-    where: { profileId: profile.id },
-    orderBy: { createdAt: "desc" },
-    take: 3,
-    include: { story: { select: { id: true, title: true } } },
-  });
+  // Wrap recentPosts in try/catch — PostLike/username schema may not exist yet in production
+  let recentPosts: any[] = [];
+  try {
+    recentPosts = await prisma.authorPost.findMany({
+      where: { profileId: profile.id },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+      include: { story: { select: { id: true, title: true } } },
+    });
+  } catch (e) {
+    console.error("recentPosts fetch failed:", e);
+  }
+
+  // Sanitize profile — convert BigInt to Number so RSC serialization doesn't crash
+  const safeProfile = {
+    ...profile,
+    reading_time_seconds: Number(profile.reading_time_seconds ?? 0),
+  };
 
   return (
     <div className="min-h-screen bg-surface flex cursor-default overflow-hidden">
@@ -89,7 +103,7 @@ export default async function DashboardPage() {
 
             <DashboardClient 
                 stories={stories} 
-                profile={profile} 
+                profile={safeProfile} 
                 comments={comments}
                 reports={authorReports}
                 licenses={authorLicenses}
