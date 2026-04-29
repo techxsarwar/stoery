@@ -85,30 +85,40 @@ export default function Navbar({ user }: NavbarProps) {
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="hidden md:flex space-x-8 items-center">
-            <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase" href="/discover">
+          <div className="hidden lg:flex space-x-6 items-center">
+            <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/discover">
               Discover
             </Link>
-            <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase" href="/feed">
+            <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/feed">
               Feed
             </Link>
-            <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase" href="/community">
+            <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/community">
               Community
             </Link>
             {user && (
               <>
-                <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase" href="/library">
+                <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/library">
                   My Library
                 </Link>
-                <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase" href={profileLink}>
-                  My Profile
-                </Link>
-                <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase" href="/dashboard">
+                <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/dashboard">
                   Dashboard
                 </Link>
               </>
             )}
           </div>
+
+          {/* Desktop Search Bar */}
+          <form action="/discover" method="GET" className="hidden md:flex flex-grow max-w-sm mx-8 relative group">
+            <input 
+                name="q"
+                type="text" 
+                placeholder="Search..." 
+                className="w-full bg-surface-container-high border-2 border-transparent focus:border-on-surface px-4 py-1.5 rounded-full font-headline text-sm focus:outline-none transition-all placeholder:text-on-surface-variant/50"
+            />
+            <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-50 group-hover:opacity-100 transition-opacity">
+                <Compass size={16} />
+            </button>
+          </form>
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex gap-4 items-center">

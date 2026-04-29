@@ -4,22 +4,75 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/utils/supabase/server";
 import ClientRecoveryRedirect from "@/components/ClientRecoveryRedirect";
-
-
+import HorizontalCarousel from "@/components/HorizontalCarousel";
+import StoryCard from "@/components/StoryCard";
 
 async function HomeContent() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  const stories = await prisma.story.findMany({
-    take: 6,
-    where: { 
-      status: "PUBLISHED",
-      isBanned: false
-    },
-    orderBy: { createdAt: "desc" },
-    include: { author: true },
-  });
+  const [
+    recentStories,
+    trendingStories,
+    fantasyStories,
+    totalStories,
+    totalAuthors,
+    topAuthors,
+    totalReads,
+    dbGenres
+  ] = await Promise.all([
+    // Recently Published
+    prisma.story.findMany({
+      take: 10,
+      where: { status: "PUBLISHED", isBanned: false },
+      orderBy: { createdAt: "desc" },
+      include: { 
+        author: true,
+        _count: { select: { likes: true } }
+      },
+    }),
+    // Trending (by reads)
+    prisma.story.findMany({
+      take: 10,
+      where: { status: "PUBLISHED", isBanned: false },
+      orderBy: { reads: "desc" },
+      include: { 
+        author: true,
+        _count: { select: { likes: true } }
+      },
+    }),
+    // Genre specific (e.g., Fantasy)
+    prisma.story.findMany({
+        take: 10,
+        where: { status: "PUBLISHED", isBanned: false, genre: "Fantasy" },
+        orderBy: { reads: "desc" },
+        include: { 
+            author: true,
+            _count: { select: { likes: true } }
+        },
+      }),
+    prisma.story.count({ where: { status: "PUBLISHED", isBanned: false } }),
+    prisma.profile.count(),
+    prisma.profile.findMany({
+      take: 5,
+      where: { stories: { some: { status: "PUBLISHED" } } },
+      include: { 
+        _count: { select: { stories: true, followers: true } }
+      },
+      orderBy: { followers: { _count: "desc" } }
+    }),
+    prisma.story.aggregate({
+        _sum: { reads: true }
+    }),
+    prisma.story.findMany({
+        where: { status: "PUBLISHED", isBanned: false, genre: { not: null } },
+        select: { genre: true },
+        distinct: ['genre'],
+        take: 12
+    })
+  ]);
+
+  const genres = dbGenres.length > 0 ? dbGenres.map(g => g.genre as string) : ["Fantasy", "Sci-Fi", "Mystery", "Romance", "Horror", "Thriller"];
 
   let recentHistory = null;
   if (user) {
@@ -36,92 +89,206 @@ async function HomeContent() {
   }
 
   return (
-    <main className="flex-grow pt-28 sm:pt-32 pb-24 px-4 sm:px-6 md:px-12 max-w-7xl mx-auto w-full flex flex-col gap-20 md:gap-32">
-      <section className="flex flex-col items-center justify-center text-center min-h-[500px] relative z-10">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary-container/40 via-surface to-surface opacity-70"></div>
-        <h1 className="font-headline text-4xl sm:text-5xl md:text-8xl font-black tracking-tighter text-on-surface mb-4 sm:mb-6 max-w-4xl leading-[0.9] uppercase">
-          Where Every Story Finds Its Reader
-        </h1>
-        <p className="font-body text-lg sm:text-xl md:text-2xl text-on-surface-variant max-w-2xl mb-8 sm:mb-12 italic px-2 sm:px-0">
-          Join a vibrant community of creators and readers. Write your masterpiece,
-          design your covers, and share your universe with the world.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-6 mt-4">
-          <Link href="#trending" className="bg-primary text-on-primary font-headline text-lg px-10 py-4 rounded font-bold border-2 border-on-surface hover:scale-[1.02] transition-all duration-300 glow-hover uppercase tracking-wide">
-            Start Reading
-          </Link>
-          {!user && (
-            <Link href="/auth/signup" className="bg-surface text-on-surface border-2 border-on-surface font-headline text-lg px-10 py-4 rounded font-bold hover:bg-surface-container-high transition-all duration-300 flex items-center justify-center uppercase tracking-wide glow-hover">
-              Create an Account
-            </Link>
-          )}
+    <main className="flex-grow pb-24 w-full flex flex-col gap-12 md:gap-24">
+      {/* Hero Section - Pure Wattpad Vibe */}
+      <section className="relative min-h-[60vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden border-b-8 border-on-surface">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=2070&auto=format&fit=crop" 
+            alt="Hero Background" 
+            className="w-full h-full object-cover grayscale opacity-40"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/80 to-transparent"></div>
         </div>
-        
-        {recentHistory && (
-            <div className="mt-12 bg-white/80 backdrop-blur-md p-6 rounded-2xl border-4 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-2xl w-full text-left flex items-center gap-6 group hover:translate-x-1 hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all">
-                {recentHistory.story.cover_url && (
-                    <div className="w-24 h-32 flex-shrink-0 bg-surface-variant overflow-hidden border-2 border-on-surface">
-                        <img src={recentHistory.story.cover_url} alt="Cover" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
-                    </div>
-                )}
-                <div className="flex flex-col flex-grow">
-                    <span className="font-label font-black text-[10px] uppercase tracking-widest text-primary mb-1">Continue Reading</span>
-                    <h3 className="font-headline font-black text-2xl uppercase tracking-tighter text-on-surface line-clamp-1">{recentHistory.story.title}</h3>
-                    <p className="font-body text-sm italic text-on-surface-variant mt-1">
-                        {Math.round(recentHistory.scrollProgress * 100)}% through the current chapter
-                    </p>
-                    <Link href={`/read/${recentHistory.storyId}`} className="mt-4 font-headline font-black text-sm uppercase tracking-widest text-on-surface hover:text-primary transition-colors inline-flex items-center gap-2">
-                        Resume Chronicle →
-                    </Link>
-                </div>
+
+        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center flex flex-col items-center">
+            <div className="inline-block px-4 py-1 bg-primary text-on-primary font-headline text-xs font-black uppercase tracking-[0.3em] mb-8 border-2 border-on-surface transform -rotate-1">
+                The New Era of Storytelling
             </div>
-        )}
+            <h1 className="font-headline text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter text-on-surface mb-8 leading-[0.85] uppercase">
+                Where Stories <br/> Come <span className="text-primary">Alive</span>
+            </h1>
+            <p className="font-body text-xl md:text-2xl text-on-surface-variant max-w-2xl mb-12 italic leading-relaxed">
+                Join millions of readers and writers. Share your voice, build your universe, and find your next favorite obsession.
+            </p>
+            
+            <form action="/discover" method="GET" className="w-full max-w-2xl mb-12 relative group">
+                <input 
+                    name="q"
+                    type="text" 
+                    placeholder="Search for stories, authors, or genres..." 
+                    className="w-full bg-white border-4 border-on-surface px-8 py-5 font-headline text-lg focus:outline-none focus:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all placeholder:text-on-surface-variant/50"
+                />
+                <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 bg-on-surface text-surface p-2 cursor-pointer hover:bg-primary hover:text-on-primary transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+            </form>
+
+            <div className="flex flex-col sm:flex-row gap-6">
+                <Link href="/discover" className="bg-primary text-on-primary font-headline text-xl px-12 py-5 border-4 border-on-surface hover:translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all duration-300 uppercase tracking-wider font-black">
+                    Start Reading
+                </Link>
+                {!user && (
+                    <Link href="/auth/signup" className="bg-white text-on-surface border-4 border-on-surface font-headline text-xl px-12 py-5 hover:translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all duration-300 uppercase tracking-wider font-black">
+                        Start Writing
+                    </Link>
+                )}
+            </div>
+        </div>
       </section>
 
-      <section id="trending" className="w-full relative z-10">
-        <div className="flex items-center gap-4 mb-12">
-          <div className="w-8 h-8 bg-primary border-2 border-on-surface transform rotate-3"></div>
-          <h2 className="font-headline text-4xl md:text-5xl font-black text-on-surface tracking-tighter uppercase">
-            Trending This Week
-          </h2>
-        </div>
+      {/* Main Content Area */}
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-12 flex flex-col gap-24">
         
-        {stories.length === 0 ? (
-          <div className="text-center py-12 text-on-surface-variant font-headline text-xl border-2 border-dashed border-outline rounded-lg bg-surface-container">No stories published yet. Be the first!</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {stories.map(story => (
-              <Link key={story.id} href={`/read/${story.id}`}>
-                <article className="bg-surface rounded-lg overflow-hidden group transition-all duration-300 cursor-pointer relative h-full flex flex-col border-2 border-on-surface glow-hover">
-                  <div className="h-48 w-full bg-surface-variant relative overflow-hidden flex-shrink-0 border-b-2 border-on-surface">
-                    <div
-                      className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500 will-change-transform"
-                      style={{
-                        backgroundImage: `url('${story.cover_url || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"}')`,
-                      }}
-                    ></div>
-                  </div>
-                  <div className="p-6 flex flex-col gap-4 relative z-10 flex-grow bg-white">
-                    {story.genre && (
-                      <span className="inline-block px-3 py-1 bg-primary text-on-primary border border-on-surface font-headline text-sm font-bold uppercase tracking-wider w-max transform -rotate-2">
-                        {story.genre}
-                      </span>
-                    )}
-                    <div>
-                      <h3 className="font-headline text-2xl font-black text-on-surface leading-tight uppercase group-hover:text-primary transition-colors">
-                        {story.title}
-                      </h3>
-                      <p className="font-label text-sm text-on-surface-variant font-medium mt-2 uppercase">
-                        By <span className="text-on-surface font-bold">{story.author.full_name || "Unknown Author"}</span>
-                      </p>
-                    </div>
-                  </div>
-                </article>
-              </Link>
-            ))}
-          </div>
+        {/* Continue Reading Section */}
+        {recentHistory && (
+          <section className="bg-surface-container border-4 border-on-surface p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-4 font-headline font-black text-xs uppercase tracking-widest text-primary/20 select-none pointer-events-none">RESUME_SESSION</div>
+             <div className="flex flex-col md:flex-row items-center gap-8">
+                <div className="w-32 h-48 flex-shrink-0 bg-on-surface border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                    <img src={recentHistory.story.cover_url || ""} alt="Cover" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex flex-col text-center md:text-left">
+                    <span className="font-label font-black text-xs uppercase tracking-[0.2em] text-primary mb-2">Continue Reading</span>
+                    <h2 className="font-headline text-3xl md:text-4xl font-black text-on-surface uppercase tracking-tight mb-4">{recentHistory.story.title}</h2>
+                    <p className="font-body text-on-surface-variant italic mb-6 max-w-xl line-clamp-2">
+                        {recentHistory.story.description || "Pick up where you left off in this captivating tale."}
+                    </p>
+                    <Link href={`/read/${recentHistory.storyId}`} className="inline-flex items-center justify-center md:justify-start gap-3 font-headline font-black text-xl uppercase tracking-widest text-on-surface hover:text-primary transition-colors group">
+                        Jump Back In <span className="group-hover:translate-x-2 transition-transform">→</span>
+                    </Link>
+                </div>
+             </div>
+          </section>
         )}
-      </section>
+
+        {/* Discovery Sections */}
+        <div className="flex flex-col gap-24">
+            <HorizontalCarousel title="Trending Stories" subtitle="What everyone is talking about right now.">
+                {trendingStories.map(story => (
+                    <StoryCard 
+                        key={story.id} 
+                        id={story.id} 
+                        title={story.title} 
+                        author={story.author.full_name || story.author.username || "Unknown"} 
+                        coverUrl={story.cover_url}
+                        genre={story.genre}
+                        reads={story.reads}
+                        likes={story._count.likes}
+                    />
+                ))}
+            </HorizontalCarousel>
+
+            <HorizontalCarousel title="New Arrivals" subtitle="Fresh voices and untold tales from the community.">
+                {recentStories.map(story => (
+                    <StoryCard 
+                        key={story.id} 
+                        id={story.id} 
+                        title={story.title} 
+                        author={story.author.full_name || story.author.username || "Unknown"} 
+                        coverUrl={story.cover_url}
+                        genre={story.genre}
+                        reads={story.reads}
+                        likes={story._count.likes}
+                    />
+                ))}
+            </HorizontalCarousel>
+
+            {fantasyStories.length > 0 && (
+                <HorizontalCarousel title="Fantasy Realms" subtitle="Escape into worlds of magic and wonder.">
+                    {fantasyStories.map(story => (
+                        <StoryCard 
+                            key={story.id} 
+                            id={story.id} 
+                            title={story.title} 
+                            author={story.author.full_name || story.author.username || "Unknown"} 
+                            coverUrl={story.cover_url}
+                            genre={story.genre}
+                            reads={story.reads}
+                            likes={story._count.likes}
+                        />
+                    ))}
+                </HorizontalCarousel>
+            )}
+        </div>
+
+        {/* Genre Grid */}
+        <section className="w-full">
+            <div className="flex items-center gap-4 mb-12">
+                <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">Explore Genres</h2>
+                <div className="flex-grow h-1 bg-on-surface-variant/20"></div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+                {genres.map((genre, i) => (
+                    <Link 
+                        key={i} 
+                        href={`/discover?genre=${genre}`}
+                        className="bg-white border-2 border-on-surface p-6 text-center font-headline font-black uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all duration-300 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                    >
+                        {genre}
+                    </Link>
+                ))}
+            </div>
+        </section>
+
+        {/* Community Stats Section */}
+        <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-on-surface text-surface p-12 border-4 border-on-surface shadow-[8px_8px_0px_0px_var(--color-primary)]">
+                <span className="font-headline text-6xl font-black block mb-2">{totalStories.toLocaleString()}</span>
+                <span className="font-label text-sm font-black uppercase tracking-[0.2em] opacity-60">Stories Written</span>
+            </div>
+            <div className="bg-primary text-on-primary p-12 border-4 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                <span className="font-headline text-6xl font-black block mb-2">{totalAuthors.toLocaleString()}</span>
+                <span className="font-label text-sm font-black uppercase tracking-[0.2em] opacity-80">Chroniclers Joined</span>
+            </div>
+            <div className="bg-white text-on-surface p-12 border-4 border-on-surface shadow-[8px_8px_0px_0px_var(--color-tertiary,black)]">
+                <span className="font-headline text-6xl font-black block mb-2">{(totalReads._sum.reads || 0).toLocaleString()}</span>
+                <span className="font-label text-sm font-black uppercase tracking-[0.2em] opacity-60">Global Reads</span>
+            </div>
+        </section>
+
+        {/* Featured Authors */}
+        <section className="w-full">
+            <div className="flex items-center justify-between gap-4 mb-12">
+                <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">Top Chroniclers</h2>
+                <Link href="/community" className="font-headline font-black text-sm uppercase tracking-widest hover:text-primary transition-colors underline decoration-2 underline-offset-4">See All</Link>
+            </div>
+            <div className="flex flex-wrap gap-8 justify-center md:justify-between">
+                {topAuthors.map((author, i) => (
+                    <Link href={`/u/${author.username || author.id}`} key={i} className="group flex flex-col items-center gap-4">
+                        <div className="w-24 h-24 rounded-full border-4 border-on-surface overflow-hidden group-hover:scale-110 transition-transform bg-primary-container relative">
+                            <img 
+                                src={author.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${author.username || author.id}`} 
+                                alt={author.username || "Author"} 
+                                className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 border-4 border-on-surface rounded-full"></div>
+                        </div>
+                        <div className="text-center">
+                            <h3 className="font-headline text-lg font-black text-on-surface uppercase group-hover:text-primary transition-colors">
+                                {author.full_name || author.username || "Anonymous"}
+                            </h3>
+                            <p className="font-label text-[10px] font-bold uppercase text-on-surface-variant">
+                                {author._count.followers} Followers
+                            </p>
+                        </div>
+                    </Link>
+                ))}
+            </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="w-full py-24 bg-primary border-8 border-on-surface shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center justify-center text-center px-6 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+            <h2 className="font-headline text-6xl md:text-8xl font-black text-on-primary uppercase tracking-tighter mb-12 relative z-10 leading-none">
+                Start Your <br/> Legacy
+            </h2>
+            <Link href={user ? "/dashboard" : "/auth/signup"} className="bg-white text-on-surface border-4 border-on-surface font-headline text-2xl px-16 py-6 rounded-none font-black hover:translate-x-2 hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-300 uppercase tracking-widest relative z-10">
+                {user ? "Go to Dashboard" : "Join Soulpad"}
+            </Link>
+        </section>
+
+      </div>
     </main>
   );
 }
@@ -137,12 +304,17 @@ export default async function Home() {
 
       <Suspense fallback={
         <div className="flex-grow pt-32 pb-24 px-6 max-w-7xl mx-auto w-full animate-pulse">
-          <div className="h-64 bg-surface-container rounded-3xl mb-20"></div>
-          <div className="h-96 bg-surface-container rounded-3xl"></div>
+          <div className="h-64 bg-surface-container rounded-none mb-20 border-4 border-on-surface"></div>
+          <div className="grid grid-cols-5 gap-6">
+            {[1,2,3,4,5].map(i => (
+                <div key={i} className="aspect-[2/3] bg-surface-container border-2 border-on-surface"></div>
+            ))}
+          </div>
         </div>
       }>
         <HomeContent />
       </Suspense>
+
 
       <footer className="bg-on-surface w-full py-16 px-8 mt-auto z-10 relative border-t-8 border-primary">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 max-w-7xl mx-auto">
