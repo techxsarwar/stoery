@@ -54,16 +54,16 @@ export default function Sidebar() {
       <button
         id="sidebar-hamburger"
         onClick={() => setIsOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-on-primary rounded-lg border-2 border-on-surface shadow-[3px_3px_0px_0px_rgba(0,0,0,0.8)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all"
+        className="md:hidden fixed bottom-6 right-6 z-[60] p-4 bg-primary text-on-primary rounded-full border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all flex items-center justify-center group"
         aria-label="Open navigation"
       >
-        <Menu size={20} />
+        <Menu size={24} className="group-hover:scale-110 transition-transform" />
       </button>
 
       {/* Mobile overlay backdrop */}
       {isOpen && (
         <div
-          className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          className="md:hidden fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
           aria-hidden="true"
         />
@@ -72,7 +72,7 @@ export default function Sidebar() {
       {/* Sidebar Panel */}
       <aside
         className={`
-          fixed left-0 top-0 h-screen z-50 flex flex-col
+          fixed left-0 top-0 h-screen z-[60] flex flex-col
           w-72 md:w-20 lg:w-64
           bg-gradient-to-b from-primary via-primary-container to-surface
           shadow-[10px_0_30px_-15px_rgba(0,0,0,0.5)]

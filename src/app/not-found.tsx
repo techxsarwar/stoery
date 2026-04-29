@@ -6,7 +6,7 @@ export default function NotFound() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--color-surface)] p-4 text-center z-10 relative">
       {/* Decorative background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-[-1]">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[var(--color-primary-container)] rounded-full blur-[100px] opacity-30" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[450px] sm:h-[450px] md:w-[600px] md:h-[600px] bg-[var(--color-primary-container)] rounded-full blur-[100px] opacity-30" />
       </div>
       
       <div className="relative max-w-2xl w-full">
@@ -16,7 +16,7 @@ export default function NotFound() {
           </div>
         </div>
 
-        <h1 className="font-headline text-8xl md:text-9xl font-black text-[var(--color-secondary)] mb-4 tracking-tighter uppercase drop-shadow-sm">
+        <h1 className="font-headline text-7xl sm:text-8xl md:text-9xl font-black text-[var(--color-secondary)] mb-4 tracking-tighter uppercase drop-shadow-sm">
           404
         </h1>
         
@@ -24,7 +24,7 @@ export default function NotFound() {
           Lost in the Archives
         </div>
         
-        <p className="font-body text-[var(--color-on-surface-variant)] text-xl md:text-2xl max-w-lg mx-auto mb-12 leading-relaxed">
+        <p className="font-body text-[var(--color-on-surface-variant)] text-lg sm:text-xl md:text-2xl max-w-lg mx-auto mb-12 leading-relaxed px-4">
           The story you're looking for seems to have been misplaced, deleted, or never existed in our universe.
         </p>
 

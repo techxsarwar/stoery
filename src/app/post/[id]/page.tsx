@@ -12,15 +12,19 @@ type Props = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const post = await prisma.authorPost.findUnique({
-    where: { id },
-    include: { profile: { select: { pen_name: true } } },
-  });
-  if (!post) return { title: "Post Not Found — SOULPAD" };
-  return {
-    title: `${post.profile.pen_name} on SOULPAD`,
-    description: post.content.slice(0, 160),
-  };
+  try {
+    const post = await prisma.authorPost.findUnique({
+      where: { id },
+      include: { profile: { select: { pen_name: true } } },
+    });
+    if (!post) return { title: "Post Not Found — SOULPAD" };
+    return {
+      title: `${post.profile.pen_name} on SOULPAD`,
+      description: post.content ? post.content.slice(0, 160) : "",
+    };
+  } catch (error) {
+    return { title: "Post Not Found — SOULPAD" };
+  }
 }
 
 export default async function SinglePostPage({ params }: Props) {
@@ -75,10 +79,15 @@ export default async function SinglePostPage({ params }: Props) {
     include.likes = { where: { profileId: currentProfile.id }, select: { id: true } };
   }
 
-  const post = await prisma.authorPost.findUnique({
-    where: { id },
-    include,
-  });
+  let post: any = null;
+  try {
+    post = await prisma.authorPost.findUnique({
+      where: { id },
+      include,
+    });
+  } catch (error) {
+    notFound();
+  }
 
   if (!post) notFound();
 

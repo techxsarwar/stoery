@@ -58,9 +58,6 @@ model Profile {
   id                   String             @id @default(cuid())
   full_name            String?
   pen_name             String?            @unique
-  username             String?            @unique
-  bio                  String?
-  avatar_url           String?
   age                  Int?
   parentage            String?
   guardian_approved    Boolean            @default(false)
@@ -74,14 +71,17 @@ model Profile {
   phone_number         String?
   reading_time_seconds BigInt             @default(0)
   isVerified           Boolean            @default(false)
+  avatar_url           String?
+  bio                  String?
+  username             String?            @unique
+  authorPosts          AuthorPost[]
   codexEntries         CodexEntry[]
   comments             Comment[]
-  followers            Follow[]           @relation("Following")
   following            Follow[]           @relation("Follower")
+  followers            Follow[]           @relation("Following")
   licenses             License[]
   likes                Like[]
   nexusMessages        NexusMessage[]
-  authorPosts          AuthorPost[]
   postLikes            PostLike[]
   user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   reports              Report[]
@@ -107,12 +107,12 @@ model Story {
   appealText           String?
   banExpiresAt         DateTime?
   isPermanentBan       Boolean      @default(false)
+  authorPosts          AuthorPost[]
   chapters             Chapter[]
   comments             Comment[]
   license              License?
   likes                Like[]
   reports              Report[]
-  authorPosts          AuthorPost[]
   author               Profile      @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
@@ -201,6 +201,40 @@ model License {
   story         Story         @relation(fields: [storyId], references: [id], onDelete: Cascade)
 }
 
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    Profile  @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   Profile  @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+model AuthorPost {
+  id        String     @id @default(cuid())
+  content   String     @default("")
+  profileId String
+  storyId   String?
+  createdAt DateTime   @default(now())
+  image_url String?
+  profile   Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  story     Story?     @relation(fields: [storyId], references: [id])
+  likes     PostLike[]
+}
+
+model PostLike {
+  id        String     @id @default(cuid())
+  postId    String
+  profileId String
+  createdAt DateTime   @default(now())
+  post      AuthorPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  profile   Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, profileId])
+}
+
 enum UserRole {
   AUTHOR
   EMPLOYEE
@@ -239,38 +273,4 @@ enum LicenseStatus {
   PENDING
   APPROVED
   REJECTED
-}
-
-model Follow {
-  id          String   @id @default(cuid())
-  followerId  String
-  followingId String
-  createdAt   DateTime @default(now())
-  follower    Profile  @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
-  following   Profile  @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
-
-  @@unique([followerId, followingId])
-}
-
-model AuthorPost {
-  id        String     @id @default(cuid())
-  content   String     @default("")
-  image_url String?
-  profileId String
-  storyId   String?
-  createdAt DateTime   @default(now())
-  profile   Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  story     Story?     @relation(fields: [storyId], references: [id], onDelete: SetNull)
-  likes     PostLike[]
-}
-
-model PostLike {
-  id        String     @id @default(cuid())
-  postId    String
-  profileId String
-  createdAt DateTime   @default(now())
-  post      AuthorPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  profile   Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
-
-  @@unique([postId, profileId])
 }

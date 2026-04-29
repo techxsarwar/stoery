@@ -66,7 +66,7 @@ export default function ResetPasswordForm() {
           required
           minLength={6}
           placeholder="••••••••"
-          className="w-full border-4 border-on-surface px-5 py-4 font-body font-bold text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface placeholder:text-on-surface-variant/50"
+          className="w-full border-4 border-on-surface px-4 sm:px-5 py-3 sm:py-4 font-body font-bold text-base sm:text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface placeholder:text-on-surface-variant/50"
         />
       </div>
 
@@ -81,14 +81,14 @@ export default function ResetPasswordForm() {
           required
           minLength={6}
           placeholder="••••••••"
-          className="w-full border-4 border-on-surface px-5 py-4 font-body font-bold text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface placeholder:text-on-surface-variant/50"
+          className="w-full border-4 border-on-surface px-4 sm:px-5 py-3 sm:py-4 font-body font-bold text-base sm:text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface placeholder:text-on-surface-variant/50"
         />
       </div>
 
       <button
         type="submit"
         disabled={status === "loading"}
-        className="mt-2 flex items-center justify-center gap-3 bg-on-surface text-surface border-4 border-on-surface px-10 py-5 font-headline font-black text-xl uppercase tracking-tighter shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)] transition-all w-full disabled:opacity-50 disabled:cursor-not-allowed"
+        className="mt-2 flex items-center justify-center gap-2 sm:gap-3 bg-on-surface text-surface border-4 border-on-surface px-6 sm:px-10 py-4 sm:py-5 font-headline font-black text-lg sm:text-xl uppercase tracking-tighter shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)] transition-all w-full disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {status === "loading" ? (
           <>

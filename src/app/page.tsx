@@ -2,6 +2,8 @@ import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/utils/supabase/server";
+import { headers } from "next/headers";
+import ClientRecoveryRedirect from "@/components/ClientRecoveryRedirect";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -19,6 +21,7 @@ export default async function Home() {
 
   return (
     <>
+      <ClientRecoveryRedirect />
       <Navbar user={user ?? null} />
 
       <main className="flex-grow pt-28 sm:pt-32 pb-24 px-4 sm:px-6 md:px-12 max-w-7xl mx-auto w-full flex flex-col gap-20 md:gap-32">
