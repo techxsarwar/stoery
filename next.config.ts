@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
 
+  cacheComponents: true,
   experimental: {
     serverActions: {
       bodySizeLimit: "10mb", // Allow cover image uploads up to 10 MB

@@ -83,6 +83,10 @@ export async function deletePost(postId: string) {
 }
 
 export async function getAllFeedPosts(currentProfileId?: string) {
+  "use cache";
+  if (currentProfileId) {
+    // Add a cache tag or just rely on the parameter for scoping
+  }
   const include: any = {
     profile: {
       select: {
@@ -124,6 +128,7 @@ export async function getAllFeedPosts(currentProfileId?: string) {
 }
 
 export async function getFollowingFeedPosts(currentProfileId: string) {
+  "use cache";
   const following = await prisma.follow.findMany({
     where: { followerId: currentProfileId },
     select: { followingId: true },
@@ -171,6 +176,7 @@ export async function getFollowingFeedPosts(currentProfileId: string) {
 }
 
 export async function getSuggestedAuthors(currentProfileId?: string) {
+  "use cache";
   return prisma.profile.findMany({
     where: {
       pen_name: { not: null },

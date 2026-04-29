@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Inter, Newsreader, Space_Grotesk } from "next/font/google";
 import "./globals.css";
@@ -61,7 +62,11 @@ export default function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4450198813209397"
           crossOrigin="anonymous"
         ></script>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Suspense fallback={null}>
+            {children}
+          </Suspense>
+        </Providers>
       </body>
     </html>
   );

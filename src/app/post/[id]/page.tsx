@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
@@ -7,6 +8,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+export const unstable_instant = { prefetch: "static" };
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -27,9 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function SinglePostPage({ params }: Props) {
-  const { id } = await params;
-
+async function PostContent({ id }: { id: string }) {
   let user: any = null;
   let currentProfile: any = null;
   let followingIds: string[] = [];
@@ -102,25 +102,38 @@ export default async function SinglePostPage({ params }: Props) {
   const isFollowing = followingIds.includes(p.profile.id);
 
   return (
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 pb-20 mt-8">
+      {/* Back link */}
+      <Link
+        href="/feed"
+        className="inline-flex items-center gap-2 font-label font-black text-xs uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors mb-6"
+      >
+        ← Back to Feed
+      </Link>
+
+      <PostCard
+        post={enrichedPost as any}
+        currentProfileId={currentProfile?.id}
+        initialIsFollowing={isFollowing}
+        isOwnProfile={isOwn}
+        isLoggedIn={!!user}
+      />
+    </div>
+  );
+}
+
+export default async function SinglePostPage({ params }: Props) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  return (
     <div className="min-h-screen bg-surface pt-20 sm:pt-24">
       <Navbar user={user ?? null} />
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 pb-20 mt-8">
-        {/* Back link */}
-        <Link
-          href="/feed"
-          className="inline-flex items-center gap-2 font-label font-black text-xs uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors mb-6"
-        >
-          ← Back to Feed
-        </Link>
-
-        <PostCard
-          post={enrichedPost as any}
-          currentProfileId={currentProfile?.id}
-          initialIsFollowing={isFollowing}
-          isOwnProfile={isOwn}
-          isLoggedIn={!!user}
-        />
-      </div>
+      <Suspense fallback={<div className="max-w-2xl mx-auto px-6 mt-8 animate-pulse"><div className="h-64 bg-surface-container-high border-4 border-on-surface"></div></div>}>
+        {params.then(({ id }) => (
+          <PostContent id={id} />
+        ))}
+      </Suspense>
     </div>
   );
 }
