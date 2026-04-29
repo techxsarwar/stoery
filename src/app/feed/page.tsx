@@ -8,7 +8,7 @@ import FollowButton from "@/components/FollowButton";
 import Link from "next/link";
 import type { Metadata } from "next";
 
-export const unstable_instant = { prefetch: "static" };
+
 
 export const metadata: Metadata = {
   title: "Author Feed — SOULPAD",

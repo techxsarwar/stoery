@@ -1,4 +1,4 @@
-export const unstable_instant = { prefetch: "static" };
+
 import Navbar from "@/components/Navbar";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";

@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { createClient } from "@/utils/supabase/server";
 import ClientRecoveryRedirect from "@/components/ClientRecoveryRedirect";
 
-export const unstable_instant = { prefetch: "static" };
+
 
 async function HomeContent() {
   const supabase = await createClient();

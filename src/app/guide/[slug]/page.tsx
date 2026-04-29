@@ -1,4 +1,4 @@
-export const unstable_instant = { prefetch: "static" };
+
 import { guides } from "@/data/guides";
 import { notFound } from "next/navigation";
 import Link from "next/link";
