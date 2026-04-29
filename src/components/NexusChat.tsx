@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { sendNexusMessage } from "@/actions/chat";
 import { Send, Zap, Users, Shield } from "lucide-react";
@@ -16,6 +17,7 @@ export default function NexusChat({ initialMessages, currentProfile }: NexusChat
   const [isSending, setIsSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
+  const router = useRouter();
 
   useEffect(() => {
     // Scroll to bottom on load
@@ -33,10 +35,8 @@ export default function NexusChat({ initialMessages, currentProfile }: NexusChat
           table: 'NexusMessage',
         },
         async (payload) => {
-          // Fetch the full message with profile info (payload only has the raw row)
-          // For now, we'll just trigger a refresh or handle it optimistically
-          // In a real app, you'd fetch the profile info here or include it in the broadcast
-          window.location.reload(); 
+          // Triggers a non-destructive background refetch of server components
+          router.refresh();
         }
       )
       .subscribe();
@@ -70,35 +70,35 @@ export default function NexusChat({ initialMessages, currentProfile }: NexusChat
           <h3 className="font-headline font-black text-primary uppercase tracking-tighter text-xl italic">Nexus Chat // Live</h3>
         </div>
         <div className="flex items-center gap-4 text-white/40 font-headline text-[10px] font-black uppercase tracking-widest">
-           <span className="flex items-center gap-1"><Users size={12} /> Sync Active</span>
-           <span className="flex items-center gap-1"><Shield size={12} /> Encrypted</span>
+          <span className="flex items-center gap-1"><Users size={12} /> Sync Active</span>
+          <span className="flex items-center gap-1"><Shield size={12} /> Encrypted</span>
         </div>
       </div>
 
       {/* Messages Area */}
-      <div 
+      <div
         ref={scrollRef}
         className="flex-grow overflow-y-auto p-6 flex flex-col gap-6 custom-scrollbar bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]"
       >
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full opacity-20 gap-4">
-             <Zap size={48} className="text-on-surface" />
-             <p className="font-headline font-black uppercase tracking-[0.3em] text-center">No transmissions found.<br/>Break the silence.</p>
+            <Zap size={48} className="text-on-surface" />
+            <p className="font-headline font-black uppercase tracking-[0.3em] text-center">No transmissions found.<br />Break the silence.</p>
           </div>
         )}
-        
+
         {messages.map((msg, i) => {
           const isOwn = msg.profileId === currentProfile?.id;
           const isStaff = msg.profile.role === "STAFF" || msg.profile.role === "ADMIN";
-          
+
           return (
-            <div 
-              key={msg.id || i} 
+            <div
+              key={msg.id || i}
               className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'} group animate-in fade-in slide-in-from-bottom-2 duration-300`}
             >
               <div className={`flex items-center gap-2 mb-1 px-1`}>
                 <span className={`text-[10px] font-black uppercase tracking-widest ${isOwn ? 'text-primary' : 'text-on-surface/40'}`}>
-                   {msg.profile.pen_name || msg.profile.full_name || "Anonymous"}
+                  {msg.profile.pen_name || msg.profile.full_name || "Anonymous"}
                 </span>
                 {msg.profile.isVerified && (
                   <div className="w-3 h-3 bg-primary rounded-full flex items-center justify-center border border-on-surface">
@@ -106,11 +106,11 @@ export default function NexusChat({ initialMessages, currentProfile }: NexusChat
                   </div>
                 )}
               </div>
-              
+
               <div className={`
                 max-w-[80%] p-4 border-2 border-on-surface font-body font-medium text-lg relative
-                ${isOwn 
-                  ? 'bg-primary text-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' 
+                ${isOwn
+                  ? 'bg-primary text-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
                   : 'bg-white text-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
                 }
               `}>

@@ -19,6 +19,8 @@
     "@tailwindcss/typography": "^0.5.19",
     "@tiptap/react": "^3.22.4",
     "@tiptap/starter-kit": "^3.22.4",
+    "@types/dompurify": "^3.0.5",
+    "dompurify": "^3.4.1",
     "lucide-react": "^1.8.0",
     "next": "16.2.4",
     "next-auth": "^4.24.14",

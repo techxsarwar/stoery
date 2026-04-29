@@ -1,80 +1,98 @@
 import Navbar from "@/components/Navbar";
+import PiracyGuard from "@/components/PiracyGuard";
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-surface flex flex-col items-center pt-24 px-6 md:px-12 w-full mx-auto pb-32">
-      <Navbar user={null} />
+    <PiracyGuard>
+        <div className="min-h-screen bg-surface flex flex-col items-center pt-24 px-6 md:px-12 w-full mx-auto pb-32">
+        <Navbar user={null} />
 
-      <main className="w-full max-w-4xl flex flex-col gap-12 mt-8">
-        <header className="border-b-8 border-primary pb-8">
-            <h1 className="font-headline text-5xl md:text-7xl font-black text-on-surface tracking-tighter uppercase leading-none">Privacy Policy</h1>
-            <p className="font-label font-bold text-on-surface-variant text-xl uppercase tracking-wider mt-4">The Data Protocol</p>
-        </header>
+        <main className="w-full max-w-4xl flex flex-col gap-12 mt-8">
+            <header className="border-b-8 border-primary pb-8">
+                <h1 className="font-headline text-5xl md:text-7xl font-black text-on-surface tracking-tighter uppercase leading-none">Privacy Policy</h1>
+                <p className="font-label font-bold text-on-surface-variant text-xl uppercase tracking-wider mt-4">The Data Protocol • Version 2.0</p>
+            </header>
 
-        <article className="prose prose-p:font-body prose-headings:font-headline prose-p:text-lg prose-p:leading-relaxed max-w-none w-full bg-white p-8 md:p-12 border-4 border-on-surface shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] text-[#171717]">
-            <p className="text-sm italic"><strong>Effective Date:</strong> April 26, 2026</p>
-            <p>At <strong>SOULPAD</strong>, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our Platform.</p>
+            <article className="prose prose-p:font-body prose-headings:font-headline prose-p:text-lg prose-p:leading-relaxed max-w-none w-full bg-white p-8 md:p-12 border-4 border-on-surface shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] text-[#171717]">
+                <p className="text-sm italic"><strong>Effective Date:</strong> April 29, 2026</p>
+                <p>At <strong>SOULPAD</strong>, we respect your creative autonomy and your privacy. This Privacy Policy outlines how we collect, use, disclose, and safeguard your data when you interact with our Platform.</p>
 
-            <h2>1. Information We Collect</h2>
-            <p><strong>1.1. Account Data:</strong> When you register, we collect your email address and any authentication data provided by our OAuth partners (e.g., Spotify, Google). This is necessary for secure account access.</p>
-            <p><strong>1.2. Profile Information:</strong> You may choose to provide a "Pen Name", bio, and profile image. This information is public and intended to identify you as an author.</p>
-            <p><strong>1.3. User Content:</strong> We store the stories, chapters, metadata, and images you upload. While some content may be private or "paused", it remains on our secure servers.</p>
-            <p><strong>1.4. Technical Data:</strong> We automatically collect certain information when you visit the Platform, including your IP address, browser type, device information, and usage patterns (via logs).</p>
+                <h2>1. Information We Collect (The Ingestion)</h2>
+                <p><strong>1.1. Voluntarily Provided Information:</strong></p>
+                <ul>
+                    <li><strong>Account Identity:</strong> Email address, username, and authentication tokens from third-party providers (Google, Spotify, etc.).</li>
+                    <li><strong>Author Profile:</strong> Your Pen Name, biography, profile images, and social links.</li>
+                    <li><strong>Creative Assets:</strong> Stories, chapters, metadata, character designs, and any images or files you upload to the Platform.</li>
+                    <li><strong>Communications:</strong> Any information you provide when contacting our support or legal teams.</li>
+                </ul>
+                <p><strong>1.2. Automatically Collected Information:</strong></p>
+                <ul>
+                    <li><strong>Technical Logs:</strong> IP address, browser type, operating system, and device identifiers.</li>
+                    <li><strong>Usage Metrics:</strong> Reading history, interactions (likes, follows), time spent on pages, and navigation paths.</li>
+                    <li><strong>Cookies & Tracking:</strong> We use essential session cookies and local storage to maintain your login state and security.</li>
+                </ul>
+                <p><strong>1.3. AI-Generated Metadata:</strong></p>
+                <ul>
+                    <li><strong>Analysis Scores:</strong> Originality percentages, sentiment analysis, and content classification tags generated by our internal AI systems.</li>
+                    <li><strong>Assistant History:</strong> Logs of prompts and outputs generated using our AI-assisted creation tools.</li>
+                </ul>
 
-            <h2>2. How We Use Your Information</h2>
-            <p>We use the collected data for the following purposes:</p>
-            <ul>
-                <li>To provide and maintain the Platform.</li>
-                <li>To authenticate your identity and prevent unauthorized access.</li>
-                <li>To process and display your creative work.</li>
-                <li>To communicate with you regarding account updates or technical notices.</li>
-                <li>To analyze usage trends and improve the user experience.</li>
-                <li>To enforce our Terms of Service and protect against fraud or abuse.</li>
-            </ul>
+                <h2>2. Purpose of Data Processing</h2>
+                <p>We process your data for the following legal bases:</p>
+                <ul>
+                    <li><strong>Contractual Necessity:</strong> To provide the core services of SOULPAD, including hosting your stories and managing your account.</li>
+                    <li><strong>Legitimate Interests:</strong> To improve our discovery algorithms, prevent fraud, and maintain platform security.</li>
+                    <li><strong>Content Integrity:</strong> To perform AI-driven checks that ensure the authenticity and quality of the SOULPAD library.</li>
+                    <li><strong>Compliance:</strong> To satisfy legal obligations (e.g., tax reporting for monetized authors).</li>
+                </ul>
 
-            <h2>3. Data Sharing & Disclosure</h2>
-            <p>We do not sell your personal data. We may share information only in the following circumstances:</p>
-            <ul>
-                <li><strong>Service Providers:</strong> We share data with infrastructure partners (e.g., Supabase for database, Vercel for hosting, Cloudflare for image delivery) who assist in operating the Platform.</li>
-                <li><strong>Legal Requirements:</strong> We may disclose information if required by law, subpoena, or to protect the safety and rights of SOULPAD or its users.</li>
-                <li><strong>Business Transfers:</strong> In the event of a merger, acquisition, or sale of assets, your information may be transferred as part of that transaction.</li>
-            </ul>
+                <h2>3. AI & Data Sovereignty</h2>
+                <p><strong>3.1. Training Policy:</strong> SOULPAD does <strong>not</strong> use your proprietary stories, manuscripts, or world-building notes to train "foundation" large language models (LLMs) for external sale or general distribution without your explicit, opt-in consent.</p>
+                <p><strong>3.2. Automated Decision Making:</strong> We use AI to automate certain moderation tasks. If your content is flagged or removed by an automated system, you have the right to request a human review by contacting <strong>moderation@soulpad.app</strong>.</p>
 
-            <h2>4. Cookies & Tracking</h2>
-            <p>We use essential cookies to manage your session and security. These are technically necessary for the Platform to function. We do not use third-party advertising or tracking cookies for marketing purposes.</p>
+                <h2>4. Data Sharing & Disclosure</h2>
+                <p>We do not sell your personal data. We share information only with:</p>
+                <ul>
+                    <li><strong>Core Infrastructure:</strong> Providers like Supabase (database), Vercel (hosting), and Cloudflare (CDN) who are bound by strict data processing agreements.</li>
+                    <li><strong>Payment Processors:</strong> Stripe or other financial partners for processing Essence purchases or author payouts.</li>
+                    <li><strong>Legal Mandates:</strong> When required by law, subpoena, or to protect the safety of our community.</li>
+                </ul>
 
-            <h2>5. Data Security</h2>
-            <p>We implement industry-standard security measures to protect your data. However, no method of transmission over the internet or electronic storage is 100% secure. While we strive to protect your personal information, we cannot guarantee its absolute security.</p>
+                <h2>5. International Rights (GDPR / CCPA / UK-GDPR)</h2>
+                <p>Depending on your location, you may have the following rights:</p>
+                <ul>
+                    <li><strong>Right to Access:</strong> Request a copy of all data we hold about you.</li>
+                    <li><strong>Right to Rectification:</strong> Correct any inaccurate or incomplete data.</li>
+                    <li><strong>Right to Erasure ("Right to be Forgotten"):</strong> Request the deletion of your account and associated data.</li>
+                    <li><strong>Right to Data Portability:</strong> Export your stories and profile data in a machine-readable format.</li>
+                    <li><strong>Right to Object:</strong> Object to our processing of your data for specific purposes (e.g., marketing).</li>
+                </ul>
+                <p>To exercise these rights, please email <strong>privacy@soulpad.app</strong>. We will respond to all requests within 30 days.</p>
 
-            <h2>6. Your Rights & Choices</h2>
-            <p>Depending on your location (e.g., GDPR in the EU, CCPA in California), you may have the following rights:</p>
-            <ul>
-                <li><strong>Access:</strong> The right to request copies of your personal data.</li>
-                <li><strong>Correction:</strong> The right to request that we correct inaccurate information.</li>
-                <li><strong>Deletion:</strong> The right to request that we erase your personal data (subject to certain legal obligations).</li>
-                <li><strong>Portability:</strong> The right to request that we transfer your data to another organization.</li>
-            </ul>
-            <p>To exercise these rights, please contact us at <strong className="uppercase">privacy@soulpad.app</strong>.</p>
+                <h2>6. Security Protocols</h2>
+                <p>We employ enterprise-grade security measures, including end-to-end encryption for sensitive data and regular vulnerability scanning. However, you acknowledge that no transmission over the internet is 100% secure.</p>
 
-            <h2>7. International Data Transfers</h2>
-            <p>Your information may be transferred to and maintained on computers located outside of your state or country, where data protection laws may differ. By using the Platform, you consent to these transfers.</p>
+                <h2>7. Children's Privacy</h2>
+                <p>SOULPAD is not intended for individuals under the age of 13. If we discover we have inadvertently collected data from a child under 13, we will delete it immediately. Parents can contact us at <strong>legal@soulpad.app</strong> for concerns.</p>
 
-            <h2>8. Children's Privacy</h2>
-            <p>SOULPAD is not intended for children under the age of 13. We do not knowingly collect personal information from children. If we become aware of such collection, we will take steps to delete the data immediately.</p>
+                <h2>8. Data Retention & Deletion</h2>
+                <p><strong>8.1. Active Data:</strong> We retain your data as long as your account is active.</p>
+                <p><strong>8.2. Deletion Process:</strong> Upon account deletion, your primary identifiers (email, name) and creative works are removed from our active production database within 30 days. Backups may persist for up to 90 days.</p>
+                <p><strong>8.3. Anonymized Analytics:</strong> Aggregated, non-personally identifiable data (e.g., total view counts on a deleted story) may be retained for historical analytics.</p>
 
-            <h2>9. Data Retention</h2>
-            <p>We retain your personal information only for as long as your account is active or as needed to provide you with services. If you choose to delete your account, we will purge your primary data (email, pen name, stories) from our active databases within 30 days.</p>
-            <p><strong>Reading History:</strong> To maintain the integrity of our analytics and prevent "ghost" data, your anonymized reading history (e.g., view counts on stories) may be retained in an aggregated form that cannot be linked back to your deleted identity.</p>
+                <h2>9. Changes to the Protocol</h2>
+                <p>We may update this policy to reflect changes in law or technology. We will notify you of significant changes via the Platform dashboard or email.</p>
 
-            <hr className="border-t-2 border-on-surface my-8" />
-            <div className="bg-surface border-2 border-on-surface p-6 font-headline text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <p className="font-black uppercase tracking-widest text-sm mb-2">Policy Updates</p>
-                <p className="text-xs italic leading-relaxed">
-                    We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the "Effective Date" at the top.
-                </p>
-            </div>
-        </article>
-      </main>
-    </div>
+                <hr className="border-t-2 border-on-surface my-8" />
+                <div className="bg-surface border-2 border-on-surface p-6 font-headline text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <p className="font-black uppercase tracking-widest text-sm mb-2">Protocol Integrity</p>
+                    <p className="text-xs italic leading-relaxed">
+                        By using SOULPAD, you consent to the collection and use of information in accordance with this Data Protocol. Your trust is the foundation of our universe.
+                    </p>
+                </div>
+            </article>
+        </main>
+        </div>
+    </PiracyGuard>
   );
 }
