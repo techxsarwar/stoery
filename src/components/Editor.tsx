@@ -2,8 +2,8 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Bold, Italic, Heading1, Heading2, List, ListOrdered, Quote, Maximize2, Minimize2, Wand2, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Bold, Italic, Heading1, Heading2, List, ListOrdered, Quote, Maximize2, Minimize2, Wand2, Loader2, ChevronDown } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 
 interface EditorProps {
   content: string;
@@ -15,6 +15,8 @@ export default function Editor({ content, onChange, isSaving }: EditorProps) {
   const [isDistractionFree, setIsDistractionFree] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiError, setAiError] = useState("");
+  const [isAiMenuOpen, setIsAiMenuOpen] = useState(false);
+  const aiMenuRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
     extensions: [StarterKit],
@@ -30,6 +32,21 @@ export default function Editor({ content, onChange, isSaving }: EditorProps) {
       onChange(editor.getHTML());
     },
   });
+
+  // Close AI menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent | TouchEvent) {
+      if (aiMenuRef.current && !aiMenuRef.current.contains(e.target as Node)) {
+        setIsAiMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     if (isDistractionFree) {
@@ -50,7 +67,8 @@ export default function Editor({ content, onChange, isSaving }: EditorProps) {
 
   const handleAiAction = async (action: "continue" | "polish") => {
       if (!editor) return;
-      
+      setIsAiMenuOpen(false);
+
       const selection = editor.state.selection;
       let textToProcess = "";
       let isSelection = false;
@@ -59,7 +77,6 @@ export default function Editor({ content, onChange, isSaving }: EditorProps) {
           textToProcess = editor.state.doc.textBetween(selection.from, selection.to, ' ');
           isSelection = true;
       } else {
-          // If no selection, for continue we take the last paragraph, for polish we require selection
           if (action === "polish") {
               setAiError("Select text to polish.");
               setTimeout(() => setAiError(""), 3000);
@@ -76,10 +93,10 @@ export default function Editor({ content, onChange, isSaving }: EditorProps) {
           const res = await fetch("/api/ai", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ 
-                  action, 
-                  text: textToProcess, 
-                  context: editor.getText().substring(0, 1000) 
+              body: JSON.stringify({
+                  action,
+                  text: textToProcess,
+                  context: editor.getText().substring(0, 1000)
               })
           });
 
@@ -101,97 +118,70 @@ export default function Editor({ content, onChange, isSaving }: EditorProps) {
 
   return (
     <div className={`transition-all duration-700 flex flex-col ${
-        isDistractionFree 
-        ? "fixed inset-0 z-[100] bg-[#131315] p-12" 
+        isDistractionFree
+        ? "fixed inset-0 z-[100] bg-[#131315] p-12"
         : "border-2 border-on-surface/10 rounded-2xl bg-surface/40 backdrop-blur-md"
     }`}>
       {/* Toolbar */}
-      <div className={`flex flex-wrap items-center justify-between gap-4 p-4 border-b border-on-surface/5 ${isDistractionFree ? "max-w-4xl mx-auto w-full mb-8" : ""}`}>
-        <div className="flex items-center gap-1">
-            <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`${baseBtn} ${editor.isActive("bold") ? activeBtn : inactiveBtn}`}
-            >
-            <Bold size={16} />
-            </button>
-            <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`${baseBtn} ${editor.isActive("italic") ? activeBtn : inactiveBtn}`}
-            >
-            <Italic size={16} />
-            </button>
-            <div className="w-px h-6 bg-on-surface/10 mx-2"></div>
-            <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-            className={`${baseBtn} ${editor.isActive("heading", { level: 1 }) ? activeBtn : inactiveBtn}`}
-            >
-            <Heading1 size={16} />
-            </button>
-            <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            className={`${baseBtn} ${editor.isActive("heading", { level: 2 }) ? activeBtn : inactiveBtn}`}
-            >
-            <Heading2 size={16} />
-            </button>
-            <div className="w-px h-6 bg-on-surface/10 mx-2"></div>
-            <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={`${baseBtn} ${editor.isActive("bulletList") ? activeBtn : inactiveBtn}`}
-            >
-            <List size={16} />
-            </button>
-            <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={`${baseBtn} ${editor.isActive("orderedList") ? activeBtn : inactiveBtn}`}
-            >
-            <ListOrdered size={16} />
-            </button>
-            <button
-                type="button"
-                onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                className={`${baseBtn} ${editor.isActive("blockquote") ? activeBtn : inactiveBtn}`}
-            >
-                <Quote size={16} />
-            </button>
-            
-            <div className="w-px h-6 bg-on-surface/10 mx-2"></div>
-            
-            <div className="relative group">
+      <div className={`flex flex-wrap items-center justify-between gap-2 p-3 border-b border-on-surface/5 ${isDistractionFree ? "max-w-4xl mx-auto w-full mb-8" : ""}`}>
+        <div className="flex flex-wrap items-center gap-1 relative">
+            <button type="button" onClick={() => editor.chain().focus().toggleBold().run()} className={`${baseBtn} ${editor.isActive("bold") ? activeBtn : inactiveBtn}`}><Bold size={16} /></button>
+            <button type="button" onClick={() => editor.chain().focus().toggleItalic().run()} className={`${baseBtn} ${editor.isActive("italic") ? activeBtn : inactiveBtn}`}><Italic size={16} /></button>
+            <div className="w-px h-6 bg-on-surface/10 mx-1"></div>
+            <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} className={`${baseBtn} ${editor.isActive("heading", { level: 1 }) ? activeBtn : inactiveBtn}`}><Heading1 size={16} /></button>
+            <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={`${baseBtn} ${editor.isActive("heading", { level: 2 }) ? activeBtn : inactiveBtn}`}><Heading2 size={16} /></button>
+            <div className="w-px h-6 bg-on-surface/10 mx-1"></div>
+            <button type="button" onClick={() => editor.chain().focus().toggleBulletList().run()} className={`${baseBtn} ${editor.isActive("bulletList") ? activeBtn : inactiveBtn}`}><List size={16} /></button>
+            <button type="button" onClick={() => editor.chain().focus().toggleOrderedList().run()} className={`${baseBtn} ${editor.isActive("orderedList") ? activeBtn : inactiveBtn}`}><ListOrdered size={16} /></button>
+            <button type="button" onClick={() => editor.chain().focus().toggleBlockquote().run()} className={`${baseBtn} ${editor.isActive("blockquote") ? activeBtn : inactiveBtn}`}><Quote size={16} /></button>
+
+            <div className="w-px h-6 bg-on-surface/10 mx-1"></div>
+
+            {/* AI Co-Pilot — click-toggle, works on mobile */}
+            <div ref={aiMenuRef} className="relative">
                 <button
                     type="button"
                     disabled={isAiLoading}
-                    className={`${baseBtn} text-emerald-600 bg-emerald-500/10 border-emerald-500/20 hover:border-emerald-500 disabled:opacity-50 gap-2 px-3`}
+                    onClick={() => setIsAiMenuOpen(prev => !prev)}
+                    className={`${baseBtn} text-emerald-600 bg-emerald-500/10 border-emerald-500/20 hover:border-emerald-500 active:border-emerald-500 disabled:opacity-50 gap-1.5 px-3 min-h-[36px]`}
                 >
                     {isAiLoading ? <Loader2 size={16} className="animate-spin" /> : <Wand2 size={16} />}
-                    <span className="font-headline font-black text-[10px] uppercase tracking-widest hidden sm:inline">AI Co-Pilot</span>
+                    <span className="font-headline font-black text-[10px] uppercase tracking-widest">AI</span>
+                    <ChevronDown size={12} className={`transition-transform ${isAiMenuOpen ? "rotate-180" : ""}`} />
                 </button>
-                <div className="absolute top-full left-0 mt-2 w-48 bg-white border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                    <button type="button" onClick={() => handleAiAction('continue')} className="text-left px-4 py-3 font-headline font-bold text-xs uppercase tracking-widest hover:bg-emerald-50 text-on-surface border-b border-on-surface/10">
-                        Auto-Continue
-                    </button>
-                    <button type="button" onClick={() => handleAiAction('polish')} className="text-left px-4 py-3 font-headline font-bold text-xs uppercase tracking-widest hover:bg-emerald-50 text-on-surface">
-                        Polish Selection
-                    </button>
-                </div>
+
+                {isAiMenuOpen && (
+                    <div className="absolute top-full left-0 mt-2 w-52 bg-white border-2 border-on-surface shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col z-[200] rounded-lg overflow-hidden">
+                        <button
+                            type="button"
+                            onClick={() => handleAiAction("continue")}
+                            className="text-left px-4 py-3.5 font-headline font-bold text-xs uppercase tracking-widest hover:bg-emerald-50 active:bg-emerald-100 text-on-surface border-b border-on-surface/10 transition-colors"
+                        >
+                            ✨ Auto-Continue
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => handleAiAction("polish")}
+                            className="text-left px-4 py-3.5 font-headline font-bold text-xs uppercase tracking-widest hover:bg-emerald-50 active:bg-emerald-100 text-on-surface transition-colors"
+                        >
+                            ✏️ Polish Selection
+                        </button>
+                    </div>
+                )}
             </div>
+
             {aiError && (
-                <span className="text-error font-label font-bold text-[10px] uppercase tracking-widest absolute -top-6 left-0 w-max bg-error/10 px-2 py-1">
+                <span className="text-error font-label font-bold text-[10px] uppercase tracking-widest bg-error/10 px-2 py-1 rounded ml-2">
                     {aiError}
                 </span>
             )}
         </div>
 
-        <div className="flex items-center gap-6">
-            {/* Obsidian Pulse Indicator */}
-            <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
+            {/* Save indicator */}
+            <div className="hidden sm:flex items-center gap-2">
                 <span className="font-label font-black text-[9px] uppercase tracking-widest text-on-surface-variant opacity-40">
-                    {isSaving ? "Syncing Ritual..." : "Inscribed in Void"}
+                    {isSaving ? "Syncing..." : "Saved"}
                 </span>
                 <div className={`w-2 h-2 rounded-full transition-all duration-1000 ${isSaving ? "bg-primary animate-pulse shadow-[0_0_12px_rgba(234,179,8,0.6)]" : "bg-on-surface/20"}`}></div>
             </div>
@@ -208,10 +198,9 @@ export default function Editor({ content, onChange, isSaving }: EditorProps) {
       </div>
 
       {/* Editor Content */}
-      <div className={`p-8 overflow-y-auto custom-scrollbar ${isDistractionFree ? "max-w-3xl mx-auto w-full h-full" : "max-h-[600px]"}`}>
+      <div className={`p-6 sm:p-8 overflow-y-auto custom-scrollbar ${isDistractionFree ? "max-w-3xl mx-auto w-full h-full" : "max-h-[600px]"}`}>
         <EditorContent editor={editor} />
       </div>
     </div>
   );
 }
-

@@ -22,6 +22,10 @@ function WriteContent() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [aiTitleLoading, setAiTitleLoading] = useState(false);
+  const [aiSynopsisLoading, setAiSynopsisLoading] = useState(false);
+  const [titleSuggestions, setTitleSuggestions] = useState<string[]>([]);
+  const [showTitleSuggestions, setShowTitleSuggestions] = useState(false);
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -55,6 +59,46 @@ function WriteContent() {
       }
     });
   }, [router, storyId]);
+
+  const suggestTitles = async () => {
+    setAiTitleLoading(true);
+    setShowTitleSuggestions(false);
+    try {
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "title", text: content.replace(/<[^>]+>/g, ' ').substring(0, 800), context: description })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      // Parse numbered list into array
+      const lines = data.text.split('\n').map((l: string) => l.replace(/^\d+\.\s*/, '').trim()).filter(Boolean);
+      setTitleSuggestions(lines);
+      setShowTitleSuggestions(true);
+    } catch (e: any) {
+      alert(e.message || "AI failed to generate titles.");
+    } finally {
+      setAiTitleLoading(false);
+    }
+  };
+
+  const suggestSynopsis = async () => {
+    setAiSynopsisLoading(true);
+    try {
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "synopsis", text: content.replace(/<[^>]+>/g, ' ').substring(0, 1000), context: title })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setDescription(data.text.trim());
+    } catch (e: any) {
+      alert(e.message || "AI failed to generate synopsis.");
+    } finally {
+      setAiSynopsisLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,7 +183,17 @@ function WriteContent() {
           {/* Metadata Section - Left */}
           <div className="lg:col-span-4 flex flex-col gap-8 bg-surface/40 backdrop-blur-md p-8 rounded-2xl border-2 border-on-surface/5 shadow-2xl">
               <div className="flex flex-col gap-2">
-                <label className="font-label font-black text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60">Story Title</label>
+                <div className="flex items-center justify-between">
+                  <label className="font-label font-black text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60">Story Title</label>
+                  <button
+                    type="button"
+                    onClick={suggestTitles}
+                    disabled={aiTitleLoading}
+                    className="flex items-center gap-1 text-emerald-600 font-headline font-black text-[9px] uppercase tracking-widest hover:underline disabled:opacity-40 transition-all"
+                  >
+                    {aiTitleLoading ? "Thinking..." : "✨ AI Suggest"}
+                  </button>
+                </div>
                 <input
                   type="text"
                   className="bg-transparent border-b-2 border-on-surface/10 text-on-surface text-xl font-headline font-black py-2 focus:outline-none focus:border-primary transition-all placeholder:opacity-20"
@@ -148,6 +202,25 @@ function WriteContent() {
                   onChange={(e) => setTitle(e.target.value)}
                   required
                 />
+                {/* Title Suggestions Dropdown */}
+                {showTitleSuggestions && titleSuggestions.length > 0 && (
+                  <div className="flex flex-col gap-1 bg-white border-2 border-emerald-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-lg overflow-hidden mt-1">
+                    <div className="px-3 py-2 bg-emerald-50 flex justify-between items-center border-b border-emerald-200">
+                      <span className="font-headline font-black text-[9px] uppercase tracking-widest text-emerald-700">Tap to Apply</span>
+                      <button type="button" onClick={() => setShowTitleSuggestions(false)} className="text-on-surface/40 hover:text-on-surface text-lg leading-none">&times;</button>
+                    </div>
+                    {titleSuggestions.map((t, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => { setTitle(t); setShowTitleSuggestions(false); }}
+                        className="text-left px-3 py-2.5 font-headline font-bold text-sm hover:bg-emerald-50 active:bg-emerald-100 text-on-surface border-b border-on-surface/5 last:border-0 transition-colors"
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-col gap-2">
@@ -202,7 +275,17 @@ function WriteContent() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="font-label font-black text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60">Synopsis</label>
+                <div className="flex items-center justify-between">
+                  <label className="font-label font-black text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60">Synopsis</label>
+                  <button
+                    type="button"
+                    onClick={suggestSynopsis}
+                    disabled={aiSynopsisLoading}
+                    className="flex items-center gap-1 text-emerald-600 font-headline font-black text-[9px] uppercase tracking-widest hover:underline disabled:opacity-40 transition-all"
+                  >
+                    {aiSynopsisLoading ? "Thinking..." : "✨ AI Write"}
+                  </button>
+                </div>
                 <textarea
                   className="bg-surface-container-high border-2 border-on-surface/5 text-on-surface p-4 rounded-lg focus:outline-none focus:border-primary transition-all font-body text-sm italic min-h-[120px] resize-none"
                   placeholder="Summon the essence of this chronicle..."
