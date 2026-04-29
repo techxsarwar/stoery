@@ -22,11 +22,13 @@ import {
   ChevronDown,
   Unlock,
   AlertOctagon,
-  Award
+  Award,
+  BookOpen
 } from "lucide-react";
 import Link from "next/link";
 import { banStory, unbanStory, updateMonetizationStatus, toggleVerification, resolveReport, handleAppeal } from "@/actions/staff";
 import { reviewLicense } from "@/actions/licenses";
+import OriginalityChecker from "@/components/OriginalityChecker";
 
 interface StaffDashboardClientProps {
   user: { name: string | null; role: string };
@@ -136,9 +138,28 @@ export default function StaffDashboardClient({
                     )}
 
                     <div className="flex justify-between items-center pt-2">
-                       <Link href={`/read/${report.storyId}`} target="_blank" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-2">
-                          Review Chronicle <ArrowUpRight size={12} />
-                       </Link>
+                       <div className="flex flex-col gap-3">
+                          <Link href={`/read/${report.storyId}`} target="_blank" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-2">
+                             Review Chronicle <ArrowUpRight size={12} />
+                          </Link>
+                          
+                          <div className="w-full">
+                            <details className="group">
+                              <summary className="cursor-pointer text-[10px] font-black uppercase tracking-widest text-on-surface/40 hover:text-primary flex items-center gap-2 list-none">
+                                <Shield size={12} /> {report.story.originalityScore !== null ? `Originality: ${report.story.originalityScore}/100` : "Run Originality Intelligence"}
+                                <ChevronDown size={10} className="group-open:rotate-180 transition-transform" />
+                              </summary>
+                              <div className="mt-4">
+                                <OriginalityChecker 
+                                  content={report.story.content || ""} 
+                                  title={report.story.title} 
+                                  storyId={report.story.id}
+                                  initialReport={report.story.originalityReport}
+                                />
+                              </div>
+                            </details>
+                          </div>
+                       </div>
 
                        {report.status === 'PENDING' && (
                          <div className="flex gap-3">
@@ -472,43 +493,63 @@ export default function StaffDashboardClient({
         return (
           <div className="flex flex-col gap-4">
             {allStories.map((story) => (
-              <div key={story.id} className={`bg-white border-4 border-on-surface p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all ${story.isBanned ? 'opacity-70 grayscale' : ''}`}>
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-black text-base tracking-tight uppercase">{story.title}</h3>
-                    {story.isBanned && (
-                      <span className="bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">BANNED</span>
+              <div key={story.id} className={`bg-white border-4 border-on-surface p-6 rounded-2xl flex flex-col gap-6 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all ${story.isBanned ? 'opacity-70 grayscale' : ''}`}>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-black text-base tracking-tight uppercase">{story.title}</h3>
+                      {story.isBanned && (
+                        <span className="bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">BANNED</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[9px] text-primary uppercase font-black tracking-widest">{story.author.pen_name || "Unknown"}</span>
+                      <span className="text-[9px] text-on-surface/20 uppercase font-black tracking-widest flex items-center gap-1">
+                        <Clock size={10} /> {formatDate(story.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <span className="bg-on-surface/5 border-2 border-on-surface px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest text-on-surface/60 flex items-center">
+                      {story.status}
+                    </span>
+                    {story.isBanned ? (
+                      <button 
+                        onClick={() => handleAction(() => unbanStory(story.id))}
+                        className="bg-emerald-500 text-white px-4 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-tighter hover:bg-emerald-600 transition-all flex items-center gap-2"
+                      >
+                        <Unlock size={14} /> Reinstate
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => {
+                          const reason = window.prompt("Enter ban reason:");
+                          if (reason) handleAction(() => banStory(story.id, reason));
+                        }}
+                        className="bg-red-500 text-white px-4 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-tighter hover:bg-red-600 transition-all flex items-center gap-2"
+                      >
+                        <AlertOctagon size={14} /> Ban Story
+                      </button>
                     )}
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[9px] text-primary uppercase font-black tracking-widest">{story.author.pen_name || "Unknown"}</span>
-                    <span className="text-[9px] text-on-surface/20 uppercase font-black tracking-widest flex items-center gap-1">
-                      <Clock size={10} /> {formatDate(story.createdAt)}
-                    </span>
-                  </div>
                 </div>
-                <div className="flex gap-3">
-                  <span className="bg-on-surface/5 border-2 border-on-surface px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest text-on-surface/60 flex items-center">
-                    {story.status}
-                  </span>
-                  {story.isBanned ? (
-                    <button 
-                      onClick={() => handleAction(() => unbanStory(story.id))}
-                      className="bg-emerald-500 text-white px-4 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-tighter hover:bg-emerald-600 transition-all flex items-center gap-2"
-                    >
-                      <Unlock size={14} /> Reinstate
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={() => {
-                        const reason = window.prompt("Enter ban reason:");
-                        if (reason) handleAction(() => banStory(story.id, reason));
-                      }}
-                      className="bg-red-500 text-white px-4 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-tighter hover:bg-red-600 transition-all flex items-center gap-2"
-                    >
-                      <AlertOctagon size={14} /> Ban Story
-                    </button>
-                  )}
+
+                <div className="w-full border-t-2 border-dashed border-on-surface/10 pt-4">
+                  <details className="group">
+                    <summary className="cursor-pointer text-[9px] font-black uppercase tracking-widest text-on-surface/30 hover:text-primary flex items-center gap-2 list-none">
+                      <Shield size={12} /> {story.originalityScore !== null ? `Originality: ${story.originalityScore}/100` : "Audit Originality"}
+                      <ChevronDown size={10} className="group-open:rotate-180 transition-transform" />
+                    </summary>
+                    <div className="mt-4 p-4 bg-on-surface/5 border-2 border-on-surface/10 rounded-xl">
+                      <OriginalityChecker 
+                        content={story.content || ""} 
+                        title={story.title} 
+                        storyId={story.id}
+                        initialReport={story.originalityReport}
+                      />
+                    </div>
+                  </details>
                 </div>
               </div>
             ))}

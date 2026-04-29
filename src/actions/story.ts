@@ -132,6 +132,15 @@ export async function updateStoryStatus(storyId: string, status: any) {
     return { error: "Unauthorized to modify this story." };
   }
 
+  // Enforce originality score for publishing
+  if (status === "PUBLISHED" || status === "published") {
+    if (story.originalityScore !== null && story.originalityScore < 60) {
+      return { 
+        error: `Originality Score too low (${story.originalityScore}/100). You need at least 60/100 to publish. Enhance your prose and remove unoriginal content.` 
+      };
+    }
+  }
+
   try {
     await prisma.story.update({
       where: { id: storyId },

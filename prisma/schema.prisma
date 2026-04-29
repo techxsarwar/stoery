@@ -114,6 +114,8 @@ model Story {
   appealText           String?
   banExpiresAt         DateTime?
   isPermanentBan       Boolean      @default(false)
+  originalityScore     Int?
+  originalityReport    Json?
   authorPosts          AuthorPost[]
   chapters             Chapter[]
   comments             Comment[]

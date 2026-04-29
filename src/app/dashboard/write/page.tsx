@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import Navbar from "@/components/Navbar";
+import OriginalityChecker from "@/components/OriginalityChecker";
 
 function WriteContent() {
   const [content, setContent] = useState("");
@@ -26,6 +27,7 @@ function WriteContent() {
   const [aiSynopsisLoading, setAiSynopsisLoading] = useState(false);
   const [titleSuggestions, setTitleSuggestions] = useState<string[]>([]);
   const [showTitleSuggestions, setShowTitleSuggestions] = useState(false);
+  const [initialReport, setInitialReport] = useState<any>(null);
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -48,6 +50,7 @@ function WriteContent() {
                 if (res.story.chapters && res.story.chapters[0]) {
                     setContent(res.story.chapters[0].content);
                 }
+                setInitialReport(res.story.originalityReport);
             } else {
                 setError(res.error || "Failed to load the chronicle.");
             }
@@ -291,6 +294,20 @@ function WriteContent() {
                   placeholder="Summon the essence of this chronicle..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
+
+              {/* AI Originality Checker */}
+              <div className="flex flex-col gap-3 pt-2 border-t border-on-surface/5">
+                <div className="flex items-center gap-2">
+                  <div className="w-1 h-4 bg-primary rounded-full"></div>
+                  <label className="font-label font-black text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60">Originality Check</label>
+                </div>
+                <OriginalityChecker 
+                  content={content} 
+                  title={title} 
+                  storyId={storyId || undefined} 
+                  initialReport={initialReport}
                 />
               </div>
           </div>
