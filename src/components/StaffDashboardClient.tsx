@@ -734,7 +734,7 @@ export default function StaffDashboardClient({
                 <Search size={16} className="text-on-surface/30 group-focus-within:text-primary" />
                 <input
                   type="text"
-             any     placeholder="Query System..."
+                  placeholder="Query System..."
                   className="bg-transparent border-none outline-none text-xs font-black uppercase tracking-widest w-32 placeholder:text-on-surface/20"
                 />
               </div>
