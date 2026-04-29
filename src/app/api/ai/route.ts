@@ -5,9 +5,9 @@ export async function POST(req: Request) {
   try {
     const { action, text, context } = await req.json();
 
-    if (!process.env.GEMINI_API_KEY) {
+    if (!process.env.GEMINI_API_KEY && !process.env.OPENAI_API_KEY && !process.env.GROQ_API_KEY) {
         return NextResponse.json(
-            { error: "GEMINI_API_KEY is missing from your .env file. Please add it to use the AI features." },
+            { error: "No AI API keys found. Please add GEMINI_API_KEY, OPENAI_API_KEY, or GROQ_API_KEY to your .env file." },
             { status: 500 }
         );
     }
@@ -32,25 +32,80 @@ Text to polish:
         return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
-    let response;
-    try {
-        response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: prompt,
-        });
-    } catch (primaryError: any) {
-        console.warn("Primary model failed, falling back to gemini-1.5-flash:", primaryError.message);
+    let aiResponseText = "";
+
+    // 1. Try Gemini Models (if key exists)
+    if (process.env.GEMINI_API_KEY && !aiResponseText) {
+        const ai = new GoogleGenAI({});
         try {
-            response = await ai.models.generateContent({
-                model: "gemini-1.5-flash",
-                contents: prompt,
-            });
-        } catch (fallbackError: any) {
-            throw new Error("The AI is currently experiencing high demand. Please wait a few moments and try again.");
+            const response = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: prompt });
+            aiResponseText = response.text || "";
+        } catch (e1: any) {
+            console.warn("Gemini 2.5 failed, trying 1.5...");
+            try {
+                const response = await ai.models.generateContent({ model: "gemini-1.5-flash", contents: prompt });
+                aiResponseText = response.text || "";
+            } catch (e2: any) {
+                console.warn("All Gemini models failed:", e2.message);
+            }
         }
     }
 
-    return NextResponse.json({ text: response.text });
+    // 2. Try Groq (Llama 3) as fallback
+    if (process.env.GROQ_API_KEY && !aiResponseText) {
+        console.warn("Falling back to Groq API...");
+        try {
+            const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: "llama-3.3-70b-versatile",
+                    messages: [{ role: "user", content: prompt }],
+                    temperature: 0.7
+                })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                aiResponseText = data.choices[0]?.message?.content || "";
+            }
+        } catch (e: any) {
+            console.warn("Groq fallback failed:", e.message);
+        }
+    }
+
+    // 3. Try OpenAI (GPT-4o-mini) as tertiary fallback
+    if (process.env.OPENAI_API_KEY && !aiResponseText) {
+        console.warn("Falling back to OpenAI API...");
+        try {
+            const res = await fetch("https://api.openai.com/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: "gpt-4o-mini",
+                    messages: [{ role: "user", content: prompt }],
+                    temperature: 0.7
+                })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                aiResponseText = data.choices[0]?.message?.content || "";
+            }
+        } catch (e: any) {
+            console.warn("OpenAI fallback failed:", e.message);
+        }
+    }
+
+    if (!aiResponseText) {
+        throw new Error("All AI providers are currently experiencing high demand. Please wait a few moments and try again.");
+    }
+
+    return NextResponse.json({ text: aiResponseText });
   } catch (error: any) {
     console.error("AI Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

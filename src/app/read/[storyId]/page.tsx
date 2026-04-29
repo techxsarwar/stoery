@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
+import Navbar from "@/components/Navbar";
 import ReadingHeartbeat from "@/components/ReadingHeartbeat";
 import { AlertOctagon, ShieldAlert } from "lucide-react";
 import ReaderClient from "@/components/ReaderClient";
