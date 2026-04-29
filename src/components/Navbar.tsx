@@ -6,6 +6,7 @@ import { useTransition, useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { signOut as nextAuthSignOut } from "next-auth/react";
 import { Menu, X, BookOpen, Compass, Users, Library, User, LayoutDashboard, PenLine, LogOut, LogIn } from "lucide-react";
+import NotificationCenter from "./NotificationCenter";
 
 interface NavbarProps {
   user: {
@@ -126,6 +127,7 @@ export default function Navbar({ user }: NavbarProps) {
                 >
                   Start Writing
                 </Link>
+                <NotificationCenter />
                 <button
                   onClick={handleSignOut}
                   disabled={isPending}

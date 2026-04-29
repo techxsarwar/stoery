@@ -74,6 +74,9 @@ model Profile {
   avatar_url           String?
   bio                  String?
   username             String?            @unique
+  reading_streak       Int                @default(0)
+  longest_streak       Int                @default(0)
+  last_reading_date    DateTime?
   authorPosts          AuthorPost[]
   codexEntries         CodexEntry[]
   comments             Comment[]
@@ -86,6 +89,10 @@ model Profile {
   user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   reports              Report[]
   stories              Story[]
+  readingHistory       ReadingHistory[]
+  notifications        Notification[]
+  reviews              Review[]
+  badges               Badge[]
 }
 
 model Story {
@@ -113,7 +120,9 @@ model Story {
   license              License?
   likes                Like[]
   reports              Report[]
-  author               Profile      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author               Profile          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  readingHistory       ReadingHistory[]
+  reviews              Review[]
 }
 
 model Report {
@@ -233,6 +242,56 @@ model PostLike {
   profile   Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@unique([postId, profileId])
+}
+
+model ReadingHistory {
+  id              String   @id @default(cuid())
+  profileId       String
+  storyId         String
+  chapterId       String?
+  scrollProgress  Float    @default(0)
+  lastReadAt      DateTime @default(now())
+  profile         Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  story           Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  
+  @@unique([profileId, storyId])
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  profileId   String
+  type        String   // NEW_CHAPTER, COMMENT_REPLY, LICENSE_APPROVED, BADGE_EARNED
+  title       String
+  message     String
+  link        String?
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  profileId   String
+  storyId     String
+  rating      Int      // 1-5
+  title       String?
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  story       Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, storyId])
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  profileId   String
+  badgeType   String   // SCHOLAR_OF_VOID, FIRST_BLOOD, etc.
+  earnedAt    DateTime @default(now())
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, badgeType])
 }
 
 enum UserRole {

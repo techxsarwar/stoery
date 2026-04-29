@@ -19,6 +19,20 @@ export default async function Home() {
     include: { author: true },
   });
 
+  let recentHistory = null;
+  if (user) {
+    const profile = await prisma.profile.findFirst({
+        where: { user: { email: user.email } }
+    });
+    if (profile) {
+        recentHistory = await prisma.readingHistory.findFirst({
+            where: { profileId: profile.id },
+            orderBy: { lastReadAt: "desc" },
+            include: { story: { include: { author: true } } }
+        });
+    }
+  }
+
   return (
     <>
       <ClientRecoveryRedirect />
@@ -34,7 +48,7 @@ export default async function Home() {
             Join a vibrant community of creators and readers. Write your masterpiece,
             design your covers, and share your universe with the world.
           </p>
-          <div className="flex flex-col sm:flex-row gap-6">
+          <div className="flex flex-col sm:flex-row gap-6 mt-4">
             <Link href="#trending" className="bg-primary text-on-primary font-headline text-lg px-10 py-4 rounded font-bold border-2 border-on-surface hover:scale-[1.02] transition-all duration-300 glow-hover uppercase tracking-wide">
               Start Reading
             </Link>
@@ -44,6 +58,26 @@ export default async function Home() {
               </Link>
             )}
           </div>
+          
+          {recentHistory && (
+              <div className="mt-12 bg-white/80 backdrop-blur-md p-6 rounded-2xl border-4 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-2xl w-full text-left flex items-center gap-6 group hover:translate-x-1 hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all">
+                  {recentHistory.story.cover_url && (
+                      <div className="w-24 h-32 flex-shrink-0 bg-surface-variant overflow-hidden border-2 border-on-surface">
+                          <img src={recentHistory.story.cover_url} alt="Cover" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                      </div>
+                  )}
+                  <div className="flex flex-col flex-grow">
+                      <span className="font-label font-black text-[10px] uppercase tracking-widest text-primary mb-1">Continue Reading</span>
+                      <h3 className="font-headline font-black text-2xl uppercase tracking-tighter text-on-surface line-clamp-1">{recentHistory.story.title}</h3>
+                      <p className="font-body text-sm italic text-on-surface-variant mt-1">
+                          {Math.round(recentHistory.scrollProgress * 100)}% through the current chapter
+                      </p>
+                      <Link href={`/read/${recentHistory.storyId}`} className="mt-4 font-headline font-black text-sm uppercase tracking-widest text-on-surface hover:text-primary transition-colors inline-flex items-center gap-2">
+                          Resume Chronicle →
+                      </Link>
+                  </div>
+              </div>
+          )}
         </section>
 
         <section id="trending" className="w-full relative z-10">
