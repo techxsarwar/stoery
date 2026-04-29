@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -123,3 +124,4 @@ export default async function ReadStoryPage({ params }: { params: Promise<{ stor
     </>
   );
 }
+

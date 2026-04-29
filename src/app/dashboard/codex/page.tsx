@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import { getCodexEntries } from "@/actions/codex";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
@@ -128,3 +129,4 @@ export default async function CodexPage() {
     </div>
   );
 }
+

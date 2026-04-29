@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
@@ -6,7 +7,6 @@ import Sidebar from "@/components/Sidebar";
 import MyProfileClient from "@/components/MyProfileClient";
 import type { Metadata } from "next";
 
-export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "My Profile — SOULPAD" };
 
 export default async function MyProfilePage() {
@@ -91,3 +91,4 @@ export default async function MyProfilePage() {
     </div>
   );
 }
+

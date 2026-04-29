@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
@@ -6,7 +7,6 @@ import DashboardClient from "@/components/DashboardClient";
 import Sidebar from "@/components/Sidebar";
 import CreatePostBox from "@/components/CreatePostBox";
 
-export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -120,3 +120,4 @@ export default async function DashboardPage() {
     </div>
   );
 }
+

@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import Navbar from "@/components/Navbar";
 import { Eye, Accessibility, Palette } from "lucide-react";
 
@@ -62,3 +63,4 @@ export default function AccessibilityPage() {
     </div>
   );
 }
+

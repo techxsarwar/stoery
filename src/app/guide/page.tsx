@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import Link from "next/link";
 import { guides } from "@/data/guides";
 import Navbar from "@/components/Navbar";
@@ -107,3 +108,4 @@ export default function GuidebookIndex() {
     </div>
   );
 }
+

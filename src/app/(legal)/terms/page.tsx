@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import Navbar from "@/components/Navbar";
 import PiracyGuard from "@/components/PiracyGuard";
 
@@ -90,3 +91,4 @@ export default function TermsOfServicePage() {
     </PiracyGuard>
   );
 }
+

@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import Navbar from "@/components/Navbar";
 import PiracyGuard from "@/components/PiracyGuard";
 import { Shield, Award, CheckCircle2, BookOpen, Scale, Zap, Globe, Lock } from "lucide-react";
@@ -112,3 +113,4 @@ export default function LicensePage() {
     </PiracyGuard>
   );
 }
+

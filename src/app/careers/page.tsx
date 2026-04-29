@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { MapPin, Clock, Zap, Heart, Globe, Shield } from "lucide-react";
@@ -223,3 +224,4 @@ export default function CareersPage() {
     </div>
   );
 }
+

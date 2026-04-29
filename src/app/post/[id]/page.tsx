@@ -7,7 +7,6 @@ import PostCard from "@/components/PostCard";
 import Link from "next/link";
 import type { Metadata } from "next";
 
-export const dynamic = "force-dynamic";
 export const unstable_instant = { prefetch: "static" };
 
 type Props = { params: Promise<{ id: string }> };

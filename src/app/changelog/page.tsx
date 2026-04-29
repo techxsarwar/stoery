@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import Navbar from "@/components/Navbar";
 import { createClient } from "@/utils/supabase/server";
 
@@ -48,3 +49,4 @@ export default async function ChangelogPage() {
     </div>
   );
 }
+

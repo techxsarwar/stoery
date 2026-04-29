@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
@@ -9,7 +10,6 @@ import FollowersModal from "@/components/FollowersModal";
 import type { Metadata } from "next";
 
 // Always server-render at request time so cookies (Supabase session) are available
-export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ penName: string }>;
@@ -266,3 +266,4 @@ function StatItem({
     </div>
   );
 }
+

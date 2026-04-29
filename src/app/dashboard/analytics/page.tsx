@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
@@ -44,3 +45,4 @@ export default async function AnalyticsPage() {
     </div>
   );
 }
+

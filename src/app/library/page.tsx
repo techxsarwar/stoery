@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
@@ -81,3 +82,4 @@ export default async function LibraryPage() {
     </div>
   );
 }
+

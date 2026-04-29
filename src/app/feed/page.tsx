@@ -8,7 +8,6 @@ import FollowButton from "@/components/FollowButton";
 import Link from "next/link";
 import type { Metadata } from "next";
 
-export const dynamic = "force-dynamic";
 export const unstable_instant = { prefetch: "static" };
 
 export const metadata: Metadata = {

@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { createClient } from "@/utils/supabase/server";
@@ -38,3 +39,4 @@ export default async function AboutPage() {
     </div>
   );
 }
+

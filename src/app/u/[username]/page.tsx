@@ -1,3 +1,4 @@
+export const unstable_instant = { prefetch: "static" };
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
@@ -23,3 +24,4 @@ export default async function UsernamePage({
 
   redirect(`/author/${encodeURIComponent(profile.pen_name)}`);
 }
+
