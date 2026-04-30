@@ -140,7 +140,7 @@ async function HomeContent() {
         {/* Discovery Sections */}
         <div className="flex flex-col gap-24">
             <HorizontalCarousel title="Trending Stories" subtitle="What everyone is talking about right now.">
-                {trendingStories.map(story => (
+                {trendingStories.map((story, i) => (
                     <StoryCard 
                         key={story.id} 
                         id={story.id} 
@@ -150,6 +150,7 @@ async function HomeContent() {
                         genre={story.genre}
                         reads={story.reads}
                         likes={story._count.likes}
+                        priority={i < 5} // Load first 5 trending stories immediately
                     />
                 ))}
             </HorizontalCarousel>
