@@ -127,7 +127,40 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Please write at least 100 characters before running an originality check." }, { status: 400 });
         }
 
+        // If a dedicated Python backend is configured, proxy the request
+        if (process.env.BACKEND_AI_URL) {
+            try {
+                const res = await fetch(`${process.env.BACKEND_AI_URL}/originality`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text, title, storyId })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    // If the python backend returns a string, we might need to parse it if it wasn't parsed there
+                    const report = typeof data.report === 'string' ? JSON.parse(data.report.replace(/```json|```/g, "").trim()) : data.report;
+                    
+                    // If storyId is provided, save to DB (consistent with local logic)
+                    if (storyId) {
+                        await prisma.story.update({
+                            where: { id: storyId },
+                            data: {
+                                originalityScore: report.originalityScore,
+                                originalityReport: report
+                            }
+                        });
+                    }
+                    return NextResponse.json({ report });
+                } else {
+                    console.warn("Python Originality Backend failed, falling back to local...");
+                }
+            } catch (e: any) {
+                console.warn("Python Originality Backend connection error:", e.message);
+            }
+        }
+
         const prompt = `You are an expert literary plagiarism analyst and originality reviewer for a fiction publishing platform.
+
 
 Analyze the following story excerpt and provide a structured originality report. Be thorough but fair.
 

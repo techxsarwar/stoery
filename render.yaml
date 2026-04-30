@@ -2,14 +2,14 @@ services:
   - type: web
     name: storyverse-platform
     env: node
-    plan: starter # Starter plan ensures "Always On" for zero-lag reading
+    plan: starter
     buildCommand: npm install && npx prisma generate && npm run build
     startCommand: node .next/standalone/server.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        sync: false # You'll add this in the Render Dashboard
+        sync: false
       - key: NEXTAUTH_SECRET
         sync: false
       - key: SPOTIFY_CLIENT_ID
@@ -24,3 +24,16 @@ services:
         sync: false
       - key: R2_BUCKET_NAME
         sync: false
+      - key: BACKEND_AI_URL
+        value: https://storyverse-ai.onrender.com # You'll update this after deploying the python service
+
+  - type: web
+    name: storyverse-ai
+    env: python
+    plan: starter
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn -w 4 -k uvicorn.workers.UvicornWorker backend.main:app
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+

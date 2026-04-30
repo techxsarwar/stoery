@@ -12,9 +12,30 @@ export async function POST(req: Request) {
         );
     }
 
+    // If a dedicated Python backend is configured, proxy the request
+    if (process.env.BACKEND_AI_URL) {
+        try {
+            const res = await fetch(`${process.env.BACKEND_AI_URL}/generate`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action, text, context })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                return NextResponse.json({ text: data.text });
+            } else {
+                console.warn("Python AI Backend failed, falling back to local...");
+            }
+        } catch (e: any) {
+            console.warn("Python AI Backend connection error:", e.message);
+        }
+    }
+
     const ai = new GoogleGenAI({});
 
     let prompt = "";
+    // ... (rest of the prompt logic)
+
 
     if (action === "continue") {
         prompt = `You are a dark fantasy / sci-fi author writing in a brutalist, raw, and highly atmospheric style. 
