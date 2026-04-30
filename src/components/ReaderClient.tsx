@@ -92,8 +92,10 @@ export default function ReaderClient({ story, currentProfile, initialChapterId, 
         }
     }, [currentChapter.content]);
 
+    const watermarkIdentifier = currentProfile?.pen_name || user?.email || "GUEST_READER";
+
     return (
-    <PiracyGuard>
+    <PiracyGuard watermarkText={watermarkIdentifier}>
         <div className={`min-h-screen flex flex-col items-center w-full mx-auto pb-32 relative ${zenMode ? 'bg-[#fdfdfa]' : 'bg-surface pt-24 px-6 md:px-12'}`}>
         
         {!zenMode && (

@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
 
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import Navbar from "@/components/Navbar";
@@ -16,6 +16,10 @@ export default async function ReadStoryPage({ params }: { params: Promise<{ stor
   
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/auth/signin");
+  }
 
   // Increment reads (non-blocking)
   prisma.story.update({

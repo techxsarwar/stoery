@@ -10,6 +10,7 @@ import { createClient } from "@/utils/supabase/server";
 import ClientRecoveryRedirect from "@/components/ClientRecoveryRedirect";
 import HorizontalCarousel from "@/components/HorizontalCarousel";
 import StoryCard from "@/components/StoryCard";
+import AnimatedFeatures from "@/components/AnimatedFeatures";
 import { 
   getRecentStories, 
   getTrendingStories, 
@@ -188,6 +189,9 @@ async function HomeContent() {
                 </HorizontalCarousel>
             )}
         </div>
+
+        {/* Core Features Grid from README - Animated */}
+        <AnimatedFeatures />
 
         {/* Genre Grid */}
         <section className="w-full">

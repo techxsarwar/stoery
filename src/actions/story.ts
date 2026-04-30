@@ -4,71 +4,60 @@ import { prisma } from "@/lib/prisma";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export async function createStory(formData: FormData) {
+/** Shared helper — resolves the logged-in user's profile id in ONE query */
+async function getProfileId(): Promise<string | null> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.email) return null;
 
-  if (!user?.email) {
-    return { error: "Unauthorized" };
-  }
+  const profile = await prisma.profile.findFirst({
+    where: { user: { email: user.email } },
+    select: { id: true },
+  });
+  return profile?.id ?? null;
+}
 
-  const title = formData.get("title") as string;
+export async function createStory(formData: FormData) {
+  const profileId = await getProfileId();
+  if (!profileId) return { error: "Unauthorized" };
+
+  const title     = formData.get("title") as string;
   const description = formData.get("description") as string;
-  const genre = formData.get("genre") as string;
+  const genre     = formData.get("genre") as string;
   const cover_url = formData.get("coverImage") as string;
-  const content = formData.get("content") as string;
-  const storyId = formData.get("storyId") as string;
+  const content   = formData.get("content") as string;
+  const storyId   = formData.get("storyId") as string;
 
-  if (!title || !content) {
-    return { error: "Title and content are required" };
-  }
+  if (!title || !content) return { error: "Title and content are required" };
 
   try {
-    const profile = await prisma.profile.findFirst({
-      where: { user: { email: user.email } }
-    });
-
-    if (!profile) {
-      return { error: "Profile not found. Please complete onboarding." };
-    }
-
     if (storyId) {
-      // Update existing story
-      const story = await prisma.story.update({
-        where: { id: storyId },
-        data: {
-          title,
-          description,
-          genre,
-          cover_url,
-          chapters: {
-            updateMany: {
-              where: { order: 1 },
-              data: { content }
-            }
-          }
-        }
+      // Verify ownership in the same update query — no separate findUnique needed
+      const story = await prisma.story.updateMany({
+        where: { id: storyId, authorId: profileId },
+        data: { title, description, genre, cover_url },
       });
+      if (story.count === 0) return { error: "Story not found or unauthorized." };
+
+      // Update chapter separately (updateMany on nested relation not supported)
+      await prisma.chapter.updateMany({
+        where: { storyId, order: 1 },
+        data: { content },
+      });
+
       revalidatePath("/dashboard");
       revalidatePath("/");
-      return { success: true, storyId: story.id };
+      return { success: true, storyId };
     } else {
-      // Create new story
       const story = await prisma.story.create({
         data: {
           title,
           description,
           genre,
           cover_url,
-          authorId: profile.id,
+          authorId: profileId,
           chapters: {
-            create: {
-              title: "Chapter 1",
-              content,
-              order: 1,
-            },
+            create: { title: "Chapter 1", content, order: 1 },
           },
         },
       });
@@ -83,27 +72,17 @@ export async function createStory(formData: FormData) {
 }
 
 export async function deleteStory(storyId: string) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user?.email) {
-    return { error: "Unauthorized" };
-  }
-
-  const profile = await prisma.profile.findFirst({
-    where: { user: { email: user.email } }
-  });
-
-  if (!profile) return { error: "Profile not found" };
-
-  const story = await prisma.story.findUnique({ where: { id: storyId } });
-
-  if (!story || story.authorId !== profile.id) {
-    return { error: "Unauthorized! This isn't your tale to end." };
-  }
+  const profileId = await getProfileId();
+  if (!profileId) return { error: "Unauthorized" };
 
   try {
-    await prisma.story.delete({ where: { id: storyId } });
+    // Single query: delete only if the author owns the story
+    const result = await prisma.story.deleteMany({
+      where: { id: storyId, authorId: profileId },
+    });
+
+    if (result.count === 0) return { error: "Story not found or unauthorized." };
+
     revalidatePath("/dashboard");
     revalidatePath("/");
     revalidatePath("/discover");
@@ -114,38 +93,33 @@ export async function deleteStory(storyId: string) {
   }
 }
 
-export async function updateStoryStatus(storyId: string, status: any) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user?.email) return { error: "Unauthorized" };
-
-  const profile = await prisma.profile.findFirst({
-    where: { user: { email: user.email } }
-  });
-
-  if (!profile) return { error: "Profile not found" };
-
-  const story = await prisma.story.findUnique({ where: { id: storyId } });
-
-  if (!story || story.authorId !== profile.id) {
-    return { error: "Unauthorized to modify this story." };
-  }
-
-  // Enforce originality score for publishing
-  if (status === "PUBLISHED" || status === "published") {
-    if (story.originalityScore !== null && story.originalityScore < 60) {
-      return { 
-        error: `Originality Score too low (${story.originalityScore}/100). You need at least 60/100 to publish. Enhance your prose and remove unoriginal content.` 
-      };
-    }
-  }
+export async function updateStoryStatus(storyId: string, status: "PUBLISHED" | "PAUSED" | "DRAFT") {
+  const profileId = await getProfileId();
+  if (!profileId) return { error: "Unauthorized" };
 
   try {
+    // Fetch story to check ownership + originality — single query
+    const story = await prisma.story.findUnique({
+      where: { id: storyId },
+      select: { authorId: true, originalityScore: true },
+    });
+
+    if (!story || story.authorId !== profileId) {
+      return { error: "Story not found or unauthorized." };
+    }
+
+    // Enforce originality score for publishing
+    if (status === "PUBLISHED" && story.originalityScore !== null && story.originalityScore < 60) {
+      return {
+        error: `Originality Score too low (${story.originalityScore}/100). You need at least 60/100 to publish.`,
+      };
+    }
+
     await prisma.story.update({
       where: { id: storyId },
-      data: { status }
+      data: { status },
     });
+
     revalidatePath("/dashboard");
     revalidatePath("/");
     revalidatePath("/discover");
@@ -155,29 +129,19 @@ export async function updateStoryStatus(storyId: string, status: any) {
     return { error: "Failed to update status." };
   }
 }
+
 export async function getStory(storyId: string) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user?.email) return { error: "Unauthorized" };
-
-  const profile = await prisma.profile.findFirst({
-    where: { user: { email: user.email } }
-  });
-
-  if (!profile) return { error: "Profile not found" };
+  const profileId = await getProfileId();
+  if (!profileId) return { error: "Unauthorized" };
 
   const story = await prisma.story.findUnique({
     where: { id: storyId },
     include: {
-        chapters: {
-            orderBy: { order: "asc" },
-            take: 1
-        }
-    }
+      chapters: { orderBy: { order: "asc" }, take: 1 },
+    },
   });
 
-  if (!story || story.authorId !== profile.id) {
+  if (!story || story.authorId !== profileId) {
     return { error: "Chronicle not found or unauthorized access." };
   }
 

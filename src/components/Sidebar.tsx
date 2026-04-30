@@ -4,7 +4,6 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { BookOpen, BarChart3, MessageSquare, Settings, PenTool, Library, DollarSign, Shield, Menu, X, User } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getUserRole } from "@/actions/auth";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -13,8 +12,15 @@ export default function Sidebar() {
 
   useEffect(() => {
     const fetchRole = async () => {
-      const role = await getUserRole();
-      setUserRole(role);
+      try {
+        const res = await fetch("/api/me/role", { cache: "force-cache" });
+        if (res.ok) {
+          const data = await res.json();
+          setUserRole(data.role);
+        }
+      } catch {
+        // silently fail — non-critical UI enhancement
+      }
     };
     fetchRole();
   }, []);

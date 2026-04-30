@@ -31,6 +31,10 @@ export default function DashboardClient({ stories, profile, comments, reports, l
     const [isPending, startTransition] = useTransition();
     const [deleteRitualId, setDeleteRitualId] = useState<string | null>(null);
     const [showCertificateId, setShowCertificateId] = useState<string | null>(null);
+    const [pendingStatusId, setPendingStatusId] = useState<string | null>(null);
+    const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+    // Optimistic story list — reflects changes instantly without waiting for server
+    const [optimisticStories, setOptimisticStories] = useState(stories);
     const router = useRouter();
 
     const formatDate = (date: string | Date) => {
@@ -40,16 +44,38 @@ export default function DashboardClient({ stories, profile, comments, reports, l
     };
 
     const handleToggleStatus = (storyId: string, currentStatus: string) => {
+        const newStatus = currentStatus === "PUBLISHED" ? "PAUSED" : "PUBLISHED";
+        // Optimistic update — instant UI feedback
+        setOptimisticStories(prev =>
+            prev.map(s => s.id === storyId ? { ...s, status: newStatus } : s)
+        );
+        setPendingStatusId(storyId);
         startTransition(async () => {
-            const newStatus = currentStatus === "PUBLISHED" ? "PAUSED" : "PUBLISHED";
-            await updateStoryStatus(storyId, newStatus);
+            const res = await updateStoryStatus(storyId, newStatus);
+            if (res?.error) {
+                // Revert on error
+                setOptimisticStories(prev =>
+                    prev.map(s => s.id === storyId ? { ...s, status: currentStatus } : s)
+                );
+                alert(res.error);
+            }
+            setPendingStatusId(null);
         });
     };
 
     const handleBurnRitual = (storyId: string) => {
+        // Optimistic removal
+        setOptimisticStories(prev => prev.filter(s => s.id !== storyId));
+        setPendingDeleteId(storyId);
+        setDeleteRitualId(null);
         startTransition(async () => {
-            await deleteStory(storyId);
-            setDeleteRitualId(null);
+            const res = await deleteStory(storyId);
+            if (res?.error) {
+                // Revert on failure
+                setOptimisticStories(stories);
+                alert(res.error);
+            }
+            setPendingDeleteId(null);
         });
     };
 
@@ -67,18 +93,18 @@ export default function DashboardClient({ stories, profile, comments, reports, l
     return (
         <div className="flex flex-col gap-12 animate-in fade-in duration-700">
             {/* Ink-Well Header */}
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 overflow-hidden">
-                <div className="relative">
+            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 sm:gap-6">
+                <div className="relative min-w-0">
                     <span className="absolute -left-4 top-0 w-1 h-full bg-primary/20"></span>
-                    <h1 className="font-headline text-5xl md:text-7xl font-black text-on-surface tracking-tighter uppercase leading-none selection:bg-primary selection:text-on-primary">The Obsidian Desk</h1>
-                    <p className="font-label font-bold text-on-surface-variant text-sm uppercase tracking-[0.3em] mt-4 opacity-60">Architect: <span className="text-primary">{profile.pen_name || "Unknown Author"}</span></p>
+                    <h1 className="font-headline text-3xl sm:text-5xl md:text-7xl font-black text-on-surface tracking-tighter uppercase leading-none selection:bg-primary selection:text-on-primary break-words">The Obsidian Desk</h1>
+                    <p className="font-label font-bold text-on-surface-variant text-xs sm:text-sm uppercase tracking-[0.3em] mt-3 sm:mt-4 opacity-60">Architect: <span className="text-primary">{profile.pen_name || "Unknown Author"}</span></p>
                 </div>
-                <Link href="/dashboard/write" className="group flex items-center gap-4 bg-surface-container-high border-2 border-on-surface/10 px-8 py-4 rounded-xl hover:border-primary/50 transition-all duration-500 shadow-2xl">
-                    <div className="p-3 bg-primary rounded-lg shadow-inner group-hover:scale-110 transition-transform">
+                <Link href="/dashboard/write" className="group flex items-center gap-3 sm:gap-4 bg-surface-container-high border-2 border-on-surface/10 px-5 sm:px-8 py-3 sm:py-4 rounded-xl hover:border-primary/50 transition-all duration-500 shadow-2xl flex-shrink-0 w-full sm:w-auto">
+                    <div className="p-2.5 sm:p-3 bg-primary rounded-lg shadow-inner group-hover:scale-110 transition-transform">
                         <Plus size={20} className="text-on-primary" />
                     </div>
                     <div className="text-left">
-                        <p className="font-headline font-black text-lg text-on-surface uppercase tracking-tight">Quick Draft</p>
+                        <p className="font-headline font-black text-base sm:text-lg text-on-surface uppercase tracking-tight">Quick Draft</p>
                         <p className="font-label font-bold text-[10px] text-on-surface-variant uppercase tracking-widest leading-none">New Chronicle</p>
                     </div>
                 </Link>
@@ -113,9 +139,9 @@ export default function DashboardClient({ stories, profile, comments, reports, l
                         Manuscripts Management
                     </h2>
 
-                    {stories.length === 0 ? <EmptyState /> : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {stories.map(story => (
+                    {optimisticStories.length === 0 ? <EmptyState /> : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            {optimisticStories.map(story => (
                                 <div key={story.id} className="group bg-surface-container-high border-2 border-on-surface/10 rounded-2xl overflow-hidden hover:border-primary/40 transition-all duration-500 relative flex flex-col">
                                     {/* Visual Indicator */}
                                     <div className="h-40 relative overflow-hidden">
@@ -153,14 +179,16 @@ export default function DashboardClient({ stories, profile, comments, reports, l
                                                 </Link>
                                                 <button
                                                     onClick={() => handleToggleStatus(story.id, story.status)}
-                                                    className="p-2 hover:bg-primary/10 rounded-lg text-on-surface-variant hover:text-primary transition-colors transition-transform active:scale-90"
+                                                    disabled={pendingStatusId === story.id}
+                                                    className="p-2 hover:bg-primary/10 rounded-lg text-on-surface-variant hover:text-primary transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
                                                     title={story.status === 'PUBLISHED' ? 'Pause Chronicle' : 'Rise Chronicle'}
                                                 >
                                                     {story.status === 'PUBLISHED' ? <Pause size={18} /> : <Play size={18} />}
                                                 </button>
                                                 <button
                                                     onClick={() => setDeleteRitualId(story.id)}
-                                                    className="p-2 hover:bg-error/10 rounded-lg text-on-surface-variant hover:text-error transition-colors transition-transform active:scale-90"
+                                                    disabled={pendingDeleteId === story.id}
+                                                    className="p-2 hover:bg-error/10 rounded-lg text-on-surface-variant hover:text-error transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
                                                     title="Burn Ritual"
                                                 >
                                                     <Trash2 size={18} />
@@ -195,7 +223,7 @@ export default function DashboardClient({ stories, profile, comments, reports, l
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Reports on your stories */}
-                        <div className="bg-white border-4 border-on-surface p-8 rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                        <div className="bg-surface-container-high border-2 border-on-surface/10 p-6 sm:p-8 rounded-3xl shadow-xl">
                             <h3 className="font-headline font-black text-2xl uppercase tracking-tighter mb-6 flex items-center gap-3">
                                 <Flag size={20} className="text-primary" />
                                 Incident Reports
@@ -203,10 +231,10 @@ export default function DashboardClient({ stories, profile, comments, reports, l
 
                             <div className="flex flex-col gap-4">
                                 {reports.length === 0 ? (
-                                    <p className="text-on-surface/40 italic font-medium">No reports filed against your chronicles.</p>
+                                    <p className="text-on-surface-variant italic font-medium opacity-60">No reports filed against your chronicles.</p>
                                 ) : (
                                     reports.map(report => (
-                                        <div key={report.id} className="p-4 bg-on-surface/5 border-2 border-on-surface rounded-xl flex flex-col gap-3">
+                                        <div key={report.id} className="p-4 bg-surface-container border border-on-surface/15 rounded-xl flex flex-col gap-3">
                                             <div className="flex justify-between items-start">
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-primary">{report.reason}</span>
                                                 <span className="text-[8px] font-bold text-on-surface/30">{formatDate(report.createdAt)}</span>
@@ -215,9 +243,9 @@ export default function DashboardClient({ stories, profile, comments, reports, l
                                             <p className="text-sm font-medium italic">"{report.details || "No details provided"}"</p>
 
                                             {report.authorResponse ? (
-                                                <div className="mt-2 p-3 bg-white border-2 border-on-surface/10 rounded-lg">
+                                                <div className="mt-2 p-3 bg-surface border border-on-surface/10 rounded-lg">
                                                     <p className="text-[9px] font-black uppercase text-primary mb-1">Your Response:</p>
-                                                    <p className="text-xs italic">"{report.authorResponse}"</p>
+                                                    <p className="text-xs italic text-on-surface-variant">"{report.authorResponse}"</p>
                                                 </div>
                                             ) : (
                                                 <button
@@ -237,7 +265,7 @@ export default function DashboardClient({ stories, profile, comments, reports, l
                         </div>
 
                         {/* Banned Stories & Appeals */}
-                        <div className="bg-white border-4 border-on-surface p-8 rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                        <div className="bg-surface-container-high border-2 border-on-surface/10 p-6 sm:p-8 rounded-3xl shadow-xl">
                             <h3 className="font-headline font-black text-2xl uppercase tracking-tighter mb-6 flex items-center gap-3">
                                 <Gavel size={20} className="text-red-500" />
                                 Restrictive Actions
@@ -245,18 +273,18 @@ export default function DashboardClient({ stories, profile, comments, reports, l
 
                             <div className="flex flex-col gap-4">
                                 {stories.filter(s => s.isBanned).length === 0 ? (
-                                    <p className="text-on-surface/40 italic font-medium">All your chronicles are in good standing.</p>
+                                    <p className="text-on-surface-variant italic font-medium opacity-60">All your chronicles are in good standing.</p>
                                 ) : (
                                     stories.filter(s => s.isBanned).map(story => (
-                                        <div key={story.id} className="p-4 bg-red-50 border-2 border-red-500/20 rounded-xl flex flex-col gap-3">
+                                        <div key={story.id} className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex flex-col gap-3">
                                             <div className="flex justify-between items-start">
-                                                <h4 className="font-black text-sm uppercase text-red-700">{story.title}</h4>
+                                                <h4 className="font-black text-sm uppercase text-red-400">{story.title}</h4>
                                                 <span className="bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full">BANNED</span>
                                             </div>
-                                            <p className="text-xs font-medium text-red-900/60">Reason: {story.banReason}</p>
+                                            <p className="text-xs font-medium text-red-400/80">Reason: {story.banReason}</p>
 
                                             {!story.isPermanentBan && (
-                                                <div className="mt-2 p-4 bg-white border-2 border-red-500/10 rounded-xl">
+                                                <div className="mt-2 p-4 bg-surface border border-red-500/15 rounded-xl">
                                                     <p className="text-[10px] font-black uppercase text-red-500 mb-2 flex items-center gap-2">
                                                         <Scale size={12} /> Appeal Status: {story.appealStatus}
                                                     </p>
@@ -287,9 +315,9 @@ export default function DashboardClient({ stories, profile, comments, reports, l
                                             )}
 
                                             {story.isPermanentBan && (
-                                                <div className="mt-2 p-4 bg-red-100 border-2 border-red-500 rounded-xl text-center">
-                                                    <p className="text-xs font-black uppercase text-red-700">PERMANENT BAN</p>
-                                                    <p className="text-[10px] text-red-700/60 mt-1 italic">This chronicle has been struck from the records forever.</p>
+                                                <div className="mt-2 p-4 bg-red-500/20 border border-red-500/40 rounded-xl text-center">
+                                                    <p className="text-xs font-black uppercase text-red-400">PERMANENT BAN</p>
+                                                    <p className="text-[10px] text-red-400/60 mt-1 italic">This chronicle has been struck from the records forever.</p>
                                                 </div>
                                             )}
                                         </div>
@@ -309,7 +337,7 @@ export default function DashboardClient({ stories, profile, comments, reports, l
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                         {/* Apply for License */}
-                        <div className="lg:col-span-4 bg-white border-4 border-on-surface p-8 rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                        <div className="lg:col-span-4 bg-surface-container-high border-2 border-on-surface/10 p-6 sm:p-8 rounded-3xl shadow-xl">
                             <h3 className="font-headline font-black text-2xl uppercase tracking-tighter mb-6">Register Chronicle</h3>
                             <form className="flex flex-col gap-5" onSubmit={async (e) => {
                                 e.preventDefault();
@@ -326,7 +354,7 @@ export default function DashboardClient({ stories, profile, comments, reports, l
                             }}>
                                 <div className="flex flex-col gap-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-on-surface/40">Select Manuscript</label>
-                                    <select name="storyId" required className="w-full bg-on-surface/5 border-2 border-on-surface p-3 rounded-xl font-black uppercase text-xs outline-none focus:border-primary">
+                                    <select name="storyId" required className="w-full bg-surface border border-on-surface/20 p-3 rounded-xl font-black uppercase text-xs outline-none focus:border-primary text-on-surface">
                                         {stories.filter(s => !licenses.some(l => l.storyId === s.id)).map(s => (
                                             <option key={s.id} value={s.id}>{s.title}</option>
                                         ))}
@@ -334,11 +362,11 @@ export default function DashboardClient({ stories, profile, comments, reports, l
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-on-surface/40">Legal Full Name</label>
-                                    <input name="legalName" required type="text" className="w-full bg-on-surface/5 border-2 border-on-surface p-3 rounded-xl font-black uppercase text-xs outline-none focus:border-primary" />
+                                    <input name="legalName" required type="text" className="w-full bg-surface border border-on-surface/20 p-3 rounded-xl font-black uppercase text-xs outline-none focus:border-primary text-on-surface" />
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-on-surface/40">License Tier</label>
-                                    <select name="licenseType" required className="w-full bg-on-surface/5 border-2 border-on-surface p-3 rounded-xl font-black uppercase text-xs outline-none focus:border-primary">
+                                    <select name="licenseType" required className="w-full bg-surface border border-on-surface/20 p-3 rounded-xl font-black uppercase text-xs outline-none focus:border-primary text-on-surface">
                                         <option value="Standard Chronicle License">Standard Chronicle License</option>
                                         <option value="Premium Author License">Premium Author License</option>
                                         <option value="Exclusive IP Registry">Exclusive IP Registry</option>
@@ -346,7 +374,7 @@ export default function DashboardClient({ stories, profile, comments, reports, l
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-on-surface/40">Creative Details</label>
-                                    <textarea name="details" className="w-full bg-on-surface/5 border-2 border-on-surface p-3 rounded-xl font-black text-xs outline-none focus:border-primary min-h-[100px]" placeholder="Briefly describe the unique aspects of this chronicle..."></textarea>
+                                    <textarea name="details" className="w-full bg-surface border border-on-surface/20 p-3 rounded-xl font-black text-xs outline-none focus:border-primary min-h-[100px] text-on-surface placeholder:text-on-surface-variant" placeholder="Briefly describe the unique aspects of this chronicle..."></textarea>
                                 </div>
                                 <button type="submit" className="bg-primary text-on-primary font-headline font-black py-4 uppercase tracking-tighter rounded-xl border-4 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all mt-4">
                                     Submit Application
@@ -355,16 +383,16 @@ export default function DashboardClient({ stories, profile, comments, reports, l
                         </div>
 
                         {/* My Licenses */}
-                        <div className="lg:col-span-8 bg-white border-4 border-on-surface p-8 rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                        <div className="lg:col-span-8 bg-surface-container-high border-2 border-on-surface/10 p-6 sm:p-8 rounded-3xl shadow-xl">
                             <h3 className="font-headline font-black text-2xl uppercase tracking-tighter mb-6">Verified Certificates</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {licenses.length === 0 ? (
-                                    <div className="md:col-span-2 p-12 text-center bg-on-surface/5 rounded-2xl border-4 border-dashed border-on-surface/10">
+                                    <div className="md:col-span-2 p-8 sm:p-12 text-center bg-surface/40 rounded-2xl border-2 border-dashed border-on-surface/10">
                                         <p className="text-on-surface/20 font-black uppercase tracking-widest italic">No licenses issued yet. Submit your first application.</p>
                                     </div>
                                 ) : (
                                     licenses.map(license => (
-                                        <div key={license.id} className="group bg-on-surface/5 border-2 border-on-surface p-6 rounded-2xl flex flex-col gap-4 relative hover:bg-white transition-colors">
+                                        <div key={license.id} className="group bg-surface border border-on-surface/15 p-5 rounded-2xl flex flex-col gap-4 relative hover:bg-surface-container transition-colors">
                                             <div className="flex justify-between items-start">
                                                 <div>
                                                     <h4 className="font-black text-sm uppercase tracking-tight text-on-surface">{license.story.title}</h4>
@@ -399,8 +427,8 @@ export default function DashboardClient({ stories, profile, comments, reports, l
 
                 {/* Certificate Modal */}
                 {showCertificateId && (
-                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in zoom-in duration-300">
-                        <div className="relative max-h-screen overflow-y-auto p-12 scrollbar-hide">
+                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6 bg-black/90 backdrop-blur-xl animate-in fade-in zoom-in duration-300">
+                        <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-12 scrollbar-hide">
                             <button
                                 onClick={() => setShowCertificateId(null)}
                                 className="absolute top-4 right-4 bg-white text-on-surface w-12 h-12 rounded-full border-4 border-on-surface flex items-center justify-center font-black hover:scale-110 transition-transform z-10"

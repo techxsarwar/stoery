@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 
 interface PiracyGuardProps {
   children: React.ReactNode;
+  watermarkText?: string;
 }
 
 /**
@@ -11,7 +12,7 @@ interface PiracyGuardProps {
  * by disabling copying, right-clicking, and common piracy keyboard shortcuts.
  * It also implements a "Blur-on-Blur" feature to deter screenshots.
  */
-export default function PiracyGuard({ children }: PiracyGuardProps) {
+export default function PiracyGuard({ children, watermarkText }: PiracyGuardProps) {
   const [isBlurred, setIsBlurred] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const warningTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -130,7 +131,18 @@ export default function PiracyGuard({ children }: PiracyGuardProps) {
         <p className="mt-4">This document is protected by SOULPAD Piracy Guard. Printing is disabled to protect intellectual property.</p>
       </div>
 
-      <div className="print:hidden">
+      <div className="print:hidden relative">
+        {/* Anti-screenshot Watermark Layer */}
+        {watermarkText && (
+          <div className="pointer-events-none fixed inset-0 z-[50] overflow-hidden opacity-[0.03] flex flex-wrap gap-12 justify-center content-center rotate-[-30deg] mix-blend-difference">
+            {Array.from({ length: 150 }).map((_, i) => (
+              <span key={i} className="font-headline font-black text-2xl uppercase tracking-widest whitespace-nowrap">
+                {watermarkText} • SOULPAD
+              </span>
+            ))}
+          </div>
+        )}
+        
         {children}
       </div>
     </div>
