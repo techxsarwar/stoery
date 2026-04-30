@@ -67,12 +67,13 @@ export default function RootLayout({
           strategy="lazyOnload"
         />
         <Providers>
-          <SmoothScroll>
-            <Suspense fallback={null}>
+          <Suspense fallback={null}>
+            <SmoothScroll>
               {children}
-            </Suspense>
-          </SmoothScroll>
+            </SmoothScroll>
+          </Suspense>
         </Providers>
+
 
       </body>
     </html>

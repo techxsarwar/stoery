@@ -1,4 +1,7 @@
+export const dynamic = "force-dynamic";
+
 export const unstable_instant = { prefetch: 'static' };
+
 
 import { Suspense } from "react";
 import Navbar from "@/components/Navbar";

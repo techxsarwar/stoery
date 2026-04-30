@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 
 export const unstable_instant = { 
   prefetch: 'static',
