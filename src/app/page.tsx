@@ -281,7 +281,7 @@ async function HomeContent() {
                 <span className="font-label text-sm font-black uppercase tracking-[0.2em] opacity-80">Chroniclers Joined</span>
             </div>
             <div className="bg-white text-on-surface p-12 border-4 border-on-surface shadow-[8px_8px_0px_0px_var(--color-tertiary,black)]">
-                <span className="font-headline text-6xl font-black block mb-2">{(totalReads._sum.reads || 0).toLocaleString()}</span>
+                <span className="font-headline text-6xl font-black block mb-2">{(totalReads || 0).toLocaleString()}</span>
                 <span className="font-label text-sm font-black uppercase tracking-[0.2em] opacity-60">Global Reads</span>
             </div>
         </section>
@@ -366,37 +366,87 @@ export default async function Home() {
       </Suspense>
 
 
-      <footer className="bg-on-surface w-full py-16 px-8 mt-auto z-10 relative border-t-8 border-primary">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 max-w-7xl mx-auto">
-          <div className="text-4xl font-black text-surface font-headline uppercase tracking-tighter">
-            SOULPAD
+      <footer className="bg-on-surface w-full pt-24 pb-12 px-6 md:px-12 mt-auto z-10 relative border-t-[12px] border-primary overflow-hidden">
+        {/* Background Noise/Texture */}
+        <div className="absolute inset-0 opacity-5 pointer-events-none mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+        
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-16 relative z-10">
+          
+          {/* Brand & Manifesto */}
+          <div className="md:col-span-5 flex flex-col items-start gap-6">
+            <Link href="/" className="text-5xl md:text-7xl font-black text-surface font-headline uppercase tracking-tighter hover:text-primary transition-colors duration-500">
+              SOULPAD<span className="text-primary">.</span>
+            </Link>
+            <p className="text-surface-variant/70 font-body text-base max-w-sm italic leading-relaxed">
+              The cinematic codex for the universe's most captivating tales. High-contrast storytelling for those who dare to write outside the margins.
+            </p>
+            <div className="flex gap-4 mt-4">
+              {['Twitter', 'Discord', 'Instagram'].map(social => (
+                <Link key={social} href="#" className="font-label font-bold text-[10px] uppercase tracking-[0.2em] px-4 py-2 border-2 border-surface-variant/30 text-surface hover:bg-primary hover:text-on-primary hover:border-primary transition-all duration-300 rounded-full">
+                  {social}
+                </Link>
+              ))}
+            </div>
           </div>
-          <div className="text-surface-variant/70 font-label text-sm tracking-tight text-left md:text-center">
-            © 2024 SOULPAD. Crafted for high-contrast storytelling.
-          </div>
-          <div className="flex flex-col sm:flex-row flex-wrap gap-x-12 gap-y-6 max-w-2xl">
-            <div className="flex flex-col gap-3">
-              <span className="font-headline font-black text-surface text-lg uppercase tracking-wider mb-2 border-b-2 border-primary pb-1">Platform</span>
-              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/about">About Us</Link>
-              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/careers">Careers</Link>
-              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/changelog">Changelog</Link>
-              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/faq">FAQ</Link>
-              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/guide">Architect's Guidebook</Link>
-              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/staff/login">Staff Portal</Link>
+
+          {/* Links Grid */}
+          <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8 sm:gap-12">
+            
+            <div className="flex flex-col gap-4">
+              <span className="font-headline font-black text-primary text-xs uppercase tracking-[0.3em] mb-4">Platform</span>
+              <Link className="text-surface-variant/70 hover:text-surface hover:translate-x-2 transition-all font-label font-bold uppercase text-xs tracking-widest flex items-center gap-2 group" href="/about">
+                <span className="w-0 group-hover:w-2 h-[2px] bg-primary transition-all duration-300"></span> About Us
+              </Link>
+              <Link className="text-surface-variant/70 hover:text-surface hover:translate-x-2 transition-all font-label font-bold uppercase text-xs tracking-widest flex items-center gap-2 group" href="/careers">
+                <span className="w-0 group-hover:w-2 h-[2px] bg-primary transition-all duration-300"></span> Careers
+              </Link>
+              <Link className="text-surface-variant/70 hover:text-surface hover:translate-x-2 transition-all font-label font-bold uppercase text-xs tracking-widest flex items-center gap-2 group" href="/changelog">
+                <span className="w-0 group-hover:w-2 h-[2px] bg-primary transition-all duration-300"></span> Changelog
+              </Link>
+              <Link className="text-surface-variant/70 hover:text-surface hover:translate-x-2 transition-all font-label font-bold uppercase text-xs tracking-widest flex items-center gap-2 group" href="/guide">
+                <span className="w-0 group-hover:w-2 h-[2px] bg-primary transition-all duration-300"></span> Architect's Guide
+              </Link>
+              <Link className="text-surface-variant/70 hover:text-surface hover:translate-x-2 transition-all font-label font-bold uppercase text-xs tracking-widest flex items-center gap-2 group" href="/staff/login">
+                <span className="w-0 group-hover:w-2 h-[2px] bg-error transition-all duration-300"></span> Staff Portal
+              </Link>
             </div>
             
-            <div className="flex flex-col gap-3">
-              <span className="font-headline font-black text-surface text-lg uppercase tracking-wider mb-2 border-b-2 border-primary pb-1">Community</span>
-              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/guidelines">Content Guidelines</Link>
-              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="https://discord.gg/soulpad" target="_blank" rel="noopener noreferrer">Discord Server</Link>
+            <div className="flex flex-col gap-4">
+              <span className="font-headline font-black text-primary text-xs uppercase tracking-[0.3em] mb-4">Community</span>
+              <Link className="text-surface-variant/70 hover:text-surface hover:translate-x-2 transition-all font-label font-bold uppercase text-xs tracking-widest flex items-center gap-2 group" href="/guidelines">
+                <span className="w-0 group-hover:w-2 h-[2px] bg-primary transition-all duration-300"></span> Codex Laws
+              </Link>
+              <Link className="text-surface-variant/70 hover:text-surface hover:translate-x-2 transition-all font-label font-bold uppercase text-xs tracking-widest flex items-center gap-2 group" href="/faq">
+                <span className="w-0 group-hover:w-2 h-[2px] bg-primary transition-all duration-300"></span> FAQ
+              </Link>
+              <Link className="text-surface-variant/70 hover:text-surface hover:translate-x-2 transition-all font-label font-bold uppercase text-xs tracking-widest flex items-center gap-2 group" href="https://discord.gg/soulpad" target="_blank" rel="noopener noreferrer">
+                <span className="w-0 group-hover:w-2 h-[2px] bg-primary transition-all duration-300"></span> The Guild (Discord)
+              </Link>
             </div>
 
-            <div className="flex flex-col gap-3">
-              <span className="font-headline font-black text-surface text-lg uppercase tracking-wider mb-2 border-b-2 border-primary pb-1">Legal & Support</span>
-              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/terms">Terms of Service</Link>
-              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/privacy">Privacy Policy</Link>
-              <Link className="text-surface-variant/70 hover:text-primary transition-all font-headline font-bold uppercase text-sm tracking-wide" href="/contact">Contact Support</Link>
+            <div className="flex flex-col gap-4 col-span-2 sm:col-span-1">
+              <span className="font-headline font-black text-primary text-xs uppercase tracking-[0.3em] mb-4">Legal</span>
+              <Link className="text-surface-variant/70 hover:text-surface hover:translate-x-2 transition-all font-label font-bold uppercase text-xs tracking-widest flex items-center gap-2 group" href="/terms">
+                <span className="w-0 group-hover:w-2 h-[2px] bg-primary transition-all duration-300"></span> Terms of Service
+              </Link>
+              <Link className="text-surface-variant/70 hover:text-surface hover:translate-x-2 transition-all font-label font-bold uppercase text-xs tracking-widest flex items-center gap-2 group" href="/privacy">
+                <span className="w-0 group-hover:w-2 h-[2px] bg-primary transition-all duration-300"></span> Privacy Policy
+              </Link>
+              <Link className="text-surface-variant/70 hover:text-surface hover:translate-x-2 transition-all font-label font-bold uppercase text-xs tracking-widest flex items-center gap-2 group" href="/contact">
+                <span className="w-0 group-hover:w-2 h-[2px] bg-primary transition-all duration-300"></span> Support
+              </Link>
             </div>
+
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-surface-variant/20 flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
+          <div className="font-label font-black text-[10px] tracking-[0.3em] text-surface-variant/50 uppercase">
+            © {new Date().getFullYear()} SOULPAD. All rights reserved.
+          </div>
+          <div className="font-label font-black text-[10px] tracking-[0.3em] text-surface-variant/30 uppercase flex items-center gap-2">
+            Forged in the Dark <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
           </div>
         </div>
       </footer>

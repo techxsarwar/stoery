@@ -65,7 +65,7 @@ async function callAI(prompt: string): Promise<string> {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    model: "meta-llama/llama-3-8b-instruct:free",
+                    model: "openrouter/free",
                     messages: [{ role: "user", content: prompt }],
                     max_tokens: 1500,
                     temperature: 0.3

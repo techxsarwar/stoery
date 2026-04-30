@@ -105,12 +105,8 @@ export default function Editor({ content, onChange, isSaving }: EditorProps) {
               throw new Error(data.error || "AI failed to respond.");
           }
 
-          if (!res.body) throw new Error("No response body received.");
-
-          const reader = res.body.getReader();
-          const decoder = new TextDecoder();
-          let done = false;
-          let accumulatedText = "";
+          const data = await res.json();
+          if (!data.text) throw new Error("No text received from AI.");
 
           // Prepare for insertion
           if (action === "polish" && isSelection) {
@@ -119,15 +115,8 @@ export default function Editor({ content, onChange, isSaving }: EditorProps) {
               editor.chain().focus().insertContent("\n\n").run();
           }
 
-          while (!done) {
-              const { value, done: doneReading } = await reader.read();
-              done = doneReading;
-              const chunkValue = decoder.decode(value);
-              accumulatedText += chunkValue;
-              
-              // Insert chunk by chunk for the "typing" effect
-              editor.chain().focus().insertContent(chunkValue).run();
-          }
+          // Insert the parsed text
+          editor.chain().focus().insertContent(data.text).run();
 
       } catch (e: any) {
           setAiError(e.message || "AI failed to respond.");

@@ -43,8 +43,10 @@
 
 | Feature | SOULPAD ✅ | Wattpad ❌ | Royal Road ❌ | Medium ❌ |
 |---|:---:|:---:|:---:|:---:|
-| **Dedicated AI Writing Engine** | ✅ Streaming | ❌ None | ❌ None | ❌ None |
-| **AI Originality Checker** | ✅ Built-in | ❌ None | ❌ None | ❌ None |
+| **Multi-Model Neural Engine** | ✅ Dynamic Router | ❌ None | ❌ None | ❌ None |
+| **The Resonance Matrix** | ✅ NVIDIA Nemotron | ❌ None | ❌ None | ❌ None |
+| **AI Originality Checker** | ✅ Hermes 405B | ❌ None | ❌ None | ❌ None |
+| **Uncensored Story Continuation** | ✅ Venice AI | ❌ None | ❌ None | ❌ None |
 | **Story Licensing System** | ✅ Full | ❌ None | ❌ None | ❌ None |
 | **Reading Streak & Heartbeat** | ✅ Yes | ❌ No | ❌ No | ❌ No |
 | **PiracyGuard Content Protection** | ✅ Yes | ❌ No | ❌ No | ❌ No |
@@ -55,29 +57,27 @@
 | **Smooth Scroll (Lenis)** | ✅ Yes | ❌ No | ❌ No | ❌ No |
 | **Author Monetization Pipeline** | ✅ Yes | 🟡 Limited | 🟡 Limited | 🟡 Limited |
 | **Verified Chronicler Status** | ✅ Yes | ❌ No | ❌ No | ❌ No |
-| **Dark Mod-only Cinematic UI** | ✅ Yes | ❌ No | ❌ No | ❌ No |
 | **Staff Appeal & Moderation System** | ✅ Full | 🟡 Basic | 🟡 Basic | 🟡 Basic |
 | **Reader Badge System** | ✅ Yes | ❌ No | ❌ No | ❌ No |
 | **Multi-chapter Story Structure** | ✅ Yes | ✅ Yes | ✅ Yes | ❌ No |
-| **AWS S3 Media Storage** | ✅ Yes | ❌ No | ❌ No | ❌ No |
+| **Cloudflare R2 Media Storage** | ✅ Yes | ❌ No | ❌ No | ❌ No |
 
 ---
 
 ## ✨ Core Features — Deep Dive
 
-### 🧠 1. Dedicated AI Engine (Gemini-Powered)
+### 🧠 1. Multi-Model Neural Engine (OpenRouter + Gemini)
 
 > **This isn't a ChatGPT wrapper. It's a high-concurrency literary microservice.**
 
-Our FastAPI + Gunicorn AI engine runs as an independent microservice on Render, completely decoupled from the frontend for maximum performance:
+Our AI engine is powered by a custom-built Dynamic Model Router that instantly selects the perfect frontier-tier AI model for the specific creative task at hand:
 
-- ⚡ **Real-time Streaming** — AI "types" story suggestions live using `StreamingResponse`, word by word
-- ✍️ **Story Continuation** — Context-aware, atmosphere-matched story continuation in dark-fantasy style
-- 🪄 **Prose Polish** — Elevates your prose without changing the plot; grammar-corrected, atmosphere-enhanced
-- 🏷️ **AI Title Generator** — Get 5 cinematic, evocative title suggestions based on your story content
-- 📝 **Synopsis Writer** — Auto-generates a compelling 2–3 sentence blurb with a reader hook
-- 🛡️ **Originality Checker** — Full plagiarism analysis: originality score (0–100), verdict, flags, strengths, and publish recommendation
-- 🤖 **Model Failover** — Auto-falls back from `gemini-2.0-flash` → `gemini-1.5-pro` if primary fails
+- ⚡ **Auto-Router Failsafe** — 100% uptime architecture. If a primary model experiences high traffic, the system seamlessly auto-routes to `openrouter/free` to guarantee instant generation.
+- ✍️ **Uncensored Story Continuation** — Context-aware, atmosphere-matched story continuation powered by **Venice Uncensored**, allowing for pure, gritty, dark-fantasy prose without safety-filter rejections.
+- 🪄 **Elite Prose Polish** — Elevates your prose using the genius-level **Hermes 3 (405B)**. Fixes grammar and enhances atmosphere without changing the core plot.
+- 🏷️ **Fast Title & Synopsis Generation** — Powered by ultra-fast models to instantly generate compelling 2-3 sentence reader blurbs and 5 cinematic title suggestions.
+- 🛡️ **Originality Checker** — Full plagiarism analysis using Hermes 3: originality score (0–100), verdict, flags, strengths, and publish recommendation.
+- 🌌 **The Resonance Matrix (New!)** — Our proprietary semantic world-building tool powered by **NVIDIA Nemotron Embeddings**. It mathematically analyzes the "vibe" and hidden meanings of your story to match it with readers who crave your exact atmospheric pacing.
 
 ---
 
@@ -176,12 +176,25 @@ Our FastAPI + Gunicorn AI engine runs as an independent microservice on Render, 
 
 ---
 
-### 🔍 11. Discovery Engine
+### 🌌 11. The Resonance Matrix — Semantic Discovery
+
+> **The world's first atmosphere-based story recommendation engine.**
+
+- 🧬 **NVIDIA Nemotron Embeddings** — Each story is mathematically analyzed into a 4096-dimension "vibe vector" capturing its atmosphere, pacing, and emotional depth
+- ✨ **One-Click Mapping** — Authors click **Map Resonance** on their story card to instantly generate and save their story's resonance fingerprint to the database
+- 🎯 **Precision Matching** — The engine finds readers who have loved stories with a mathematically similar atmosphere — even across completely different genres
+- 💾 **Persistent Vectors** — Resonance data is stored directly on the `Story` model (`resonanceVector Float[]`, `resonanceMappedAt DateTime`) in PostgreSQL
+- 🔄 **Auto-Router Failsafe** — Powered by a dedicated embedding API at `/api/ai/embed` with full DB persistence and error recovery
+
+---
+
+### 🔍 12. Discovery Engine
 
 - 🏷️ **Genre Filtering** — Browse by Sci-Fi, Fantasy, Mystery, Romance, Horror, and more
 - 🔥 **Trending Stories** — Real-time tracking of global reads and likes to surface hot content
 - 🆕 **New Arrivals** — Discover freshly published stories from the community
 - 🔎 **Search** — Full-text story search across title, genre, and author
+- 🌌 **Resonance-Based Recommendations** *(coming soon)* — "Similar Vibes" carousel powered by semantic vector similarity
 
 ---
 
@@ -197,26 +210,26 @@ Our FastAPI + Gunicorn AI engine runs as an independent microservice on Render, 
 ## 🛠️ Technical Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                     SOULPAD PLATFORM                    │
-├────────────────────┬────────────────────────────────────┤
-│   FRONTEND         │   AI MICROSERVICE                  │
-│   Next.js 16.2     │   FastAPI + Gunicorn               │
-│   React 19         │   Gemini 2.0 Flash (Primary)       │
-│   TypeScript 5     │   Gemini 1.5 Pro (Fallback)        │
-│   Turbopack        │   Streaming Responses              │
-├────────────────────┼────────────────────────────────────┤
-│   DATABASE         │   AUTH                             │
-│   PostgreSQL       │   Supabase Auth                    │
-│   Prisma ORM v6    │   NextAuth.js v4                   │
-│   Type-safe Models │   Multi-Provider SSO               │
-├────────────────────┼────────────────────────────────────┤
-│   STORAGE          │   DESIGN SYSTEM                    │
-│   AWS S3           │   Vanilla CSS + Tailwind v4        │
-│   Story Covers     │   Space Grotesk + Newsreader       │
-│   Codex Images     │   Framer Motion v12                │
-│   Avatar Uploads   │   Lenis Smooth Scroll              │
-└────────────────────┴────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                      SOULPAD PLATFORM                       │
+├──────────────────────┬──────────────────────────────────────┤
+│   FRONTEND           │   AI NEURAL ENGINE                   │
+│   Next.js 16.2       │   Dynamic Model Router               │
+│   React 19           │   Venice Uncensored (Continue)       │
+│   TypeScript 5       │   Hermes 3 405B (Edit/Originality)   │
+│   Turbopack          │   openrouter/free (Failsafe)         │
+├──────────────────────┼──────────────────────────────────────┤
+│   RESONANCE MATRIX   │   AUTH                               │
+│   NVIDIA Nemotron    │   Supabase Auth                      │
+│   4096-dim Vectors   │   NextAuth.js v4                     │
+│   Float[] in PG      │   Multi-Provider SSO                 │
+├──────────────────────┼──────────────────────────────────────┤
+│   DATABASE           │   DESIGN SYSTEM                      │
+│   PostgreSQL         │   Vanilla CSS + Tailwind v4          │
+│   Prisma ORM v6      │   Space Grotesk + Newsreader         │
+│   21 Models          │   Framer Motion v12                  │
+│   Cloudflare R2      │   Lenis Smooth Scroll                │
+└──────────────────────┴──────────────────────────────────────┘
 ```
 
 | Layer | Technology | Version | Purpose |

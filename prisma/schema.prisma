@@ -116,6 +116,8 @@ model Story {
   isPermanentBan       Boolean      @default(false)
   originalityScore     Int?
   originalityReport    Json?
+  resonanceVector      Float[]
+  resonanceMappedAt    DateTime?
   authorPosts          AuthorPost[]
   chapters             Chapter[]
   comments             Comment[]

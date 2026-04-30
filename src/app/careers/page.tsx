@@ -183,12 +183,12 @@ export default function CareersPage() {
                       <Clock size={12} />
                       <span className="font-label font-bold text-[10px] uppercase tracking-widest">{role.type}</span>
                     </div>
-                    <a
-                      href={`mailto:careers@soulpad.in?subject=Application: ${role.title}`}
+                    <Link
+                      href={`/careers/apply?role=${encodeURIComponent(role.title)}`}
                       className="mt-2 bg-primary text-on-primary font-headline font-black text-sm uppercase tracking-tighter px-6 py-3 rounded-xl hover:bg-on-surface hover:text-surface transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,0.15)] hover:shadow-none hover:translate-x-1 hover:translate-y-1"
                     >
                       Apply Now →
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -206,12 +206,12 @@ export default function CareersPage() {
               We are always looking for exceptional people. Send us your story — what you do, what you believe in, and why SOULPAD matters to you.
             </p>
           </div>
-          <a
-            href="mailto:careers@soulpad.in?subject=Open Application"
+          <Link
+            href="/careers/apply?role=Open%20Application"
             className="flex-shrink-0 bg-primary text-on-primary font-headline font-black text-lg uppercase tracking-tighter px-10 py-5 rounded-2xl hover:bg-yellow-300 transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,0.4)]"
           >
             Send an Open Application
-          </a>
+          </Link>
         </section>
 
       </main>

@@ -4,9 +4,14 @@ import { motion, Variants } from "framer-motion";
 
 const features = [
     {
+        icon: "🌌",
+        title: "The Resonance Matrix",
+        desc: "Our proprietary AI engine analyzes your story's atmosphere, pacing & hidden themes — then automatically surfaces it to readers who crave your exact vibe. Powered by NVIDIA Nemotron embeddings."
+    },
+    {
         icon: "🧠",
-        title: "Dedicated AI Engine",
-        desc: "Not a wrapper. A high-concurrency Gemini microservice for real-time prose polishing, title generation, and plagiarism checks."
+        title: "Multi-Model Neural Engine",
+        desc: "Not a wrapper. A dynamic AI router that picks the perfect frontier model for every task: Venice Uncensored for raw storytelling, Hermes 405B for elite prose editing, with an auto-failsafe for 100% uptime."
     },
     {
         icon: "🛡️",
@@ -32,6 +37,11 @@ const features = [
         icon: "🏆",
         title: "Gamified Progression",
         desc: "Earn achievement badges, maintain daily reading streaks, and climb the ranks to become a Verified Chronicler."
+    },
+    {
+        icon: "🔍",
+        title: "Originality Checker",
+        desc: "Run a full AI plagiarism analysis before publishing. Get an originality score (0–100), verdict, flags, and a structured publish recommendation powered by Hermes 3 405B."
     }
 ];
 

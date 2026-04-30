@@ -4,7 +4,7 @@ import { useTransition, useState } from "react";
 import { deleteStory, updateStoryStatus } from "@/actions/story";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, Book, Trash2, Pause, Play, Edit3, MessageCircle, BarChart, Ghost, ShieldAlert, Flag, Send, Gavel, Scale, Award, Download, Printer } from "lucide-react";
+import { Plus, Book, Trash2, Pause, Play, Edit3, MessageCircle, BarChart, Ghost, ShieldAlert, Flag, Send, Gavel, Scale, Award, Download, Printer, Sparkles, CheckCircle2 } from "lucide-react";
 import { respondToReport, submitAppeal } from "@/actions/moderation";
 import { applyForLicense } from "@/actions/licenses";
 import LicenseCertificate from "./LicenseCertificate";
@@ -33,9 +33,36 @@ export default function DashboardClient({ stories, profile, comments, reports, l
     const [showCertificateId, setShowCertificateId] = useState<string | null>(null);
     const [pendingStatusId, setPendingStatusId] = useState<string | null>(null);
     const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+    const [resonancePendingId, setResonancePendingId] = useState<string | null>(null);
+    const [resonanceMappedIds, setResonanceMappedIds] = useState<Set<string>>(new Set());
     // Optimistic story list — reflects changes instantly without waiting for server
     const [optimisticStories, setOptimisticStories] = useState(stories);
     const router = useRouter();
+
+    const handleMapResonance = async (story: any) => {
+        if (resonancePendingId) return;
+        setResonancePendingId(story.id);
+        try {
+            const textToEmbed = [
+                story.title,
+                story.description || "",
+                story.content?.replace(/<[^>]*>/g, "").slice(0, 2000) || ""
+            ].join("\n\n").trim();
+
+            const res = await fetch("/api/ai/embed", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: textToEmbed, storyId: story.id })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed to map resonance");
+            setResonanceMappedIds(prev => new Set(prev).add(story.id));
+        } catch (e: any) {
+            alert("Resonance Mapping failed: " + e.message);
+        } finally {
+            setResonancePendingId(null);
+        }
+    };
 
     const formatDate = (date: string | Date) => {
         const d = new Date(date);
@@ -172,30 +199,57 @@ export default function DashboardClient({ stories, profile, comments, reports, l
                                             {story.description || "A tale yet to be fully inscribed into the obsidian records."}
                                         </p>
 
-                                        <div className="mt-auto flex items-center justify-between pt-6 border-t border-on-surface/5">
-                                            <div className="flex gap-4">
-                                                <Link href={`/dashboard/write?id=${story.id}`} className="p-2 hover:bg-primary/10 rounded-lg text-on-surface-variant hover:text-primary transition-colors transition-transform active:scale-90" title="Continue Inscribing">
-                                                    <Edit3 size={18} />
-                                                </Link>
-                                                <button
-                                                    onClick={() => handleToggleStatus(story.id, story.status)}
-                                                    disabled={pendingStatusId === story.id}
-                                                    className="p-2 hover:bg-primary/10 rounded-lg text-on-surface-variant hover:text-primary transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
-                                                    title={story.status === 'PUBLISHED' ? 'Pause Chronicle' : 'Rise Chronicle'}
-                                                >
-                                                    {story.status === 'PUBLISHED' ? <Pause size={18} /> : <Play size={18} />}
-                                                </button>
-                                                <button
-                                                    onClick={() => setDeleteRitualId(story.id)}
-                                                    disabled={pendingDeleteId === story.id}
-                                                    className="p-2 hover:bg-error/10 rounded-lg text-on-surface-variant hover:text-error transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
-                                                    title="Burn Ritual"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                            <div className="text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-widest">
-                                                {story._count?.likes || 0} Souls Loved
+                                        <div className="mt-auto flex flex-col gap-3 pt-6 border-t border-on-surface/5">
+                                            {/* Map Resonance Button */}
+                                            <button
+                                                onClick={() => handleMapResonance(story)}
+                                                disabled={!!resonancePendingId || resonanceMappedIds.has(story.id)}
+                                                className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-label font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 disabled:cursor-not-allowed border ${
+                                                    resonanceMappedIds.has(story.id)
+                                                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                                                        : resonancePendingId === story.id
+                                                        ? "bg-primary/10 text-primary border-primary/30 animate-pulse"
+                                                        : "bg-surface/50 text-on-surface-variant border-on-surface/10 hover:bg-primary/10 hover:text-primary hover:border-primary/30"
+                                                }`}
+                                            >
+                                                {resonanceMappedIds.has(story.id) ? (
+                                                    <><CheckCircle2 size={12} /> Resonance Mapped</>  
+                                                ) : resonancePendingId === story.id ? (
+                                                    <><Sparkles size={12} className="animate-spin" /> Mapping Resonance...</>
+                                                ) : (
+                                                    <><Sparkles size={12} /> Map Resonance</>
+                                                )}
+                                            </button>
+                                            {!resonanceMappedIds.has(story.id) && (
+                                                <p className="text-[9px] font-label text-on-surface-variant/40 text-center leading-tight px-1">
+                                                    Analyzes your story&apos;s vibe &amp; atmosphere using AI to recommend it to the right readers automatically.
+                                                </p>
+                                            )}
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex gap-4">
+                                                    <Link href={`/dashboard/write?id=${story.id}`} className="p-2 hover:bg-primary/10 rounded-lg text-on-surface-variant hover:text-primary transition-colors transition-transform active:scale-90" title="Continue Inscribing">
+                                                        <Edit3 size={18} />
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => handleToggleStatus(story.id, story.status)}
+                                                        disabled={pendingStatusId === story.id}
+                                                        className="p-2 hover:bg-primary/10 rounded-lg text-on-surface-variant hover:text-primary transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                                                        title={story.status === 'PUBLISHED' ? 'Pause Chronicle' : 'Rise Chronicle'}
+                                                    >
+                                                        {story.status === 'PUBLISHED' ? <Pause size={18} /> : <Play size={18} />}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setDeleteRitualId(story.id)}
+                                                        disabled={pendingDeleteId === story.id}
+                                                        className="p-2 hover:bg-error/10 rounded-lg text-on-surface-variant hover:text-error transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                                                        title="Burn Ritual"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
+                                                <div className="text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-widest">
+                                                    {story._count?.likes || 0} Souls Loved
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

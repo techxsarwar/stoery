@@ -88,9 +88,20 @@ Story content:
         }
     }
 
-    // 2. Try OpenRouter as primary fallback
-    if (process.env.OPENROUTER_API_KEY && !aiResponseText) {
-        console.warn("Falling back to OpenRouter API...");
+    // 2. OpenRouter Dynamic Model Routing
+    if (!aiResponseText && process.env.OPENROUTER_API_KEY) {
+        let targetModel = "openrouter/free"; // Auto-routes to any available free model to prevent rate limits
+
+        // Route based on action to the most specialized model (using the main key)
+        if (action === "continue") {
+            targetModel = "venice/uncensored:free"; // Uncensored creativity for dark fiction
+        } else if (action === "polish" || action === "originality") {
+            targetModel = "nousresearch/hermes-3-llama-3.1-405b:free"; // Elite editing/logic
+        }
+
+        console.warn(`Routing to OpenRouter Model: ${targetModel}...`);
+        let useFallback = false;
+
         try {
             const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
@@ -98,55 +109,53 @@ Story content:
                     "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
                     "Content-Type": "application/json",
                     "HTTP-Referer": "https://stoery.app",
-                    "X-Title": "Stoery",
+                    "X-Title": "SOULPAD Neural Engine",
                 },
                 body: JSON.stringify({
-                    model: "google/gemini-2.5-flash",
+                    model: targetModel,
                     messages: [{ role: "user", content: prompt }],
-                    temperature: 0.7,
-                    max_tokens: 1000
+                    temperature: action === "continue" ? 0.9 : 0.7,
+                    max_tokens: 1500
                 })
             });
+            
             if (res.ok) {
                 const data = await res.json();
                 aiResponseText = data.choices?.[0]?.message?.content || "";
-                if (!aiResponseText || aiResponseText === "null") {
-                    console.warn("OpenRouter returned null content, trying free model fallback");
-                    aiResponseText = ""; // Reset to trigger next fallback
-                }
             } else {
                 const errData = await res.json();
-                console.warn("OpenRouter API Error:", errData);
+                console.warn(`OpenRouter API Error (${targetModel}):`, errData);
+                useFallback = true;
             }
         } catch (e: any) {
-            console.warn("OpenRouter fallback failed:", e.message);
+            console.warn(`OpenRouter routing failed (${targetModel}):`, e.message);
+            useFallback = true;
         }
 
-        // Try free model if paid model failed or returned null (e.g. out of credits)
-        if (!aiResponseText) {
+        // FAILSAFE: If the specialized model is overloaded, instantly fall back to auto-router
+        if (useFallback && targetModel !== "openrouter/free") {
+            console.warn("Specialized model failed/rate-limited. Engaging Failsafe: Routing to openrouter/free...");
             try {
-                const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                const resFallback = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "HTTP-Referer": "https://stoery.app",
                     },
                     body: JSON.stringify({
-                        model: "meta-llama/llama-3-8b-instruct:free",
+                        model: "openrouter/free",
                         messages: [{ role: "user", content: prompt }],
                         temperature: 0.7,
-                        max_tokens: 1000
+                        max_tokens: 1500
                     })
                 });
-                if (res.ok) {
-                    const data = await res.json();
-                    aiResponseText = data.choices?.[0]?.message?.content || "";
-                } else {
-                    const errData = await res.json();
-                    console.warn("OpenRouter Free Model API Error:", errData);
+                if (resFallback.ok) {
+                    const dataFallback = await resFallback.json();
+                    aiResponseText = dataFallback.choices?.[0]?.message?.content || "";
                 }
-            } catch (e: any) {
-                console.warn("OpenRouter free fallback failed:", e.message);
+            } catch (fallbackError: any) {
+                console.warn("Gemma 2 Failsafe also failed:", fallbackError.message);
             }
         }
     }
@@ -202,7 +211,7 @@ Story content:
     }
 
     if (!aiResponseText) {
-        throw new Error("All AI providers are currently experiencing high demand. Please wait a few moments and try again.");
+        throw new Error(`OpenRouter/Gemini failed to generate a response. Please check your Next.js terminal for the exact API error.`);
     }
 
     return NextResponse.json({ text: aiResponseText });

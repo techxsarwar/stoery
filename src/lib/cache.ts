@@ -87,13 +87,13 @@ export const getFantasyStories = unstable_cache(
 
 export const getPlatformStats = unstable_cache(
   async () => {
-    const [totalStories, totalAuthors, totalReads] = await Promise.all([
-      prisma.story.count({ where: { status: "PUBLISHED", isBanned: false } }),
-      prisma.profile.count(),
-      prisma.story.aggregate({
-          _sum: { reads: true }
-      })
-    ]);
+    const totalStories = await prisma.story.count({ where: { status: "PUBLISHED", isBanned: false } });
+    const totalAuthors = await prisma.profile.count();
+    const totalReadsAgg = await prisma.story.aggregate({
+        _sum: { reads: true }
+    });
+    const totalReads = totalReadsAgg._sum.reads || 0;
+    
     return { totalStories, totalAuthors, totalReads };
   },
   ["platform-stats"],
