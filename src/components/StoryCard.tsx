@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Eye, Heart } from "lucide-react";
+import Image from "next/image";
 
 interface StoryCardProps {
   id: string;
@@ -15,10 +16,12 @@ export default function StoryCard({ id, title, author, coverUrl, genre, reads = 
   return (
     <Link href={`/read/${id}`} className="flex-shrink-0 w-[140px] sm:w-[160px] md:w-[180px] snap-start group">
       <div className="relative aspect-[2/3] w-full bg-surface-container border-2 border-on-surface overflow-hidden transition-all duration-300 group-hover:shadow-[6px_6px_0px_0px_var(--color-primary)] group-hover:-translate-x-1 group-hover:-translate-y-1">
-        <img 
+        <Image 
           src={coverUrl || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"} 
           alt={title}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          fill
+          sizes="(max-width: 768px) 140px, (max-width: 1024px) 160px, 180px"
+          className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
         {genre && (
           <div className="absolute top-2 left-2 px-2 py-0.5 bg-primary text-on-primary text-[9px] font-black uppercase tracking-widest border border-on-surface">

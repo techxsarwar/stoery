@@ -3,6 +3,7 @@ export const unstable_instant = { prefetch: 'static' };
 import { Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/utils/supabase/server";
 import ClientRecoveryRedirect from "@/components/ClientRecoveryRedirect";
@@ -19,9 +20,9 @@ import {
 
 async function HomeContent() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
+  
   const [
+    { data: { user } },
     recentStories,
     trendingStories,
     fantasyStories,
@@ -29,6 +30,7 @@ async function HomeContent() {
     topAuthors,
     genres
   ] = await Promise.all([
+    supabase.auth.getUser(),
     getRecentStories(),
     getTrendingStories(),
     getFantasyStories(),
@@ -58,10 +60,12 @@ async function HomeContent() {
       {/* Hero Section - Pure Wattpad Vibe */}
       <section className="relative min-h-[60vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden border-b-8 border-on-surface">
         <div className="absolute inset-0 z-0">
-          <img 
+          <Image 
             src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=2070&auto=format&fit=crop" 
             alt="Hero Background" 
-            className="w-full h-full object-cover grayscale opacity-40"
+            fill
+            priority
+            className="object-cover grayscale opacity-40"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/80 to-transparent"></div>
         </div>
@@ -110,8 +114,13 @@ async function HomeContent() {
           <section className="bg-surface-container border-4 border-on-surface p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden">
              <div className="absolute top-0 right-0 p-4 font-headline font-black text-xs uppercase tracking-widest text-primary/20 select-none pointer-events-none">RESUME_SESSION</div>
              <div className="flex flex-col md:flex-row items-center gap-8">
-                <div className="w-32 h-48 flex-shrink-0 bg-on-surface border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-                    <img src={recentHistory.story.cover_url || ""} alt="Cover" className="w-full h-full object-cover" />
+                <div className="w-32 h-48 flex-shrink-0 relative bg-on-surface border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                    <Image 
+                        src={recentHistory.story.cover_url || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"} 
+                        alt="Cover" 
+                        fill
+                        className="object-cover" 
+                    />
                 </div>
                 <div className="flex flex-col text-center md:text-left">
                     <span className="font-label font-black text-xs uppercase tracking-[0.2em] text-primary mb-2">Continue Reading</span>
@@ -222,10 +231,11 @@ async function HomeContent() {
                 {topAuthors.map((author, i) => (
                     <Link href={`/u/${author.username || author.id}`} key={i} className="group flex flex-col items-center gap-4">
                         <div className="w-24 h-24 rounded-full border-4 border-on-surface overflow-hidden group-hover:scale-110 transition-transform bg-primary-container relative">
-                            <img 
+                            <Image 
                                 src={author.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${author.username || author.id}`} 
                                 alt={author.username || "Author"} 
-                                className="w-full h-full object-cover"
+                                fill
+                                className="object-cover"
                             />
                             <div className="absolute inset-0 border-4 border-on-surface rounded-full"></div>
                         </div>
@@ -262,10 +272,19 @@ export default async function Home() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  let penName = null;
+  if (user) {
+    const profile = await prisma.profile.findUnique({
+      where: { userId: user.id },
+      select: { pen_name: true }
+    });
+    penName = profile?.pen_name;
+  }
+
   return (
     <>
       <ClientRecoveryRedirect />
-      <Navbar user={user ?? null} />
+      <Navbar user={user ?? null} penName={penName} />
 
       <Suspense fallback={
         <div className="flex-grow pt-32 pb-24 px-6 max-w-7xl mx-auto w-full animate-pulse">

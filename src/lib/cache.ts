@@ -6,10 +6,22 @@ export async function getRecentStories() {
     take: 10,
     where: { status: "PUBLISHED", isBanned: false },
     orderBy: { createdAt: "desc" },
-    include: { 
-      author: true,
+    select: {
+      id: true,
+      title: true,
+      cover_url: true,
+      genre: true,
+      reads: true,
+      author: {
+        select: {
+          id: true,
+          username: true,
+          full_name: true,
+          avatar_url: true
+        }
+      },
       _count: { select: { likes: true } }
-    },
+    }
   });
 }
 
@@ -19,10 +31,22 @@ export async function getTrendingStories() {
     take: 10,
     where: { status: "PUBLISHED", isBanned: false },
     orderBy: { reads: "desc" },
-    include: { 
-      author: true,
-      _count: { select: { likes: true } }
-    },
+    select: {
+        id: true,
+        title: true,
+        cover_url: true,
+        genre: true,
+        reads: true,
+        author: {
+          select: {
+            id: true,
+            username: true,
+            full_name: true,
+            avatar_url: true
+          }
+        },
+        _count: { select: { likes: true } }
+      }
   });
 }
 
@@ -32,10 +56,22 @@ export async function getFantasyStories() {
     take: 10,
     where: { status: "PUBLISHED", isBanned: false, genre: "Fantasy" },
     orderBy: { reads: "desc" },
-    include: { 
-      author: true,
-      _count: { select: { likes: true } }
-    },
+    select: {
+        id: true,
+        title: true,
+        cover_url: true,
+        genre: true,
+        reads: true,
+        author: {
+          select: {
+            id: true,
+            username: true,
+            full_name: true,
+            avatar_url: true
+          }
+        },
+        _count: { select: { likes: true } }
+      }
   });
 }
 
@@ -56,8 +92,12 @@ export async function getTopAuthors() {
   return prisma.profile.findMany({
     take: 5,
     where: { stories: { some: { status: "PUBLISHED" } } },
-    include: { 
-      _count: { select: { stories: true, followers: true } }
+    select: {
+        id: true,
+        username: true,
+        full_name: true,
+        avatar_url: true,
+        _count: { select: { stories: true, followers: true } }
     },
     orderBy: { followers: { _count: "desc" } }
   });
@@ -78,12 +118,36 @@ export async function getStoryContent(storyId: string) {
     "use cache";
     return prisma.story.findUnique({
       where: { id: storyId },
-      include: {
-        author: true,
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        genre: true,
+        cover_url: true,
+        description: true,
+        reads: true,
+        isBanned: true,
+        banReason: true,
+        isPermanentBan: true,
+        banExpiresAt: true,
+        author: {
+          select: {
+            id: true,
+            username: true,
+            full_name: true,
+            avatar_url: true
+          }
+        },
         chapters: {
           orderBy: { order: "asc" },
+          select: {
+              id: true,
+              title: true,
+              content: true,
+              order: true
+          }
         },
-      },
+      }
     });
 }
 

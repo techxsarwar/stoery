@@ -84,8 +84,15 @@ export default function ReaderClient({ story, currentProfile, initialChapterId, 
   };
 
   const isLiked = currentProfile ? story.likes.some((l: any) => l.profileId === currentProfile.id) : false;
+    const [sanitizedContent, setSanitizedContent] = useState(currentChapter.content);
 
-  return (
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setSanitizedContent(DOMPurify.sanitize(currentChapter.content));
+        }
+    }, [currentChapter.content]);
+
+    return (
     <PiracyGuard>
         <div className={`min-h-screen flex flex-col items-center w-full mx-auto pb-32 relative ${zenMode ? 'bg-[#fdfdfa]' : 'bg-surface pt-24 px-6 md:px-12'}`}>
         
@@ -93,7 +100,7 @@ export default function ReaderClient({ story, currentProfile, initialChapterId, 
             <>
                 <div className="fixed inset-0 bg-[#fdfdfa] -z-20"></div>
                 <div className="fixed inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50 -z-10"></div>
-                <Navbar user={user} />
+                <Navbar user={user} penName={currentProfile?.pen_name} />
             </>
         )}
 
@@ -145,7 +152,7 @@ export default function ReaderClient({ story, currentProfile, initialChapterId, 
             <article 
             ref={contentRef}
             className={`prose prose-p:font-body prose-headings:font-headline ${zenMode ? 'prose-p:text-2xl prose-p:leading-loose text-[#222]' : 'prose-p:text-xl prose-p:leading-[1.8] text-[#171717] bg-white p-8 md:p-12 border-4 border-on-surface shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]'} font-medium max-w-none w-full mb-12 transition-all duration-700`} 
-            dangerouslySetInnerHTML={{ __html: typeof window !== 'undefined' ? DOMPurify.sanitize(currentChapter.content) : currentChapter.content }} 
+            dangerouslySetInnerHTML={{ __html: sanitizedContent }} 
             />
 
             <div className="flex items-center justify-between py-8 border-y-2 border-on-surface/10">

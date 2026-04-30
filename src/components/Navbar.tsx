@@ -16,18 +16,19 @@ interface NavbarProps {
     image?: string | null;
     user_metadata?: { full_name?: string; avatar_url?: string };
   } | null;
+  penName?: string | null;
 }
 
-export default function Navbar({ user }: NavbarProps) {
+export default function Navbar({ user, penName: initialPenName }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [penName, setPenName] = useState<string | null>(null);
+  const [penName, setPenName] = useState<string | null>(initialPenName || null);
 
-  // Fetch pen_name for "My Profile" link
+  // Fetch pen_name if not provided and user is logged in
   useEffect(() => {
-    if (!user?.email) return;
+    if (initialPenName || !user?.email) return;
     
     async function fetchPenName() {
       try {
