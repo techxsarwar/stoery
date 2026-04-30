@@ -1,5 +1,10 @@
 
-export const unstable_instant = { prefetch: 'static' };
+export const unstable_instant = { 
+  prefetch: 'static',
+  samples: [
+    { params: { storyId: 'sample-story' } }
+  ]
+};
 
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";

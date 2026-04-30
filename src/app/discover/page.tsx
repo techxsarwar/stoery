@@ -1,4 +1,10 @@
-export const unstable_instant = { prefetch: 'static' };
+export const unstable_instant = { 
+  prefetch: 'static',
+  samples: [
+    { searchParams: { q: null, genre: null } },
+    { searchParams: { q: 'search', genre: 'All' } }
+  ]
+};
 
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
