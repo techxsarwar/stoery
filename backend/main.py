@@ -38,6 +38,10 @@ class OriginalityReport(BaseModel):
 async def root():
     return {"status": "Stoery AI Engine is running", "version": "1.0.0"}
 
+from fastapi.responses import StreamingResponse
+import json
+import asyncio
+
 @app.post("/generate")
 async def generate_content(req: AIRequest):
     if not GEMINI_API_KEY:
@@ -72,18 +76,26 @@ Story content:
     else:
         raise HTTPException(status_code=400, detail="Invalid action")
 
-    try:
-        model = genai.GenerativeModel("gemini-2.0-flash")
-        response = model.generate_content(prompt)
-        return {"text": response.text}
-    except Exception as e:
-        # Fallback to 1.5 pro if 2.0 fails
+    async def generate():
         try:
-            model = genai.GenerativeModel("gemini-1.5-pro")
-            response = model.generate_content(prompt)
-            return {"text": response.text}
-        except Exception as e2:
-            raise HTTPException(status_code=500, detail=str(e2))
+            model = genai.GenerativeModel("gemini-2.0-flash")
+            response = model.generate_content(prompt, stream=True)
+            for chunk in response:
+                if chunk.text:
+                    yield chunk.text
+        except Exception as e:
+            # Fallback to 1.5 pro if 2.0 fails
+            try:
+                model = genai.GenerativeModel("gemini-1.5-pro")
+                response = model.generate_content(prompt, stream=True)
+                for chunk in response:
+                    if chunk.text:
+                        yield chunk.text
+            except Exception as e2:
+                yield f"Error: {str(e2)}"
+
+    return StreamingResponse(generate(), media_type="text/plain")
+
 
 @app.post("/originality")
 async def check_originality(req: AIRequest):

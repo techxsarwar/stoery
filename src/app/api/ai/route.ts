@@ -20,16 +20,19 @@ export async function POST(req: Request) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action, text, context })
             });
-            if (res.ok) {
-                const data = await res.json();
-                return NextResponse.json({ text: data.text });
+            if (res.ok && res.body) {
+                // Pipe the stream directly back to the client
+                return new Response(res.body, {
+                    headers: { "Content-Type": "text/plain; charset=utf-8" }
+                });
             } else {
-                console.warn("Python AI Backend failed, falling back to local...");
+                console.warn("Python AI Backend failed or returned no body, falling back to local...");
             }
         } catch (e: any) {
             console.warn("Python AI Backend connection error:", e.message);
         }
     }
+
 
     const ai = new GoogleGenAI({});
 

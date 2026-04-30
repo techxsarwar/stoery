@@ -100,20 +100,42 @@ export default function Editor({ content, onChange, isSaving }: EditorProps) {
               })
           });
 
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error);
-
-          if (action === "polish" && isSelection) {
-              editor.chain().focus().deleteSelection().insertContent(data.text).run();
-          } else {
-              editor.chain().focus().insertContent(data.text ? `\n\n${data.text}` : "").run();
+          if (!res.ok) {
+              const data = await res.json();
+              throw new Error(data.error || "AI failed to respond.");
           }
+
+          if (!res.body) throw new Error("No response body received.");
+
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let done = false;
+          let accumulatedText = "";
+
+          // Prepare for insertion
+          if (action === "polish" && isSelection) {
+              editor.chain().focus().deleteSelection().run();
+          } else if (action === "continue") {
+              editor.chain().focus().insertContent("\n\n").run();
+          }
+
+          while (!done) {
+              const { value, done: doneReading } = await reader.read();
+              done = doneReading;
+              const chunkValue = decoder.decode(value);
+              accumulatedText += chunkValue;
+              
+              // Insert chunk by chunk for the "typing" effect
+              editor.chain().focus().insertContent(chunkValue).run();
+          }
+
       } catch (e: any) {
           setAiError(e.message || "AI failed to respond.");
           setTimeout(() => setAiError(""), 5000);
       } finally {
           setIsAiLoading(false);
       }
+
   };
 
   return (
