@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getRecentStories() {
-  "use cache";
   return prisma.story.findMany({
     take: 10,
     where: { status: "PUBLISHED", isBanned: false },
@@ -26,7 +25,6 @@ export async function getRecentStories() {
 }
 
 export async function getTrendingStories() {
-  "use cache";
   return prisma.story.findMany({
     take: 10,
     where: { status: "PUBLISHED", isBanned: false },
@@ -51,7 +49,6 @@ export async function getTrendingStories() {
 }
 
 export async function getFantasyStories() {
-  "use cache";
   return prisma.story.findMany({
     take: 10,
     where: { status: "PUBLISHED", isBanned: false, genre: "Fantasy" },
@@ -76,7 +73,6 @@ export async function getFantasyStories() {
 }
 
 export async function getPlatformStats() {
-  "use cache";
   const [totalStories, totalAuthors, totalReads] = await Promise.all([
     prisma.story.count({ where: { status: "PUBLISHED", isBanned: false } }),
     prisma.profile.count(),
@@ -88,7 +84,6 @@ export async function getPlatformStats() {
 }
 
 export async function getTopAuthors() {
-  "use cache";
   return prisma.profile.findMany({
     take: 5,
     where: { stories: { some: { status: "PUBLISHED" } } },
@@ -104,7 +99,6 @@ export async function getTopAuthors() {
 }
 
 export async function getGenres() {
-  "use cache";
   const dbGenres = await prisma.story.findMany({
       where: { status: "PUBLISHED", isBanned: false, genre: { not: null } },
       select: { genre: true },
@@ -115,7 +109,6 @@ export async function getGenres() {
 }
 
 export async function getStoryContent(storyId: string) {
-    "use cache";
     return prisma.story.findUnique({
       where: { id: storyId },
       select: {
@@ -152,22 +145,26 @@ export async function getStoryContent(storyId: string) {
 }
 
 export async function getStoryEngagement(storyId: string, currentProfileId?: string) {
-    // Uncached, fetches live likes and filtered comments
     return prisma.story.findUnique({
         where: { id: storyId },
         select: {
             reads: true,
-            likes: true,
-            comments: {
-                where: {
-                    OR: [
-                        { isShadowBanned: false },
-                        { profileId: currentProfileId || "none" }
-                    ]
-                },
-                include: { profile: true },
-                orderBy: { createdAt: "desc" },
+            likes: {
+                select: { profileId: true }
             },
+            comments: {
+                where: { isShadowBanned: false },
+                orderBy: { createdAt: "desc" },
+                include: { 
+                    profile: { select: { full_name: true, username: true, avatar_url: true } } 
+                }
+            },
+            _count: {
+                select: {
+                    likes: true,
+                    comments: { where: { isShadowBanned: false } }
+                }
+            }
         }
     });
 }
