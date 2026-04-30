@@ -1,13 +1,7 @@
 export const dynamic = "force-dynamic";
 
-export const unstable_instant = { 
-  prefetch: 'static',
-  samples: [
-    { params: { storyId: 'sample-story' } }
-  ]
-};
-
 import { prisma } from "@/lib/prisma";
+
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
