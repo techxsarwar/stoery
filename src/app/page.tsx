@@ -17,7 +17,9 @@ import {
   getFantasyStories, 
   getPlatformStats, 
   getTopAuthors, 
-  getGenres 
+  getGenres,
+  getMasterpieceStories,
+  getRecentReviews
 } from "@/lib/cache";
 
 async function HomeContent() {
@@ -30,7 +32,9 @@ async function HomeContent() {
     fantasyStories,
     stats,
     topAuthors,
-    genres
+    genres,
+    masterpieces,
+    recentReviews
   ] = await Promise.all([
     supabase.auth.getUser(),
     getRecentStories(),
@@ -38,7 +42,9 @@ async function HomeContent() {
     getFantasyStories(),
     getPlatformStats(),
     getTopAuthors(),
-    getGenres()
+    getGenres(),
+    getMasterpieceStories(),
+    getRecentReviews()
   ]);
 
   const { totalStories, totalAuthors, totalReads } = stats;
@@ -157,6 +163,21 @@ async function HomeContent() {
                 ))}
             </HorizontalCarousel>
 
+            <HorizontalCarousel title="The Masterpieces" subtitle="The highest-rated chronicles of all time.">
+                {masterpieces.map((story) => (
+                    <StoryCard 
+                        key={story.id} 
+                        id={story.id} 
+                        title={story.title} 
+                        author={story.author.full_name || story.author.username || "Unknown"} 
+                        coverUrl={story.cover_url}
+                        genre={story.genre}
+                        reads={story.reads}
+                        likes={story._count.likes}
+                    />
+                ))}
+            </HorizontalCarousel>
+
             <HorizontalCarousel title="New Arrivals" subtitle="Fresh voices and untold tales from the community.">
                 {recentStories.map(story => (
                     <StoryCard 
@@ -211,6 +232,43 @@ async function HomeContent() {
                 ))}
             </div>
         </section>
+
+        {/* Community Reviews Section */}
+        {recentReviews.length > 0 && (
+            <section className="w-full">
+                <div className="flex items-center gap-4 mb-12">
+                    <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">Voices from the Nexus</h2>
+                    <div className="flex-grow h-1 bg-on-surface-variant/20"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {recentReviews.map(review => (
+                        <div key={review.id} className="bg-surface-container border-4 border-on-surface p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_var(--color-primary)] transition-all duration-300 flex flex-col gap-4">
+                            <div className="flex justify-between items-start">
+                                <div className="flex text-brand_yellow">
+                                    {Array.from({ length: 5 }).map((_, i) => (
+                                        <svg key={i} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill={i < review.rating ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                    ))}
+                                </div>
+                                <span className="font-label text-[10px] font-bold uppercase tracking-widest opacity-40">{new Date(review.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            <h3 className="font-headline font-black text-lg uppercase tracking-tight text-on-surface leading-snug">"{review.title}"</h3>
+                            <p className="font-body italic text-on-surface-variant line-clamp-4 flex-grow">{review.content}</p>
+                            <div className="mt-4 pt-4 border-t-2 border-on-surface/10 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full border-2 border-on-surface overflow-hidden bg-primary/20 relative">
+                                        <Image src={review.profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.profile.username || review.profile.full_name}`} alt="Avatar" fill className="object-cover" />
+                                    </div>
+                                    <span className="font-headline text-xs font-black uppercase text-on-surface">{review.profile.full_name || review.profile.username}</span>
+                                </div>
+                                <Link href={`/read/${review.storyId}`} className="font-label text-[10px] font-bold uppercase tracking-widest text-primary hover:underline max-w-[120px] truncate text-right">
+                                    on {review.story.title}
+                                </Link>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+        )}
 
         {/* Community Stats Section */}
         <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-8">

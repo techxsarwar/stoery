@@ -133,6 +133,50 @@ export const getGenres = unstable_cache(
   { revalidate: 86400 } // Genres rarely change
 );
 
+export const getMasterpieceStories = unstable_cache(
+  async () => {
+    return prisma.story.findMany({
+      take: 10,
+      where: { status: "PUBLISHED", isBanned: false },
+      orderBy: { likes: { _count: "desc" } },
+      select: {
+          id: true,
+          title: true,
+          cover_url: true,
+          genre: true,
+          reads: true,
+          author: {
+            select: {
+              id: true,
+              username: true,
+              full_name: true,
+              avatar_url: true
+            }
+          },
+          _count: { select: { likes: true } }
+        }
+    });
+  },
+  ["masterpiece-stories"],
+  { revalidate: 3600 }
+);
+
+export const getRecentReviews = unstable_cache(
+  async () => {
+    return prisma.review.findMany({
+      take: 6,
+      orderBy: { createdAt: "desc" },
+      where: { rating: { gte: 4 }, story: { status: "PUBLISHED", isBanned: false } },
+      include: {
+        profile: { select: { full_name: true, username: true, avatar_url: true } },
+        story: { select: { id: true, title: true, cover_url: true } }
+      }
+    });
+  },
+  ["recent-reviews"],
+  { revalidate: 300 }
+);
+
 export async function getStoryContent(storyId: string) {
     return prisma.story.findUnique({
       where: { id: storyId },
