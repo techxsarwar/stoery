@@ -1,4 +1,6 @@
 
+export const unstable_instant = { prefetch: 'static' };
+
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -7,6 +9,7 @@ import Navbar from "@/components/Navbar";
 import ReadingHeartbeat from "@/components/ReadingHeartbeat";
 import { AlertOctagon, ShieldAlert } from "lucide-react";
 import ReaderClient from "@/components/ReaderClient";
+import { getStoryContent, getStoryEngagement } from "@/lib/cache";
 
 export default async function ReadStoryPage({ params }: { params: Promise<{ storyId: string }> }) {
   const { storyId } = await params;
@@ -14,45 +17,32 @@ export default async function ReadStoryPage({ params }: { params: Promise<{ stor
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Increment reads
-  try {
-      await prisma.story.update({
-          where: { id: storyId },
-          data: { reads: { increment: 1 } }
-      });
-  } catch (e) {
-      console.error("Failed to increment reads", e);
-  }
+  // Increment reads (non-blocking)
+  prisma.story.update({
+      where: { id: storyId },
+      data: { reads: { increment: 1 } }
+  }).catch(e => console.error("Failed to increment reads", e));
 
-  // Get current user's profile for interaction checks
-  const currentProfile = user ? await prisma.profile.findFirst({
-    where: { user: { email: user.email } }
-  }) : null;
+  // Get profile, cached story content, and live engagement in parallel
+  const [currentProfile, storyContent] = await Promise.all([
+      user ? prisma.profile.findFirst({
+        where: { user: { email: user.email } }
+      }) : Promise.resolve(null),
+      getStoryContent(storyId),
+  ]);
 
-  const story = await prisma.story.findUnique({
-    where: { id: storyId },
-    include: {
-      author: true,
-      chapters: {
-        orderBy: { order: "asc" },
-      },
-      likes: true,
-      comments: {
-        where: {
-            OR: [
-                { isShadowBanned: false },
-                { profileId: currentProfile?.id || "none" }
-            ]
-        },
-        include: { profile: true },
-        orderBy: { createdAt: "desc" },
-      },
-    },
-  });
-
-  if (!story || story.chapters.length === 0) {
+  if (!storyContent || storyContent.chapters.length === 0) {
     notFound();
   }
+
+  // Fetch engagement separately (can be after finding story content to avoid unnecessary DB load)
+  const engagement = await getStoryEngagement(storyId, currentProfile?.id);
+
+  // Merge story data for the client
+  const story = {
+      ...storyContent,
+      ...engagement
+  };
 
   if (story.isBanned) {
     return (

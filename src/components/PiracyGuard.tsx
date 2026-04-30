@@ -40,8 +40,22 @@ export default function PiracyGuard({ children }: PiracyGuardProps) {
     };
 
     // 3. Screen Obfuscation on Focus Loss (Anti-Screenshot/Recording)
-    const handleBlur = () => setIsBlurred(true);
-    const handleFocus = () => setIsBlurred(false);
+    const handleBlur = () => {
+      setIsBlurred(true);
+      setShowWarning(true);
+    };
+    const handleFocus = () => {
+      setIsBlurred(false);
+      setShowWarning(false);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        handleBlur();
+      } else {
+        handleFocus();
+      }
+    };
 
     // 4. Print Protection
     const beforePrint = () => {
@@ -51,27 +65,42 @@ export default function PiracyGuard({ children }: PiracyGuardProps) {
       setIsBlurred(false);
     }
 
+    // 5. Mobile Protection (Touch detection)
+    const handleTouchStart = (e: TouchEvent) => {
+        // Many screenshots involve multiple fingers or specific button combos
+        // While we can't block hardware buttons, we can react to sudden loss of touch
+        if (e.touches.length > 2) {
+            triggerWarning();
+        }
+    };
+
     window.addEventListener("contextmenu", handleContextMenu);
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("blur", handleBlur);
     window.addEventListener("focus", handleFocus);
+    window.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("pagehide", handleBlur);
     window.addEventListener("beforeprint", beforePrint);
     window.addEventListener("afterprint", afterPrint);
+    window.addEventListener("touchstart", handleTouchStart);
 
     return () => {
       window.removeEventListener("contextmenu", handleContextMenu);
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("blur", handleBlur);
       window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("pagehide", handleBlur);
       window.removeEventListener("beforeprint", beforePrint);
       window.removeEventListener("afterprint", afterPrint);
+      window.removeEventListener("touchstart", handleTouchStart);
     };
   }, []);
 
   const triggerWarning = () => {
     setShowWarning(true);
     if (warningTimeout.current) clearTimeout(warningTimeout.current);
-    warningTimeout.current = setTimeout(() => setShowWarning(false), 2000);
+    warningTimeout.current = setTimeout(() => setShowWarning(false), 3000);
   };
 
   return (

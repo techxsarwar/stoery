@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Inter, Newsreader, Space_Grotesk } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { Providers } from "@/providers/Provider";
 
@@ -57,11 +58,12 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${newsreader.variable} ${inter.variable}`}
     >
       <body className="font-body antialiased min-h-screen flex flex-col relative overflow-x-hidden">
-        <script
+        <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4450198813209397"
           crossOrigin="anonymous"
-        ></script>
+          strategy="lazyOnload"
+        />
         <Providers>
           <Suspense fallback={null}>
             {children}

@@ -1,3 +1,5 @@
+export const unstable_instant = { prefetch: 'static' };
+
 import { Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
@@ -6,6 +8,14 @@ import { createClient } from "@/utils/supabase/server";
 import ClientRecoveryRedirect from "@/components/ClientRecoveryRedirect";
 import HorizontalCarousel from "@/components/HorizontalCarousel";
 import StoryCard from "@/components/StoryCard";
+import { 
+  getRecentStories, 
+  getTrendingStories, 
+  getFantasyStories, 
+  getPlatformStats, 
+  getTopAuthors, 
+  getGenres 
+} from "@/lib/cache";
 
 async function HomeContent() {
   const supabase = await createClient();
@@ -15,64 +25,19 @@ async function HomeContent() {
     recentStories,
     trendingStories,
     fantasyStories,
-    totalStories,
-    totalAuthors,
+    stats,
     topAuthors,
-    totalReads,
-    dbGenres
+    genres
   ] = await Promise.all([
-    // Recently Published
-    prisma.story.findMany({
-      take: 10,
-      where: { status: "PUBLISHED", isBanned: false },
-      orderBy: { createdAt: "desc" },
-      include: { 
-        author: true,
-        _count: { select: { likes: true } }
-      },
-    }),
-    // Trending (by reads)
-    prisma.story.findMany({
-      take: 10,
-      where: { status: "PUBLISHED", isBanned: false },
-      orderBy: { reads: "desc" },
-      include: { 
-        author: true,
-        _count: { select: { likes: true } }
-      },
-    }),
-    // Genre specific (e.g., Fantasy)
-    prisma.story.findMany({
-        take: 10,
-        where: { status: "PUBLISHED", isBanned: false, genre: "Fantasy" },
-        orderBy: { reads: "desc" },
-        include: { 
-            author: true,
-            _count: { select: { likes: true } }
-        },
-      }),
-    prisma.story.count({ where: { status: "PUBLISHED", isBanned: false } }),
-    prisma.profile.count(),
-    prisma.profile.findMany({
-      take: 5,
-      where: { stories: { some: { status: "PUBLISHED" } } },
-      include: { 
-        _count: { select: { stories: true, followers: true } }
-      },
-      orderBy: { followers: { _count: "desc" } }
-    }),
-    prisma.story.aggregate({
-        _sum: { reads: true }
-    }),
-    prisma.story.findMany({
-        where: { status: "PUBLISHED", isBanned: false, genre: { not: null } },
-        select: { genre: true },
-        distinct: ['genre'],
-        take: 12
-    })
+    getRecentStories(),
+    getTrendingStories(),
+    getFantasyStories(),
+    getPlatformStats(),
+    getTopAuthors(),
+    getGenres()
   ]);
 
-  const genres = dbGenres.length > 0 ? dbGenres.map(g => g.genre as string) : ["Fantasy", "Sci-Fi", "Mystery", "Romance", "Horror", "Thriller"];
+  const { totalStories, totalAuthors, totalReads } = stats;
 
   let recentHistory = null;
   if (user) {

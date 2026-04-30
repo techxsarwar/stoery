@@ -1,12 +1,34 @@
+export const unstable_instant = { prefetch: 'static' };
+
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import Navbar from "@/components/Navbar";
 import { Prisma } from "@prisma/client";
+import { Suspense } from "react";
 
 export default async function DiscoverPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-surface flex flex-col items-center pt-24 px-6 md:px-12 w-full mx-auto animate-pulse">
+                <div className="h-20 w-full bg-surface-container border-b-8 border-primary mb-12"></div>
+                <div className="grid grid-cols-4 gap-8 w-full max-w-7xl">
+                    {[1,2,3,4,5,6,7,8].map(i => (
+                        <div key={i} className="aspect-[3/4] bg-surface-container border-4 border-on-surface"></div>
+                    ))}
+                </div>
+            </div>
+        }>
+            <DiscoverContent {...props} />
+        </Suspense>
+    );
+}
+
+async function DiscoverContent(props: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  }) {
   const searchParams = await props.searchParams;
   const q = typeof searchParams.q === 'string' ? searchParams.q : undefined;
   const genre = typeof searchParams.genre === 'string' ? searchParams.genre : undefined;
