@@ -4,6 +4,8 @@ import { Inter, Newsreader, Space_Grotesk } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { Providers } from "@/providers/Provider";
+import SmoothScroll from "@/providers/SmoothScroll";
+
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -65,10 +67,13 @@ export default function RootLayout({
           strategy="lazyOnload"
         />
         <Providers>
-          <Suspense fallback={null}>
-            {children}
-          </Suspense>
+          <SmoothScroll>
+            <Suspense fallback={null}>
+              {children}
+            </Suspense>
+          </SmoothScroll>
         </Providers>
+
       </body>
     </html>
   );

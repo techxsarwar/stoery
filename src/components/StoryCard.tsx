@@ -13,39 +13,50 @@ interface StoryCardProps {
   priority?: boolean;
 }
 
+import { motion } from "framer-motion";
+
 export default function StoryCard({ id, title, author, coverUrl, genre, reads = 0, likes = 0, priority = false }: StoryCardProps) {
   return (
-    <Link href={`/read/${id}`} className="flex-shrink-0 w-[140px] sm:w-[160px] md:w-[180px] snap-start group">
-      <div className="relative aspect-[2/3] w-full bg-surface-container-high border-2 border-on-surface overflow-hidden transition-all duration-300 group-hover:shadow-[6px_6px_0px_0px_var(--color-primary)] group-hover:-translate-x-1 group-hover:-translate-y-1">
-        <Image 
-          src={coverUrl || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"} 
-          alt={title}
-          fill
-          priority={priority}
-          sizes="(max-width: 768px) 140px, (max-width: 1024px) 160px, 180px"
-          className="object-cover transition-all duration-700 group-hover:scale-110"
-        />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="flex-shrink-0 w-[140px] sm:w-[160px] md:w-[180px] snap-start group"
+    >
+      <Link href={`/read/${id}`}>
+        <div className="relative aspect-[2/3] w-full bg-surface-container-high border-2 border-on-surface overflow-hidden transition-all duration-300 group-hover:shadow-[6px_6px_0px_0px_var(--color-primary)] group-hover:-translate-x-1 group-hover:-translate-y-1">
+          <Image 
+            src={coverUrl || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"} 
+            alt={title}
+            fill
+            priority={priority}
+            sizes="(max-width: 768px) 140px, (max-width: 1024px) 160px, 180px"
+            className="object-cover transition-all duration-700 group-hover:scale-110"
+          />
 
-        {genre && (
-          <div className="absolute top-2 left-2 px-2 py-0.5 bg-primary text-on-primary text-[9px] font-black uppercase tracking-widest border border-on-surface">
-            {genre}
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-on-surface/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-            <div className="flex gap-3 text-surface font-headline font-black text-[10px] uppercase">
-                <span className="flex items-center gap-1"><Eye size={12} strokeWidth={3} /> {reads > 1000 ? `${(reads/1000).toFixed(1)}k` : reads}</span>
-                <span className="flex items-center gap-1"><Heart size={12} strokeWidth={3} /> {likes > 1000 ? `${(likes/1000).toFixed(1)}k` : likes}</span>
+          {genre && (
+            <div className="absolute top-2 left-2 px-2 py-0.5 bg-primary text-on-primary text-[9px] font-black uppercase tracking-widest border border-on-surface">
+              {genre}
             </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-on-surface/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+              <div className="flex gap-3 text-surface font-headline font-black text-[10px] uppercase">
+                  <span className="flex items-center gap-1"><Eye size={12} strokeWidth={3} /> {reads > 1000 ? `${(reads/1000).toFixed(1)}k` : reads}</span>
+                  <span className="flex items-center gap-1"><Heart size={12} strokeWidth={3} /> {likes > 1000 ? `${(likes/1000).toFixed(1)}k` : likes}</span>
+              </div>
+          </div>
         </div>
-      </div>
-      <div className="mt-3">
-        <h3 className="font-headline font-black text-xs sm:text-sm md:text-base uppercase tracking-tight line-clamp-1 group-hover:text-primary transition-colors">
-          {title}
-        </h3>
-        <p className="font-label text-[9px] md:text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
-          By {author}
-        </p>
-      </div>
-    </Link>
+        <div className="mt-3">
+          <h3 className="font-headline font-black text-xs sm:text-sm md:text-base uppercase tracking-tight line-clamp-1 group-hover:text-primary transition-colors">
+            {title}
+          </h3>
+          <p className="font-label text-[9px] md:text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
+            By {author}
+          </p>
+        </div>
+      </Link>
+    </motion.div>
   );
 }
+
