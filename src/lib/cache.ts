@@ -229,6 +229,46 @@ export const getNowReading = unstable_cache(
   { revalidate: 60 }
 );
 
+export const getAuthorSpotlights = unstable_cache(
+  async () => {
+    return prisma.profile.findMany({
+      take: 3,
+      where: {
+        stories: { some: { status: "PUBLISHED", isBanned: false } },
+      },
+      orderBy: { followers: { _count: "desc" } },
+      select: {
+        id: true,
+        username: true,
+        full_name: true,
+        pen_name: true,
+        bio: true,
+        avatar_url: true,
+        isVerified: true,
+        faction: true,
+        _count: { select: { followers: true, stories: true } },
+        stories: {
+          take: 1,
+          where: { status: "PUBLISHED", isBanned: false },
+          orderBy: { likes: { _count: "desc" } },
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            cover_url: true,
+            genre: true,
+            reads: true,
+            createdAt: true,
+            _count: { select: { likes: true, chapters: true } },
+          },
+        },
+      },
+    });
+  },
+  ["author-spotlights"],
+  { revalidate: 3600 }
+);
+
 export async function getStoryContent(storyId: string) {
     return prisma.story.findUnique({
       where: { id: storyId },

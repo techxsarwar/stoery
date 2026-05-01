@@ -23,7 +23,8 @@ import {
   getRecentReviews,
   getEchoOfTheDay,
   getStreakLeaderboard,
-  getNowReading
+  getNowReading,
+  getAuthorSpotlights
 } from "@/lib/cache";
 
 async function HomeContent() {
@@ -41,7 +42,8 @@ async function HomeContent() {
     recentReviews,
     echoOfTheDay,
     streakLeaderboard,
-    nowReading
+    nowReading,
+    authorSpotlights
   ] = await Promise.all([
     supabase.auth.getUser(),
     getRecentStories(),
@@ -54,7 +56,8 @@ async function HomeContent() {
     getRecentReviews(),
     getEchoOfTheDay(),
     getStreakLeaderboard(),
-    getNowReading()
+    getNowReading(),
+    getAuthorSpotlights()
   ]);
 
   const { totalStories, totalAuthors, totalReads } = stats;
@@ -265,7 +268,132 @@ async function HomeContent() {
             )}
         </div>
 
+        {/* Author Spotlights — Chronicles from Our Community */}
+        {authorSpotlights.length > 0 && (
+          <section className="w-full">
+            <div className="flex items-center gap-4 mb-12">
+              <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">Chronicles from Our Community</h2>
+              <div className="flex-grow h-1 bg-on-surface-variant/20"></div>
+              <Link href="/discover" className="font-label font-black text-xs uppercase tracking-[0.2em] text-primary hover:underline underline-offset-4 decoration-2 whitespace-nowrap">
+                All Stories →
+              </Link>
+            </div>
+
+            <div className="flex flex-col gap-0 border-4 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+              {authorSpotlights.map((author, i) => {
+                const story = author.stories[0];
+                if (!story) return null;
+
+                const factionLabel: Record<string, { label: string; color: string }> = {
+                  NEON_SYNDICATE: { label: "Neon Syndicate", color: "bg-[#00ff41] text-black" },
+                  OBSIDIAN_ORDER: { label: "Obsidian Order", color: "bg-on-surface text-surface" },
+                  THE_VOIDBORN:   { label: "The Voidborn",   color: "bg-purple-600 text-white" },
+                };
+                const faction = author.faction ? factionLabel[author.faction] : null;
+                const isEven = i % 2 === 0;
+
+                return (
+                  <div
+                    key={author.id}
+                    className={`flex flex-col md:flex-row ${isEven ? "" : "md:flex-row-reverse"} border-b-4 border-on-surface last:border-b-0 group`}
+                  >
+                    {/* Story Cover */}
+                    <Link
+                      href={`/read/${story.id}`}
+                      className="relative w-full md:w-72 h-64 md:h-auto flex-shrink-0 overflow-hidden bg-on-surface"
+                    >
+                      <Image
+                        src={story.cover_url || `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop`}
+                        alt={story.title}
+                        fill
+                        className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
+                      />
+                      {/* Genre badge */}
+                      {story.genre && (
+                        <div className="absolute top-4 left-4 px-3 py-1 bg-primary text-on-primary font-label font-black text-[10px] uppercase tracking-[0.2em]">
+                          {story.genre}
+                        </div>
+                      )}
+                    </Link>
+
+                    {/* Content */}
+                    <div className={`flex-1 p-8 md:p-12 flex flex-col justify-between gap-6 bg-surface-container ${ isEven ? "border-l-0 md:border-l-4" : "border-r-0 md:border-r-4"} border-on-surface`}>
+                      {/* Author identity */}
+                      <div className="flex items-start gap-4">
+                        <Link href={`/u/${author.username || author.id}`} className="flex-shrink-0">
+                          <div className="w-14 h-14 rounded-full border-4 border-on-surface overflow-hidden relative bg-primary/20 hover:scale-110 transition-transform">
+                            <Image
+                              src={author.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${author.username || author.id}`}
+                              alt={author.pen_name || author.full_name || "Author"}
+                              fill unoptimized className="object-cover"
+                            />
+                          </div>
+                        </Link>
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Link href={`/u/${author.username || author.id}`} className="font-headline font-black text-xl uppercase text-on-surface hover:text-primary transition-colors">
+                              {author.pen_name || author.full_name || author.username}
+                            </Link>
+                            {author.isVerified && (
+                              <span title="Verified Chronicler" className="text-primary text-base">✦</span>
+                            )}
+                            {faction && (
+                              <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-2 py-0.5 ${faction.color}`}>
+                                {faction.label}
+                              </span>
+                            )}
+                          </div>
+                          <p className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mt-0.5">
+                            {author._count.followers.toLocaleString()} Followers · {author._count.stories} {author._count.stories === 1 ? "Story" : "Stories"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Story info */}
+                      <div className="flex flex-col gap-3">
+                        <Link href={`/read/${story.id}`} className="font-headline font-black text-3xl uppercase tracking-tight text-on-surface hover:text-primary transition-colors leading-tight">
+                          {story.title}
+                        </Link>
+                        {story.description && (
+                          <p className="font-body italic text-on-surface-variant leading-relaxed line-clamp-3">
+                            {story.description}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Stats + CTA */}
+                      <div className="flex items-center justify-between flex-wrap gap-4 pt-4 border-t-2 border-on-surface/10">
+                        <div className="flex items-center gap-6">
+                          <span className="flex items-center gap-1.5 font-label font-bold text-xs uppercase tracking-widest text-on-surface-variant">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            {story.reads.toLocaleString()}
+                          </span>
+                          <span className="flex items-center gap-1.5 font-label font-bold text-xs uppercase tracking-widest text-on-surface-variant">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            {story._count.likes.toLocaleString()}
+                          </span>
+                          <span className="flex items-center gap-1.5 font-label font-bold text-xs uppercase tracking-widest text-on-surface-variant">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                            {story._count.chapters} {story._count.chapters === 1 ? "Chapter" : "Chapters"}
+                          </span>
+                        </div>
+                        <Link
+                          href={`/read/${story.id}`}
+                          className="bg-on-surface text-surface font-headline font-black text-xs uppercase tracking-[0.2em] px-6 py-3 border-2 border-on-surface hover:bg-primary hover:border-primary hover:text-on-primary transition-all duration-300"
+                        >
+                          Read Now →
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         {/* AI Feature Showcase */}
+
         <section className="w-full">
           <div className="flex items-center gap-4 mb-12">
             <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">The Neural Engine</h2>
