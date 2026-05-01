@@ -177,6 +177,58 @@ export const getRecentReviews = unstable_cache(
   { revalidate: 300 }
 );
 
+export const getEchoOfTheDay = unstable_cache(
+  async () => {
+    return prisma.echo.findFirst({
+      orderBy: { createdAt: "desc" },
+      include: {
+        profile: { select: { full_name: true, username: true, avatar_url: true, pen_name: true } },
+        story:   { select: { id: true, title: true, cover_url: true } }
+      }
+    });
+  },
+  ["echo-of-the-day"],
+  { revalidate: 3600 }
+);
+
+export const getStreakLeaderboard = unstable_cache(
+  async () => {
+    return prisma.profile.findMany({
+      take: 5,
+      where: { reading_streak: { gt: 0 } },
+      orderBy: { reading_streak: "desc" },
+      select: {
+        id: true,
+        username: true,
+        full_name: true,
+        pen_name: true,
+        avatar_url: true,
+        reading_streak: true,
+        longest_streak: true
+      }
+    });
+  },
+  ["streak-leaderboard"],
+  { revalidate: 1800 }
+);
+
+export const getNowReading = unstable_cache(
+  async () => {
+    const since = new Date(Date.now() - 30 * 60 * 1000); // last 30 min
+    return prisma.readingHistory.findMany({
+      take: 8,
+      where: { lastReadAt: { gte: since } },
+      orderBy: { lastReadAt: "desc" },
+      distinct: ["storyId"],
+      include: {
+        story: { select: { id: true, title: true, genre: true } }
+      }
+    });
+  },
+  ["now-reading"],
+  { revalidate: 60 }
+);
+
 export async function getStoryContent(storyId: string) {
     return prisma.story.findUnique({
       where: { id: storyId },

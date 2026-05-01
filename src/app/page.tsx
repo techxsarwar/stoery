@@ -20,7 +20,10 @@ import {
   getTopAuthors, 
   getGenres,
   getMasterpieceStories,
-  getRecentReviews
+  getRecentReviews,
+  getEchoOfTheDay,
+  getStreakLeaderboard,
+  getNowReading
 } from "@/lib/cache";
 
 async function HomeContent() {
@@ -35,7 +38,10 @@ async function HomeContent() {
     topAuthors,
     genres,
     masterpieces,
-    recentReviews
+    recentReviews,
+    echoOfTheDay,
+    streakLeaderboard,
+    nowReading
   ] = await Promise.all([
     supabase.auth.getUser(),
     getRecentStories(),
@@ -45,7 +51,10 @@ async function HomeContent() {
     getTopAuthors(),
     getGenres(),
     getMasterpieceStories(),
-    getRecentReviews()
+    getRecentReviews(),
+    getEchoOfTheDay(),
+    getStreakLeaderboard(),
+    getNowReading()
   ]);
 
   const { totalStories, totalAuthors, totalReads } = stats;
@@ -57,11 +66,14 @@ async function HomeContent() {
   });
 
   let recentHistory = null;
+  let userFaction: string | null = null;
   if (user) {
     const profile = await prisma.profile.findFirst({
-        where: { user: { email: user.email } }
+        where: { user: { email: user.email } },
+        select: { id: true, faction: true }
     });
     if (profile) {
+        userFaction = profile.faction;
         recentHistory = await prisma.readingHistory.findFirst({
             where: { profileId: profile.id },
             orderBy: { lastReadAt: "desc" },
@@ -134,6 +146,27 @@ async function HomeContent() {
               ))}
           </div>
       </div>
+
+      {/* Now Reading Live Strip */}
+      {nowReading.length > 0 && (
+        <div className="w-full bg-surface-container border-b-4 border-on-surface/10 overflow-hidden py-2 flex">
+          <div className="animate-marquee whitespace-nowrap flex gap-16 font-label font-bold uppercase tracking-widest text-on-surface-variant text-xs">
+            {[...Array(3)].map((_, i) => (
+              <span key={i} className="flex gap-16">
+                {nowReading.map((r) => (
+                  <span key={`${i}-${r.id}`} className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse inline-block"></span>
+                    Someone is reading{" "}
+                    <Link href={`/read/${r.storyId}`} className="text-primary hover:underline">
+                      {r.story.title}
+                    </Link>
+                  </span>
+                ))}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Main Content Area */}
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-12 flex flex-col gap-24">
@@ -232,6 +265,46 @@ async function HomeContent() {
             )}
         </div>
 
+        {/* AI Feature Showcase */}
+        <section className="w-full">
+          <div className="flex items-center gap-4 mb-12">
+            <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">The Neural Engine</h2>
+            <div className="flex-grow h-1 bg-on-surface-variant/20"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-4 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+            <div className="bg-on-surface text-surface p-10 flex flex-col gap-6 border-b-4 md:border-b-0 md:border-r-4 border-surface/20 group hover:bg-primary hover:text-on-primary transition-colors duration-300">
+              <div className="text-5xl">✍️</div>
+              <h3 className="font-headline text-2xl font-black uppercase tracking-tight">Continue Your Story</h3>
+              <p className="font-body text-sm italic opacity-70 leading-relaxed flex-grow">
+                Stuck mid-chapter? Let Venice Uncensored pick up your exact atmosphere and keep the prose burning — no safety filters, no compromises.
+              </p>
+              <Link href="/dashboard" className="font-label font-black text-xs uppercase tracking-[0.2em] underline decoration-2 underline-offset-4 opacity-60 group-hover:opacity-100 transition-opacity">
+                Open Writing Studio →
+              </Link>
+            </div>
+            <div className="bg-surface-container-high text-on-surface p-10 flex flex-col gap-6 border-b-4 md:border-b-0 md:border-r-4 border-on-surface/20 group hover:bg-on-surface hover:text-surface transition-colors duration-300">
+              <div className="text-5xl">🌌</div>
+              <h3 className="font-headline text-2xl font-black uppercase tracking-tight">Map Your Resonance</h3>
+              <p className="font-body text-sm italic opacity-70 leading-relaxed flex-grow">
+                NVIDIA Nemotron encodes your story into a 4096-dimension vibe vector. Find readers who feel exactly what you wrote — across any genre.
+              </p>
+              <Link href="/dashboard" className="font-label font-black text-xs uppercase tracking-[0.2em] underline decoration-2 underline-offset-4 opacity-60 group-hover:opacity-100 transition-opacity">
+                Explore Resonance Matrix →
+              </Link>
+            </div>
+            <div className="bg-white text-on-surface p-10 flex flex-col gap-6 group hover:bg-primary hover:text-on-primary transition-colors duration-300">
+              <div className="text-5xl">🛡️</div>
+              <h3 className="font-headline text-2xl font-black uppercase tracking-tight">Originality Check</h3>
+              <p className="font-body text-sm italic opacity-70 leading-relaxed flex-grow">
+                Hermes 3 (405B) runs a full plagiarism analysis before you publish — originality score, structured flags, and a publish verdict.
+              </p>
+              <Link href="/dashboard" className="font-label font-black text-xs uppercase tracking-[0.2em] underline decoration-2 underline-offset-4 opacity-60 group-hover:opacity-100 transition-opacity">
+                Score Your Story →
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* Core Features Grid from README - Animated */}
         <AnimatedFeatures />
 
@@ -253,6 +326,52 @@ async function HomeContent() {
                 ))}
             </div>
         </section>
+
+        {/* Echo of the Day */}
+        {echoOfTheDay && (
+          <section className="w-full">
+            <div className="flex items-center gap-4 mb-12">
+              <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">Echo of the Day</h2>
+              <div className="flex-grow h-1 bg-on-surface-variant/20"></div>
+            </div>
+            <div className="relative border-4 border-on-surface bg-surface-container shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+              <div className="absolute top-4 left-6 font-headline text-[160px] font-black leading-none text-primary/5 select-none pointer-events-none">{String.fromCharCode(0x201C)}</div>
+              <div className="relative z-10 p-10 md:p-16 flex flex-col gap-8">
+                <div className="inline-block px-3 py-1 bg-primary text-on-primary font-label text-[10px] font-black uppercase tracking-[0.3em] w-fit">
+                  Reader&apos;s Echo
+                </div>
+                <blockquote className="font-body text-2xl md:text-3xl italic text-on-surface leading-relaxed border-l-4 border-primary pl-6">
+                  &ldquo;{echoOfTheDay.quote}&rdquo;
+                </blockquote>
+                <p className="font-body text-on-surface-variant italic text-lg leading-relaxed max-w-3xl">
+                  {echoOfTheDay.content}
+                </p>
+                <div className="flex items-center justify-between flex-wrap gap-4 pt-4 border-t-2 border-on-surface/10">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full border-2 border-on-surface overflow-hidden bg-primary/20 relative flex-shrink-0">
+                      <Image
+                        src={echoOfTheDay.profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${echoOfTheDay.profile.username}`}
+                        alt="Avatar" fill unoptimized className="object-cover"
+                      />
+                    </div>
+                    <div>
+                      <p className="font-headline font-black text-sm uppercase text-on-surface">
+                        {echoOfTheDay.profile.pen_name || echoOfTheDay.profile.full_name || echoOfTheDay.profile.username}
+                      </p>
+                      <p className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Reader</p>
+                    </div>
+                  </div>
+                  <Link
+                    href={`/read/${echoOfTheDay.storyId}`}
+                    className="font-headline font-black text-sm uppercase tracking-widest text-primary hover:underline decoration-2 underline-offset-4 flex items-center gap-2"
+                  >
+                    from: {echoOfTheDay.story.title} →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Community Reviews Section */}
         {recentReviews.length > 0 && (
@@ -306,6 +425,47 @@ async function HomeContent() {
                 <span className="font-label text-sm font-black uppercase tracking-[0.2em] opacity-60">Global Reads</span>
             </div>
         </section>
+
+        {/* Reading Streak Leaderboard */}
+        {streakLeaderboard.length > 0 && (
+          <section className="w-full">
+            <div className="flex items-center gap-4 mb-12">
+              <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">Streak Leaderboard</h2>
+              <div className="flex-grow h-1 bg-on-surface-variant/20"></div>
+              <span className="font-label font-black text-xs uppercase tracking-[0.2em] text-primary">🔥 Active Readers</span>
+            </div>
+            <div className="border-4 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+              {streakLeaderboard.map((reader, i) => (
+                <div
+                  key={reader.id}
+                  className={`flex items-center gap-6 px-8 py-5 border-b-2 border-on-surface/10 last:border-b-0 hover:-translate-x-1 transition-transform ${
+                    i === 0 ? "bg-primary text-on-primary" : i === 1 ? "bg-surface-container-high text-on-surface" : "bg-surface-container text-on-surface"
+                  }`}
+                >
+                  <span className={`font-headline font-black text-3xl w-10 text-center ${ i === 0 ? "text-on-primary" : "text-primary"}`}>
+                    {i === 0 ? "👑" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`}
+                  </span>
+                  <div className="w-10 h-10 rounded-full border-2 border-on-surface overflow-hidden bg-primary/20 relative flex-shrink-0">
+                    <Image
+                      src={reader.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${reader.username || reader.id}`}
+                      alt={reader.username || "Reader"} fill unoptimized className="object-cover"
+                    />
+                  </div>
+                  <div className="flex-grow">
+                    <Link href={`/u/${reader.username || reader.id}`} className="font-headline font-black text-lg uppercase hover:underline decoration-2 underline-offset-2">
+                      {reader.pen_name || reader.full_name || reader.username || "Anonymous"}
+                    </Link>
+                    <p className="font-label text-[10px] uppercase tracking-widest opacity-60">Longest: {reader.longest_streak} days</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-headline font-black text-3xl">{reader.reading_streak}</p>
+                    <p className="font-label text-[10px] uppercase tracking-widest opacity-60">Day Streak</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Faction Leaderboard */}
         <section className="w-full">
@@ -368,6 +528,62 @@ async function HomeContent() {
                     </Link>
                 ))}
             </div>
+        </section>
+
+        {/* Join a Faction CTA */}
+        {(!user || !userFaction) && (
+          <section className="w-full border-4 border-on-surface bg-surface-container shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-10 md:p-14 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 font-headline font-black text-xs uppercase tracking-widest text-primary/10 select-none pointer-events-none">CHOOSE_ALLEGIANCE</div>
+            <div className="flex flex-col md:flex-row items-center gap-10">
+              <div className="flex-1">
+                <div className="inline-block px-3 py-1 bg-primary text-on-primary font-label text-[10px] font-black uppercase tracking-[0.3em] mb-4">Allegiance Required</div>
+                <h2 className="font-headline text-4xl md:text-5xl font-black text-on-surface uppercase tracking-tight leading-tight mb-4">
+                  Choose Your Faction
+                </h2>
+                <p className="font-body italic text-on-surface-variant max-w-md leading-relaxed">
+                  Every chronicler owes allegiance to a cause. Join a faction, earn its colours, and represent your tribe across the SOULPAD universe.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 flex-shrink-0">
+                {([
+                  { key: "NEON_SYNDICATE", label: "Neon Syndicate", emoji: "🔴", shadow: "hover:shadow-[6px_6px_0px_0px_#00ff41]" },
+                  { key: "OBSIDIAN_ORDER", label: "Obsidian Order", emoji: "⚫", shadow: "hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]" },
+                  { key: "THE_VOIDBORN",   label: "The Voidborn",   emoji: "🌌", shadow: "hover:shadow-[6px_6px_0px_0px_#a855f7]" },
+                ] as const).map(f => (
+                  <Link
+                    key={f.key}
+                    href={user ? "/profile" : "/auth/signup"}
+                    className={`flex flex-col items-center gap-2 bg-white border-4 border-on-surface px-6 py-5 font-headline font-black text-sm uppercase tracking-widest hover:-translate-y-1 transition-all duration-300 ${f.shadow}`}
+                  >
+                    <span className="text-3xl">{f.emoji}</span>
+                    {f.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Careers Teaser */}
+        <section className="w-full flex flex-col md:flex-row items-center justify-between gap-6 border-4 border-on-surface bg-surface-container p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-300">
+          <div className="flex items-center gap-5">
+            <span className="text-4xl flex-shrink-0">💼</span>
+            <div>
+              <p className="font-label font-black text-[10px] uppercase tracking-[0.3em] text-primary mb-1">We&apos;re Hiring</p>
+              <h3 className="font-headline font-black text-2xl uppercase text-on-surface tracking-tight">
+                Join the Team Building the Future of Storytelling
+              </h3>
+              <p className="font-body italic text-on-surface-variant text-sm mt-1">
+                Engineers, designers, and writers — come forge something legendary.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/careers"
+            className="flex-shrink-0 bg-on-surface text-surface font-headline font-black text-sm uppercase tracking-[0.2em] px-8 py-4 border-4 border-on-surface hover:bg-primary hover:text-on-primary transition-colors duration-300 whitespace-nowrap"
+          >
+            View Open Roles →
+          </Link>
         </section>
 
         {/* Final CTA */}
