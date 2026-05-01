@@ -11,6 +11,7 @@ export async function updateProfileSettings(data: {
   username: string;
   bio?: string;
   avatar_url?: string;
+  faction?: any;
 }) {
   const supabase = await createClient();
   const {
@@ -53,6 +54,7 @@ export async function updateProfileSettings(data: {
         username,
         bio: data.bio ?? undefined,
         avatar_url: data.avatar_url ?? undefined,
+        faction: data.faction ?? undefined,
       },
     });
 
@@ -194,4 +196,32 @@ export async function isFollowing(targetProfileId: string) {
   });
 
   return !!follow;
+}
+
+export async function deleteAccount() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) return { error: "Unauthorized" };
+
+  try {
+    const dbUser = await prisma.user.findUnique({
+      where: { email: user.email },
+    });
+
+    if (!dbUser) return { error: "User not found" };
+
+    await prisma.user.delete({
+      where: { id: dbUser.id },
+    });
+
+    await supabase.auth.signOut();
+
+    return { success: true };
+  } catch (e) {
+    console.error("Account deletion error:", e);
+    return { error: "Failed to delete account" };
+  }
 }

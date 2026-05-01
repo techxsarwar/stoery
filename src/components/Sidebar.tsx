@@ -19,7 +19,7 @@ export default function Sidebar() {
           setUserRole(data.role);
         }
       } catch {
-        // silently fail — non-critical UI enhancement
+        // silently fail
       }
     };
     fetchRole();
@@ -56,11 +56,11 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile hamburger button — shown only on mobile, floats in top-left */}
+      {/* Mobile hamburger button */}
       <button
         id="sidebar-hamburger"
         onClick={() => setIsOpen(true)}
-        className="md:hidden fixed bottom-6 right-6 z-[60] p-4 bg-primary text-on-primary rounded-full border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all flex items-center justify-center group"
+        className="md:hidden fixed bottom-6 right-6 z-[60] p-4 bg-primary text-on-primary rounded-none border-4 border-on-surface shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all flex items-center justify-center group"
         aria-label="Open navigation"
       >
         <Menu size={24} className="group-hover:scale-110 transition-transform" />
@@ -69,7 +69,7 @@ export default function Sidebar() {
       {/* Mobile overlay backdrop */}
       {isOpen && (
         <div
-          className="md:hidden fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm"
+          className="md:hidden fixed inset-0 z-[55] bg-black/80 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
           aria-hidden="true"
         />
@@ -80,27 +80,32 @@ export default function Sidebar() {
         className={`
           fixed left-0 top-0 h-screen z-[60] flex flex-col
           w-72 md:w-20 lg:w-64
-          bg-gradient-to-b from-primary via-primary-container to-surface
-          shadow-[10px_0_30px_-15px_rgba(0,0,0,0.5)]
-          border-r border-on-surface/10
+          bg-white
+          shadow-[8px_0px_0px_0px_var(--color-primary)]
+          border-r-8 border-on-surface
           transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
       >
         {/* Header */}
-        <div className="px-6 py-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-on-surface flex items-center justify-center rounded shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] rotate-3 hover:rotate-0 transition-transform flex-shrink-0">
-              <PenTool className="text-primary w-6 h-6" />
+        <div className="px-6 py-8 flex items-center justify-between border-b-4 border-on-surface bg-surface-container">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-primary flex items-center justify-center border-4 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rotate-3 hover:rotate-0 transition-transform flex-shrink-0">
+              <PenTool className="text-on-primary w-6 h-6" />
             </div>
-            <span className="md:hidden lg:block font-headline font-black text-xl tracking-tighter uppercase text-on-surface drop-shadow-sm">
-              Private Desk
-            </span>
+            <div className="md:hidden lg:flex flex-col">
+                <span className="font-headline font-black text-2xl tracking-tighter uppercase text-on-surface leading-none drop-shadow-sm">
+                Private
+                </span>
+                <span className="font-headline font-black text-2xl tracking-tighter uppercase text-primary leading-none drop-shadow-sm">
+                Desk
+                </span>
+            </div>
           </div>
           {/* Close button — mobile only */}
           <button
             onClick={() => setIsOpen(false)}
-            className="md:hidden p-1.5 text-on-surface/60 hover:text-on-surface transition-colors rounded-lg hover:bg-on-surface/10"
+            className="md:hidden p-2 bg-white border-4 border-on-surface hover:bg-red-500 hover:text-white transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
             aria-label="Close navigation"
           >
             <X size={20} />
@@ -108,7 +113,7 @@ export default function Sidebar() {
         </div>
 
         {/* Nav Items */}
-        <nav className="flex-grow w-full px-4 flex flex-col gap-2">
+        <nav className="flex-grow w-full px-4 py-6 flex flex-col gap-3 overflow-y-auto scrollbar-hide bg-surface">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -116,14 +121,14 @@ export default function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 group ${
+                className={`flex items-center gap-4 px-4 py-4 border-4 transition-all duration-300 group ${
                   isActive
-                    ? "bg-on-surface text-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] scale-105"
-                    : "text-on-surface/70 hover:bg-on-surface/10 hover:text-on-surface"
+                    ? "bg-on-surface text-surface border-on-surface shadow-[4px_4px_0px_0px_var(--color-primary)] translate-x-2"
+                    : "bg-white text-on-surface border-transparent hover:border-on-surface hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1"
                 }`}
               >
                 <Icon className={`w-6 h-6 flex-shrink-0 ${isActive ? "text-primary" : "group-hover:scale-110 group-hover:rotate-6 transition-transform"}`} />
-                <span className="md:hidden lg:block font-label font-bold uppercase tracking-wider text-sm">
+                <span className="md:hidden lg:block font-headline font-black uppercase tracking-widest text-sm">
                   {item.name}
                 </span>
               </Link>
@@ -132,11 +137,11 @@ export default function Sidebar() {
         </nav>
 
         {/* Footer Widget */}
-        <div className="px-6 pb-8 mt-auto w-full">
-          <div className="md:hidden lg:block p-4 bg-white/30 border-2 border-on-surface/20 rounded-xl backdrop-blur-md hover:bg-white/50 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)]">
-            <p className="font-label font-black text-[10px] uppercase text-on-surface tracking-widest mb-2 text-center drop-shadow-sm">Creative Flow</p>
-            <div className="w-full h-1.5 bg-on-surface/10 rounded-full overflow-hidden shadow-inner">
-              <div className="h-full bg-on-surface w-2/3"></div>
+        <div className="px-6 pb-8 mt-auto w-full border-t-4 border-on-surface pt-6 bg-surface-container">
+          <div className="md:hidden lg:flex flex-col items-center justify-center p-4 bg-white border-4 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all cursor-default">
+            <p className="font-headline font-black text-[10px] uppercase text-on-surface tracking-widest mb-3">Creative Flow</p>
+            <div className="w-full h-3 bg-surface border-2 border-on-surface rounded-none overflow-hidden relative">
+              <div className="absolute top-0 left-0 h-full bg-primary w-2/3"></div>
             </div>
           </div>
         </div>

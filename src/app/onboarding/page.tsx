@@ -43,135 +43,135 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFF00] flex items-center justify-center py-20 px-6 relative overflow-hidden">
-      {/* Background pattern */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(90deg,#000_1px,transparent_1px),linear-gradient(180deg,#000_1px,transparent_1px)] bg-[size:40px_40px]" />
-      </div>
-
-      <div className="bg-white border-[6px] border-black p-8 md:p-12 max-w-2xl w-full shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] relative z-10">
-        <h1 className="font-headline font-black text-5xl md:text-6xl text-black uppercase tracking-tighter mb-4 leading-none italic">
-          Complete Your Universe
-        </h1>
-        <p className="font-body text-xl text-black/70 mb-10 font-bold tracking-tight">
-          One last step before you start writing history.
-        </p>
+    <div className="min-h-screen bg-black flex items-center justify-center p-6 relative overflow-hidden font-mono">
+      {/* CRT Scanline Overlay */}
+      <div className="absolute inset-0 z-50 opacity-10 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]"></div>
+      
+      <div className="bg-black border-2 border-[#00ff41] p-8 md:p-12 max-w-3xl w-full shadow-[0_0_20px_rgba(0,255,65,0.2)] relative z-10 text-[#00ff41]">
+        <div className="mb-8 border-b-2 border-[#00ff41]/30 pb-4">
+            <h1 className="text-2xl md:text-4xl font-bold tracking-widest uppercase mb-2 animate-pulse">
+            &gt; SYSTEM.INITIATE_PROTOCOL("AUTHOR")
+            </h1>
+            <p className="text-sm opacity-80 uppercase tracking-widest">
+            Establishing neural link... Identity required for databank entry.
+            </p>
+        </div>
 
         {error && (
-          <div className="bg-red-500 text-white border-4 border-black p-4 mb-8 font-headline font-bold text-xl uppercase tracking-tighter shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            {error}
+          <div className="bg-red-900/20 text-red-500 border border-red-500 p-4 mb-8 text-sm uppercase tracking-wider">
+            [ERROR]: {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-
-          {/* Full Name */}
-          <div className="flex flex-col gap-3">
-            <label className="font-headline font-black text-2xl uppercase text-black tracking-tighter flex items-center gap-2">
-              <span className="bg-black text-[#FFFF00] px-2 py-1">01</span> Full Name
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          
+          <div className="flex flex-col gap-2">
+            <label className="text-sm uppercase tracking-widest opacity-70">
+              [01] INPUT_REAL_IDENTITY
             </label>
-            <input
-              name="fullName"
-              required
-              className="w-full border-4 border-black p-4 text-2xl font-body font-bold focus:bg-[#FFFF00] focus:outline-none transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-              placeholder="YOUR REAL IDENTITY"
-            />
+            <div className="flex items-center gap-4">
+                <span className="text-xl">&gt;</span>
+                <input
+                name="fullName"
+                required
+                className="w-full bg-transparent border-b-2 border-[#00ff41]/50 p-2 text-xl focus:border-[#00ff41] focus:outline-none transition-colors placeholder:text-[#00ff41]/20"
+                placeholder="YOUR REAL NAME"
+                />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Age */}
-            <div className="flex flex-col gap-3">
-              <label className="font-headline font-black text-2xl uppercase text-black tracking-tighter flex items-center gap-2">
-                <span className="bg-black text-[#FFFF00] px-2 py-1">02</span> Age
+            <div className="flex flex-col gap-2">
+              <label className="text-sm uppercase tracking-widest opacity-70">
+                [02] CYCLES_ALIVE
               </label>
-              <input
-                name="age"
-                type="number"
-                required
-                className="w-full border-4 border-black p-4 text-2xl font-body font-bold focus:bg-[#FFFF00] focus:outline-none transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                placeholder="YEARS ALIVE"
-              />
+              <div className="flex items-center gap-4">
+                  <span className="text-xl">&gt;</span>
+                  <input
+                    name="age"
+                    type="number"
+                    required
+                    className="w-full bg-transparent border-b-2 border-[#00ff41]/50 p-2 text-xl focus:border-[#00ff41] focus:outline-none transition-colors placeholder:text-[#00ff41]/20"
+                    placeholder="AGE"
+                  />
+              </div>
             </div>
 
-            {/* Pen Name */}
-            <div className="flex flex-col gap-3">
-              <label className="font-headline font-black text-2xl uppercase text-black tracking-tighter flex items-center gap-2">
-                <span className="bg-black text-[#FFFF00] px-2 py-1">03</span> Pen Name
+            <div className="flex flex-col gap-2">
+              <label className="text-sm uppercase tracking-widest opacity-70">
+                [03] CHOOSE_ALIAS
               </label>
-              <input
-                name="penName"
-                required
-                className="w-full border-4 border-black p-4 text-2xl font-body font-bold focus:bg-[#FFFF00] focus:outline-none transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                placeholder="YOUR ALIAS"
-              />
+              <div className="flex items-center gap-4">
+                  <span className="text-xl">&gt;</span>
+                  <input
+                    name="penName"
+                    required
+                    className="w-full bg-transparent border-b-2 border-[#00ff41]/50 p-2 text-xl focus:border-[#00ff41] focus:outline-none transition-colors placeholder:text-[#00ff41]/20"
+                    placeholder="PEN NAME"
+                  />
+              </div>
             </div>
           </div>
 
-          {/* Username */}
-          <div className="flex flex-col gap-3">
-            <label className="font-headline font-black text-2xl uppercase text-black tracking-tighter flex items-center gap-2">
-              <span className="bg-black text-[#FFFF00] px-2 py-1">04</span> Username
+          <div className="flex flex-col gap-2">
+            <label className="text-sm uppercase tracking-widest opacity-70 flex justify-between">
+              <span>[04] NETWORK_HANDLE</span>
+              <span className={`${usernameVal.length > 12 ? "text-red-500" : "opacity-50"}`}>
+                CHARS: {usernameVal.length}/14
+              </span>
             </label>
-            <p className="text-sm font-body font-bold text-black/50 -mt-1">
-              Max 14 characters · Letters, numbers, underscores only
-            </p>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 font-headline font-black text-2xl text-black/40 select-none">
-                @
-              </span>
-              <input
-                name="username"
-                value={usernameVal}
-                onChange={handleUsernameChange}
-                required
-                maxLength={14}
-                className={`w-full border-4 p-4 pl-10 text-2xl font-body font-bold focus:outline-none transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
-                  usernameError ? "border-red-500 bg-red-50" : "border-black focus:bg-[#FFFF00]"
-                }`}
-                placeholder="your_handle"
-              />
-              <span className={`absolute right-4 top-1/2 -translate-y-1/2 font-label font-black text-sm ${usernameVal.length > 12 ? "text-red-500" : "text-black/30"}`}>
-                {usernameVal.length}/14
-              </span>
+            <div className="flex items-center gap-4">
+                <span className="text-xl">@</span>
+                <input
+                    name="username"
+                    value={usernameVal}
+                    onChange={handleUsernameChange}
+                    required
+                    maxLength={14}
+                    className={`w-full bg-transparent border-b-2 p-2 text-xl focus:outline-none transition-colors placeholder:text-[#00ff41]/20 ${
+                    usernameError ? "border-red-500 text-red-500" : "border-[#00ff41]/50 focus:border-[#00ff41]"
+                    }`}
+                    placeholder="system_username"
+                />
             </div>
             {usernameError && (
-              <p className="text-red-500 font-label font-bold text-sm">{usernameError}</p>
+              <p className="text-red-500 text-xs uppercase tracking-widest">{usernameError}</p>
             )}
           </div>
 
-          {/* Parentage */}
-          <div className="flex flex-col gap-3">
-            <label className="font-headline font-black text-2xl uppercase text-black tracking-tighter flex items-center gap-2">
-              <span className="bg-black text-[#FFFF00] px-2 py-1">05</span> Parentage (Optional)
+          <div className="flex flex-col gap-2">
+            <label className="text-sm uppercase tracking-widest opacity-70">
+              [05] LINEAGE (OPTIONAL)
             </label>
-            <input
-              name="parentage"
-              className="w-full border-4 border-black p-4 text-2xl font-body font-bold focus:bg-[#FFFF00] focus:outline-none transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-              placeholder="LINEAGE OR ORIGIN"
-            />
+            <div className="flex items-center gap-4">
+                <span className="text-xl">&gt;</span>
+                <input
+                name="parentage"
+                className="w-full bg-transparent border-b-2 border-[#00ff41]/50 p-2 text-xl focus:border-[#00ff41] focus:outline-none transition-colors placeholder:text-[#00ff41]/20"
+                placeholder="PARENTAGE / ORIGIN"
+                />
+            </div>
           </div>
 
-          {/* Terms */}
-          <div className="flex items-start gap-4 mt-4">
+          <div className="flex items-start gap-4 mt-6 p-4 border border-[#00ff41]/30 bg-[#00ff41]/5">
             <input
               type="checkbox"
               name="guardianApproved"
               id="guardian"
               required
-              className="w-8 h-8 border-4 border-black checked:bg-black transition-all cursor-pointer flex-shrink-0"
+              className="mt-1 w-5 h-5 accent-[#00ff41] bg-black border border-[#00ff41] cursor-pointer flex-shrink-0"
             />
-            <label htmlFor="guardian" className="font-body font-bold text-lg text-black leading-tight cursor-pointer">
-              If I am a minor, I confirm my guardian has approved my registration. I agree to the terms of the SOULPAD alliance.
+            <label htmlFor="guardian" className="text-xs uppercase tracking-widest leading-relaxed cursor-pointer opacity-90">
+              [ACKNOWLEDGE] IF MINOR, GUARDIAN OVERRIDE AUTHORIZED. I SUBMIT TO THE CODEX LAWS AND SOULPAD ARCHITECTURE PROTOCOLS.
             </label>
           </div>
 
           <button
             type="submit"
             disabled={isPending || !!usernameError}
-            className="mt-6 bg-black text-white border-4 border-black px-12 py-6 font-headline font-black text-3xl uppercase tracking-tighter italic hover:bg-white hover:text-black hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center gap-4 disabled:opacity-50 group"
+            className="mt-8 bg-transparent border-2 border-[#00ff41] text-[#00ff41] px-8 py-4 text-xl uppercase tracking-[0.3em] hover:bg-[#00ff41] hover:text-black transition-all disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-[#00ff41]"
           >
-            {isPending ? "Syncing..." : "ENTER THE VERSE"}
-            <span className="group-hover:translate-x-2 transition-transform">→</span>
+            {isPending ? "UPLOADING_CONSCIOUSNESS..." : "EXECUTE_BOOT_SEQUENCE"}
           </button>
         </form>
       </div>

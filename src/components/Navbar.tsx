@@ -17,9 +17,10 @@ interface NavbarProps {
     user_metadata?: { full_name?: string; avatar_url?: string };
   } | null;
   penName?: string | null;
+  isDashboard?: boolean;
 }
 
-export default function Navbar({ user, penName: initialPenName }: NavbarProps) {
+export default function Navbar({ user, penName: initialPenName, isDashboard = false }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
@@ -74,7 +75,7 @@ export default function Navbar({ user, penName: initialPenName }: NavbarProps) {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-surface-variant/50 shadow-sm">
+      <nav className="fixed top-0 w-full z-50 bg-white border-b-4 border-on-surface shadow-[0px_4px_0px_0px_rgba(0,0,0,1)]">
         <div className="flex justify-between items-center px-4 sm:px-8 py-4 max-w-full">
           {/* Logo */}
           <Link
@@ -87,24 +88,35 @@ export default function Navbar({ user, penName: initialPenName }: NavbarProps) {
 
           {/* Desktop Nav Links */}
           <div className="hidden lg:flex space-x-6 items-center">
-            <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/discover">
-              Discover
-            </Link>
-            <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/feed">
-              Feed
-            </Link>
-            <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/community">
-              Community
-            </Link>
-            {user && (
-              <>
-                <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/library">
-                  My Library
-                </Link>
-                <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/dashboard">
-                  Dashboard
-                </Link>
-              </>
+            {isDashboard ? (
+                <>
+                    <span className="font-headline tracking-widest text-primary font-black uppercase text-sm border-2 border-primary px-3 py-1 bg-primary/10">Author Matrix</span>
+                    <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/">
+                        Return to Hub
+                    </Link>
+                </>
+            ) : (
+                <>
+                    <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/discover">
+                    Discover
+                    </Link>
+                    <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/feed">
+                    Feed
+                    </Link>
+                    <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/community">
+                    Community
+                    </Link>
+                    {user && (
+                    <>
+                        <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/library">
+                        My Library
+                        </Link>
+                        <Link className="font-headline tracking-wide text-on-surface-variant hover:text-on-surface hover:tracking-wider transition-all duration-300 font-bold uppercase text-xs" href="/dashboard">
+                        Dashboard
+                        </Link>
+                    </>
+                    )}
+                </>
             )}
           </div>
 
@@ -114,9 +126,9 @@ export default function Navbar({ user, penName: initialPenName }: NavbarProps) {
                 name="q"
                 type="text" 
                 placeholder="Search..." 
-                className="w-full bg-surface-container-high border-2 border-transparent focus:border-on-surface px-4 py-1.5 rounded-full font-headline text-sm focus:outline-none transition-all placeholder:text-on-surface-variant/50"
+                className="w-full bg-surface border-4 border-on-surface px-4 py-2 font-headline font-black uppercase text-xs focus:outline-none focus:bg-primary-container transition-all placeholder:text-on-surface-variant/50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
             />
-            <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-50 group-hover:opacity-100 transition-opacity">
+            <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface hover:text-primary transition-colors">
                 <Compass size={16} />
             </button>
           </form>
@@ -126,23 +138,25 @@ export default function Navbar({ user, penName: initialPenName }: NavbarProps) {
             {!user ? (
               <Link
                 href="/auth/signin"
-                className="bg-white text-on-surface font-headline px-6 py-2 rounded font-bold border-2 border-on-surface transition-all duration-300 hover:bg-surface-container uppercase tracking-wide"
+                className="bg-white text-on-surface font-headline font-black px-6 py-2 border-4 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase tracking-widest text-xs"
               >
                 Sign In
               </Link>
             ) : (
               <>
-                <Link
-                  href="/dashboard/write"
-                  className="bg-primary text-on-primary font-headline px-6 py-2 rounded font-bold border-2 border-on-surface transition-all duration-300 glow-hover uppercase tracking-wide"
-                >
-                  Start Writing
-                </Link>
+                {!isDashboard && (
+                    <Link
+                    href="/dashboard/write"
+                    className="bg-primary text-on-primary font-headline font-black px-6 py-2 border-4 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase tracking-widest text-xs flex items-center gap-2"
+                    >
+                    <PenLine size={16} /> Start Writing
+                    </Link>
+                )}
                 <NotificationCenter />
                 <button
                   onClick={handleSignOut}
                   disabled={isPending}
-                  className="text-on-surface-variant hover:text-primary font-headline font-bold uppercase tracking-wide transition-colors text-sm disabled:opacity-50"
+                  className="text-on-surface bg-white border-4 border-on-surface px-4 py-2 font-headline font-black uppercase tracking-widest text-xs shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50"
                 >
                   {isPending ? "..." : "Sign Out"}
                 </button>
@@ -210,12 +224,14 @@ export default function Navbar({ user, penName: initialPenName }: NavbarProps) {
               </Link>
             ) : (
               <>
-                <Link
-                  href="/dashboard/write"
-                  className="flex items-center justify-center gap-3 bg-primary text-on-primary font-headline font-black text-lg px-6 py-4 rounded-xl uppercase tracking-tight border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all"
-                >
-                  <PenLine size={18} /> Start Writing
-                </Link>
+                {!isDashboard && (
+                    <Link
+                    href="/dashboard/write"
+                    className="flex items-center justify-center gap-3 bg-primary text-on-primary font-headline font-black text-lg px-6 py-4 rounded-xl uppercase tracking-tight border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all"
+                    >
+                    <PenLine size={18} /> Start Writing
+                    </Link>
+                )}
                 <button
                   onClick={handleSignOut}
                   disabled={isPending}

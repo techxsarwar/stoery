@@ -31,7 +31,7 @@ export default async function SettingsPage() {
             </header>
             
             <div className="mt-8">
-                <SettingsForm profile={{ pen_name: profile.pen_name, full_name: profile.full_name, age: profile.age, bio: profile.bio, avatar_url: profile.avatar_url, username: profile.username }} />
+                <SettingsForm profile={{ pen_name: profile.pen_name, full_name: profile.full_name, age: profile.age, bio: profile.bio, avatar_url: profile.avatar_url, username: profile.username, faction: profile.faction }} />
             </div>
         </div>
       </main>

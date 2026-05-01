@@ -11,6 +11,7 @@ import ClientRecoveryRedirect from "@/components/ClientRecoveryRedirect";
 import HorizontalCarousel from "@/components/HorizontalCarousel";
 import StoryCard from "@/components/StoryCard";
 import AnimatedFeatures from "@/components/AnimatedFeatures";
+import AIChatHelper from "@/components/AIChatHelper";
 import { 
   getRecentStories, 
   getTrendingStories, 
@@ -48,6 +49,12 @@ async function HomeContent() {
   ]);
 
   const { totalStories, totalAuthors, totalReads } = stats;
+
+  const factionStats = await prisma.profile.groupBy({
+      by: ['faction'],
+      _count: { id: true },
+      where: { faction: { not: null } }
+  });
 
   let recentHistory = null;
   if (user) {
@@ -113,6 +120,20 @@ async function HomeContent() {
             </div>
         </div>
       </section>
+
+      {/* Cyberpunk Marquee Ticker */}
+      <div className="w-full bg-primary border-b-8 border-on-surface overflow-hidden py-3 relative z-20 flex">
+          <div className="animate-marquee whitespace-nowrap flex gap-12 font-headline font-black uppercase tracking-widest text-on-primary text-sm">
+              {[...Array(4)].map((_, i) => (
+                  <span key={i} className="flex gap-12">
+                      <span>/// NEON SYNDICATE TAKES THE LEAD</span>
+                      <span>{totalReads.toLocaleString()} SOULS BURNED TODAY</span>
+                      <span>SYSTEM ARCHITECTURE: STABLE ///</span>
+                      <span>{totalAuthors.toLocaleString()} CHRONICLERS CONNECTED</span>
+                  </span>
+              ))}
+          </div>
+      </div>
 
       {/* Main Content Area */}
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-12 flex flex-col gap-24">
@@ -256,7 +277,7 @@ async function HomeContent() {
                             <div className="mt-4 pt-4 border-t-2 border-on-surface/10 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="w-8 h-8 rounded-full border-2 border-on-surface overflow-hidden bg-primary/20 relative">
-                                        <Image src={review.profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.profile.username || review.profile.full_name}`} alt="Avatar" fill className="object-cover" />
+                                        <Image src={review.profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.profile.username || review.profile.full_name}`} alt="Avatar" fill unoptimized className="object-cover" />
                                     </div>
                                     <span className="font-headline text-xs font-black uppercase text-on-surface">{review.profile.full_name || review.profile.username}</span>
                                 </div>
@@ -286,6 +307,36 @@ async function HomeContent() {
             </div>
         </section>
 
+        {/* Faction Leaderboard */}
+        <section className="w-full">
+            <div className="flex items-center gap-4 mb-12">
+                <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">The Faction Wars</h2>
+                <div className="flex-grow h-1 bg-on-surface-variant/20"></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {['NEON_SYNDICATE', 'OBSIDIAN_ORDER', 'THE_VOIDBORN'].map((faction) => {
+                    const count = factionStats.find((f:any) => f.faction === faction)?._count.id || 0;
+                    const names = {
+                        NEON_SYNDICATE: "The Neon Syndicate",
+                        OBSIDIAN_ORDER: "The Obsidian Order",
+                        THE_VOIDBORN: "The Voidborn"
+                    };
+                    const colors = {
+                        NEON_SYNDICATE: "border-[#00ff41] text-on-surface shadow-[8px_8px_0px_0px_#00ff41]",
+                        OBSIDIAN_ORDER: "border-on-surface text-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-on-surface/5",
+                        THE_VOIDBORN: "border-purple-500 text-on-surface shadow-[8px_8px_0px_0px_#a855f7]"
+                    };
+                    return (
+                        <div key={faction} className={`bg-white border-4 p-8 hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all ${colors[faction as keyof typeof colors]}`}>
+                            <h3 className="font-headline text-2xl font-black uppercase tracking-tight mb-4">{names[faction as keyof typeof names]}</h3>
+                            <span className="font-headline text-6xl font-black block mb-2 text-on-surface">{count}</span>
+                            <span className="font-label text-sm font-black uppercase tracking-[0.2em] text-on-surface-variant">Souls Pledged</span>
+                        </div>
+                    );
+                })}
+            </div>
+        </section>
+
         {/* Featured Authors */}
         <section className="w-full">
             <div className="flex items-center justify-between gap-4 mb-12">
@@ -300,6 +351,7 @@ async function HomeContent() {
                                 src={author.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${author.username || author.id}`}
                                 alt={author.username || "Author"}
                                 fill
+                                unoptimized
                                 loading="lazy"
                                 className="object-cover"
                             />
@@ -351,6 +403,7 @@ export default async function Home() {
     <>
       <ClientRecoveryRedirect />
       <Navbar user={user ?? null} penName={penName} />
+      <AIChatHelper />
 
       <Suspense fallback={
         <div className="flex-grow pt-32 pb-24 px-6 max-w-7xl mx-auto w-full animate-pulse">

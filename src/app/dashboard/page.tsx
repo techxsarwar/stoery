@@ -85,7 +85,7 @@ export default async function DashboardPage() {
       <Sidebar />
       
       <main className="flex-grow ml-0 md:ml-20 lg:ml-64 min-h-screen overflow-y-auto overflow-x-hidden bg-[radial-gradient(circle_at_top_right,#e5e7eb,transparent)] custom-scrollbar">
-        <Navbar user={user ?? null} />
+        <Navbar user={user ?? null} isDashboard={true} />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 pt-24 pb-36 md:pb-20 flex flex-col gap-12">
             {/* Post Composer */}

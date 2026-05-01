@@ -14,6 +14,7 @@ interface SettingsFormProps {
     bio: string | null;
     avatar_url: string | null;
     username: string | null;
+    faction: string | null;
   };
 }
 
@@ -24,6 +25,7 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
   const [bio, setBio] = useState(profile.bio || "");
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || "");
   const [username, setUsername] = useState(profile.username || "");
+  const [faction, setFaction] = useState(profile.faction || "");
   const [usernameError, setUsernameError] = useState("");
   const [isPending, startTransition] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
@@ -83,6 +85,7 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
         username,
         bio: bio || undefined,
         avatar_url: avatarUrl || undefined,
+        faction: faction || undefined,
       });
 
       if (res.error) {
@@ -184,6 +187,19 @@ export default function SettingsForm({ profile }: SettingsFormProps) {
         <span className={`text-xs font-label font-bold self-end ${bio.length > 280 ? "text-red-500" : "text-on-surface-variant"}`}>
           {bio.length}/300
         </span>
+      </div>
+
+      {/* Faction */}
+      <div className="flex flex-col gap-2">
+        <label className="font-headline font-black uppercase text-on-surface tracking-tighter text-sm">Allegiance (Faction)</label>
+        <p className="text-xs font-label text-on-surface-variant font-bold">Choose your faction.</p>
+        <select value={faction} onChange={(e) => setFaction(e.target.value)}
+          className="w-full border-4 border-on-surface px-5 py-4 font-body font-bold text-lg focus:outline-none focus:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-surface text-on-surface">
+            <option value="">Unaffiliated</option>
+            <option value="NEON_SYNDICATE">The Neon Syndicate</option>
+            <option value="OBSIDIAN_ORDER">The Obsidian Order</option>
+            <option value="THE_VOIDBORN">The Voidborn</option>
+        </select>
       </div>
 
       <button type="submit" disabled={isPending || isUploading || !!usernameError}

@@ -65,6 +65,18 @@ Based on the following story content, write a compelling 2-3 sentence synopsis/b
 It should be atmospheric, intriguing, and end on a hook. Do NOT include any preamble — only return the synopsis text itself.
 Story content:
 "${text || context || 'A dark epic story'}"`;
+    } else if (action === "chat") {
+        prompt = `You are SOUL, the AI assistant for the SOULPAD platform, a brutalist, high-impact dark fiction community. 
+Your tone should be helpful but maintain the raw, slightly edgy, and highly atmospheric style of the platform.
+The user is asking a question or chatting. Keep responses concise and engaging.
+User's message:
+"${text}"`;
+    } else if (action === "forge") {
+        prompt = `You are SOUL, the worldbuilding architect of a brutalist dark fiction platform. 
+The author needs you to generate structured lore, a character sheet, or worldbuilding details based on their input.
+Format your response nicely in markdown. Do not include conversational filler, just the requested lore.
+Input:
+"${text}"`;
     } else {
         return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
@@ -80,7 +92,7 @@ Story content:
         } catch (e1: any) {
             console.warn("Gemini 2.0 failed, trying 1.5 pro...");
             try {
-                const response = await ai.models.generateContent({ model: "gemini-1.5-pro", contents: prompt });
+                const response = await ai.models.generateContent({ model: "gemini-1.5-pro-latest", contents: prompt });
                 aiResponseText = response.text || "";
             } catch (e2: any) {
                 console.warn("All Gemini models failed:", e2.message);

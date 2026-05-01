@@ -8,68 +8,10 @@ export const metadata = {
   description: "Join the SOULPAD team. We are building the future of storytelling — come help us shape it.",
 };
 
-const openRoles = [
-  {
-    title: "Content Moderator",
-    department: "Trust & Safety",
-    type: "Full-Time",
-    location: "Remote (India)",
-    description: "Review author submissions, enforce community guidelines, and keep the SOULPAD ecosystem safe and inspiring for all creators.",
-    skills: ["Strong written English", "Attention to detail", "Empathy", "Conflict resolution"],
-    tag: "Hiring",
-    tagColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-  },
-  {
-    title: "Community Manager",
-    department: "Growth",
-    type: "Full-Time",
-    location: "Remote (India)",
-    description: "Grow and engage our author and reader communities on Discord, social media, and within the platform. Be the voice of SOULPAD.",
-    skills: ["Social media fluency", "Event planning", "Creative writing", "Data-driven thinking"],
-    tag: "Hiring",
-    tagColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-  },
-  {
-    title: "Frontend Engineer",
-    department: "Engineering",
-    type: "Full-Time",
-    location: "Remote",
-    description: "Build beautiful, performant interfaces for the next generation of storytelling tools. You will work across the dashboard, reader, and discovery systems.",
-    skills: ["Next.js", "TypeScript", "Tailwind CSS", "Prisma"],
-    tag: "Hiring",
-    tagColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-  },
-  {
-    title: "Creator Partnerships Lead",
-    department: "Monetization",
-    type: "Full-Time",
-    location: "Remote (India)",
-    description: "Identify and onboard high-potential authors into our Creator Program. Manage relationships, track milestones, and champion creator success.",
-    skills: ["Relationship management", "Strong communication", "Love for fiction", "Analytics"],
-    tag: "Hiring",
-    tagColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-  },
-  {
-    title: "Illustrator / Visual Artist",
-    department: "Design",
-    type: "Contract",
-    location: "Remote",
-    description: "Create Noir Manga-style illustrations for platform features, marketing, and editorial content. Bring the SOULPAD aesthetic to life.",
-    skills: ["Digital illustration", "Manga/comic style", "Adobe Suite or Procreate", "High-contrast aesthetics"],
-    tag: "Contract",
-    tagColor: "bg-primary/10 text-primary border-primary/20",
-  },
-  {
-    title: "Editorial Reviewer",
-    department: "Content",
-    type: "Part-Time",
-    location: "Remote",
-    description: "Read and evaluate manuscripts for quality, originality, and platform fit. Provide structured feedback to authors in the monetization pipeline.",
-    skills: ["Deep reading", "Editorial eye", "Written feedback skills", "Genre knowledge"],
-    tag: "Part-Time",
-    tagColor: "bg-purple-400/10 text-purple-400 border-purple-400/20",
-  },
-];
+import { prisma } from "@/lib/prisma";
+
+// We keep values static for the UI
+
 
 const values = [
   { icon: Zap, title: "Velocity", description: "We move fast and iterate constantly. Ideas become live features within days, not quarters." },
@@ -78,7 +20,13 @@ const values = [
   { icon: Shield, title: "Integrity", description: "We build tools that are honest, fair, and built to last. We do not exploit creators. We grow with them." },
 ];
 
-export default function CareersPage() {
+export default async function CareersPage() {
+  // Fetch active jobs from DB
+  const openRoles = await prisma.jobPosting.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: "desc" }
+  });
+
   return (
     <div className="min-h-screen bg-surface flex flex-col">
       <Navbar user={null} />

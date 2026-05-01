@@ -228,10 +228,17 @@ export async function getStoryEngagement(storyId: string, currentProfileId?: str
                     profile: { select: { full_name: true, username: true, avatar_url: true } } 
                 }
             },
+            echoes: {
+                orderBy: { createdAt: "desc" },
+                include: { 
+                    profile: { select: { full_name: true, username: true, avatar_url: true } } 
+                }
+            },
             _count: {
                 select: {
                     likes: true,
-                    comments: { where: { isShadowBanned: false } }
+                    comments: { where: { isShadowBanned: false } },
+                    echoes: true
                 }
             }
         }

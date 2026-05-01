@@ -93,6 +93,8 @@ model Profile {
   notifications        Notification[]
   reviews              Review[]
   badges               Badge[]
+  echoes               Echo[]
+  faction              Faction?
 }
 
 model Story {
@@ -127,6 +129,7 @@ model Story {
   author               Profile          @relation(fields: [authorId], references: [id], onDelete: Cascade)
   readingHistory       ReadingHistory[]
   reviews              Review[]
+  echoes               Echo[]
 }
 
 model Report {
@@ -336,4 +339,59 @@ enum LicenseStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum Faction {
+  NEON_SYNDICATE
+  OBSIDIAN_ORDER
+  THE_VOIDBORN
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWED
+  INTERVIEWING
+  REJECTED
+  HIRED
+}
+
+model Echo {
+  id        String   @id @default(cuid())
+  profileId String
+  storyId   String
+  chapterId String?
+  quote     String   
+  content   String   
+  createdAt DateTime @default(now())
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+}
+
+model JobPosting {
+  id          String   @id @default(cuid())
+  title       String
+  department  String
+  type        String
+  location    String
+  description String
+  skills      String[]
+  tag         String
+  tagColor    String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  applications JobApplication[]
+}
+
+model JobApplication {
+  id            String   @id @default(cuid())
+  jobId         String
+  job           JobPosting @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  applicantName String
+  email         String
+  portfolioUrl  String?
+  resumeUrl     String?
+  coverLetter   String?
+  status        ApplicationStatus @default(PENDING)
+  createdAt     DateTime @default(now())
 }
