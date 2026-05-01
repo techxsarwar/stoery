@@ -1,6 +1,8 @@
 <div align="center">
 
-<img src="./public/logo.png" alt="SOULPAD Logo" width="160" />
+<img src="./public/logo.png" alt="SOULPAD Logo" width="140" />
+
+<br/>
 
 # ⚡ SOULPAD
 
@@ -8,22 +10,24 @@
 
 <br/>
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.2-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-16.2.4-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://typescriptlang.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-AI_Engine-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Prisma-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgresql.org)
-[![Supabase](https://img.shields.io/badge/Supabase-Auth-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
+[![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://prisma.io)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://supabase.com)
+[![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-black?style=for-the-badge&logo=vercel&logoColor=white)](https://stoery.vercel.app)
 
 <br/>
 
-> **"Where stories don't just live — they breathe, burn, and bleed."**  
+> **"Where stories don't just live — they breathe, burn, and bleed."**
+>
 > A premium storytelling platform engineered for writers who demand cinematic quality and readers who crave immersive worlds.
 
 <br/>
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Visit_SOULPAD-FFD700?style=for-the-badge)](https://stoery.vercel.app)
-[![GitHub Stars](https://img.shields.io/github/stars/techxsarwar/stoery?style=for-the-badge&color=FFD700)](https://github.com/techxsarwar/stoery)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-stoery.vercel.app-FFD700?style=for-the-badge)](https://stoery.vercel.app)
+[![GitHub Stars](https://img.shields.io/github/stars/techxsarwar/stoery?style=for-the-badge&color=FFD700&label=⭐_Stars)](https://github.com/techxsarwar/stoery)
+[![License](https://img.shields.io/badge/License-Proprietary-a078ff?style=for-the-badge)](#-license)
 
 </div>
 
@@ -47,11 +51,14 @@
 | **The Resonance Matrix** | ✅ NVIDIA Nemotron | ❌ None | ❌ None | ❌ None |
 | **AI Originality Checker** | ✅ Hermes 405B | ❌ None | ❌ None | ❌ None |
 | **Uncensored Story Continuation** | ✅ Venice AI | ❌ None | ❌ None | ❌ None |
+| **Echoes (Highlighted Quotes)** | ✅ Yes | ❌ No | ❌ No | ❌ No |
+| **Faction System** | ✅ Yes | ❌ No | ❌ No | ❌ No |
 | **Story Licensing System** | ✅ Full | ❌ None | ❌ None | ❌ None |
 | **Reading Streak & Heartbeat** | ✅ Yes | ❌ No | ❌ No | ❌ No |
-| **PiracyGuard Content Protection** | ✅ Yes | ❌ No | ❌ No | ❌ No |
+| **PiracyGuard™ Content Protection** | ✅ Yes | ❌ No | ❌ No | ❌ No |
 | **The Codex (World-building Tool)** | ✅ Yes | ❌ No | ❌ No | ❌ No |
 | **The Nexus (Community Chat)** | ✅ Yes | ❌ No | ❌ No | ❌ No |
+| **Careers & Recruitment Portal** | ✅ Yes | ❌ No | ❌ No | ❌ No |
 | **Brutalist Cinematic Design** | ✅ Yes | ❌ Generic | ❌ Generic | ❌ Generic |
 | **Framer Motion Transitions** | ✅ Yes | ❌ No | ❌ No | ❌ No |
 | **Smooth Scroll (Lenis)** | ✅ Yes | ❌ No | ❌ No | ❌ No |
@@ -60,24 +67,24 @@
 | **Staff Appeal & Moderation System** | ✅ Full | 🟡 Basic | 🟡 Basic | 🟡 Basic |
 | **Reader Badge System** | ✅ Yes | ❌ No | ❌ No | ❌ No |
 | **Multi-chapter Story Structure** | ✅ Yes | ✅ Yes | ✅ Yes | ❌ No |
-| **Cloudflare R2 Media Storage** | ✅ Yes | ❌ No | ❌ No | ❌ No |
+| **Cloudflare R2 / AWS S3 Storage** | ✅ Yes | ❌ No | ❌ No | ❌ No |
 
 ---
 
 ## ✨ Core Features — Deep Dive
 
-### 🧠 1. Multi-Model Neural Engine (OpenRouter + Gemini)
+### 🧠 1. Multi-Model Neural Engine
 
 > **This isn't a ChatGPT wrapper. It's a high-concurrency literary microservice.**
 
-Our AI engine is powered by a custom-built Dynamic Model Router that instantly selects the perfect frontier-tier AI model for the specific creative task at hand:
+A custom-built Dynamic Model Router that instantly selects the perfect frontier-tier AI model for each creative task:
 
-- ⚡ **Auto-Router Failsafe** — 100% uptime architecture. If a primary model experiences high traffic, the system seamlessly auto-routes to `openrouter/free` to guarantee instant generation.
-- ✍️ **Uncensored Story Continuation** — Context-aware, atmosphere-matched story continuation powered by **Venice Uncensored**, allowing for pure, gritty, dark-fantasy prose without safety-filter rejections.
-- 🪄 **Elite Prose Polish** — Elevates your prose using the genius-level **Hermes 3 (405B)**. Fixes grammar and enhances atmosphere without changing the core plot.
-- 🏷️ **Fast Title & Synopsis Generation** — Powered by ultra-fast models to instantly generate compelling 2-3 sentence reader blurbs and 5 cinematic title suggestions.
-- 🛡️ **Originality Checker** — Full plagiarism analysis using Hermes 3: originality score (0–100), verdict, flags, strengths, and publish recommendation.
-- 🌌 **The Resonance Matrix (New!)** — Our proprietary semantic world-building tool powered by **NVIDIA Nemotron Embeddings**. It mathematically analyzes the "vibe" and hidden meanings of your story to match it with readers who crave your exact atmospheric pacing.
+- ⚡ **Auto-Router Failsafe** — 100% uptime architecture with seamless fallback to `openrouter/free`
+- ✍️ **Uncensored Story Continuation** — Context-aware continuation powered by **Venice Uncensored** — pure, gritty dark-fantasy prose without safety-filter rejections
+- 🪄 **Elite Prose Polish** — Powered by genius-level **Hermes 3 (405B)** — elevates prose without changing plot
+- 🏷️ **Title & Synopsis Generation** — Instantly generate compelling 2–3 sentence reader blurbs and 5 cinematic title suggestions
+- 🛡️ **Originality Checker** — Full plagiarism analysis: originality score (0–100), verdict, flags, strengths, and publish recommendation
+- 🌌 **The Resonance Matrix** — Proprietary semantic engine powered by **NVIDIA Nemotron Embeddings** that maps a story's "vibe" into a 4096-dimension vector for atmospheric matching
 
 ---
 
@@ -96,11 +103,12 @@ Our AI engine is powered by a custom-built Dynamic Model Router that instantly s
 
 ### 📖 3. Advanced Reader Experience
 
-- 🚫 **PiracyGuard™** — Anti-copy content protection layer baked into the reader; prevents text selection and screenshotting
-- ⏱️ **Reading Heartbeat** — Passive server pings track your reading time in real time, updated to your profile
+- 🚫 **PiracyGuard™** — Anti-copy content protection; prevents text selection and screen capture
+- ⏱️ **Reading Heartbeat** — Passive server pings track reading time in real-time per user
 - 📈 **Reading Streaks** — Daily reading streaks and longest-streak records tracked per user
 - 🔖 **Scroll Progress Sync** — Your exact scroll position in every chapter is saved and resumed automatically
-- 📚 **Distraction-Free Mode** — High-contrast typography-focused reading interface using `Newsreader` serif font
+- 💬 **Echoes** — Readers can highlight a quote from any chapter and add their personal reflection — like a literary bookmark meets marginalia
+- 📚 **Distraction-Free Mode** — High-contrast `Newsreader` serif typography for deep reading
 - 🔔 **Smart Notifications** — In-app notifications for new chapters, badge earnings, license approvals, and comment replies
 
 ---
@@ -109,10 +117,10 @@ Our AI engine is powered by a custom-built Dynamic Model Router that instantly s
 
 - 🖊️ **TipTap Rich Editor v3** — Block-based, extensible writing editor with full formatting support
 - 🤖 **Inline AI Toolbar** — Continue, polish, generate titles and synopses without leaving the editor
-- 📋 **Multi-Chapter Management** — Organize stories into ordered chapters with individual titles and content
-- 🖼️ **AWS S3 Cover Uploads** — Directly upload high-res story covers to AWS S3; no third-party image hosting
-- 📊 **Story Dashboard** — View reads, likes, and status (Published / Paused / Draft) per story
-- 🛡️ **Originality Report** — Run a full AI plagiarism check before publishing, with a score and structured flags
+- 📋 **Multi-Chapter Management** — Organize stories into ordered chapters with individual titles
+- 🖼️ **AWS S3 Cover Uploads** — Directly upload high-res story covers to AWS S3
+- 📊 **Story Dashboard** — View reads, likes, and status (`PUBLISHED` / `PAUSED` / `DRAFT`) per story
+- 🛡️ **Originality Report** — Run a full AI plagiarism check before publishing with a score and structured flags
 
 ---
 
@@ -123,7 +131,7 @@ Our AI engine is powered by a custom-built Dynamic Model Router that instantly s
 - 📦 **Categorized Entries** — Create lore entries for Characters, Locations, Events, Magic Systems, and more
 - 🔒 **Private by Default** — Entries are hidden from readers; only you see your world-building notes
 - 🖼️ **Image Support** — Attach reference images to any Codex entry
-- 🔗 **Linked to Stories** — Each Codex lives in context of your author profile
+- 🔗 **Linked to Author Profile** — Each Codex lives in context of your creative identity
 
 ---
 
@@ -137,99 +145,123 @@ Our AI engine is powered by a custom-built Dynamic Model Router that instantly s
 
 ---
 
-### 📜 7. Story Licensing System
+### ⚔️ 7. Factions — Community Identity
+
+> **Choose your allegiance. Join a faction. Define your place in the SOULPAD universe.**
+
+- 🔴 **Neon Syndicate** — Cyberpunk rebels who bend the rules of prose
+- ⚫ **Obsidian Order** — Dark fantasy devotees who craft shadow and lore
+- 🌌 **The Voidborn** — Cosmic horror and sci-fi dreamers who write at the edge of reality
+
+Each faction is a badge of identity displayed on your author profile, giving the platform community a sense of tribal belonging and narrative allegiance.
+
+---
+
+### 📜 8. Story Licensing System
 
 > **No other story platform offers this. SOULPAD does.**
 
-- 📃 **License Applications** — Authors can formally license their stories with legal name, license type, and details
-- 🔢 **Unique License Numbers** — Each approved license gets a unique, permanent license number
-- ⚖️ **Staff Review Pipeline** — Internal staff team reviews, approves, or rejects licensing requests
+- 📃 **License Applications** — Authors formally license their stories with legal name, license type, and details
+- 🔢 **Unique License Numbers** — Each approved license gets a permanent, unique license number
+- ⚖️ **Staff Review Pipeline** — Internal staff reviews, approves, or rejects licensing requests
 - 🔐 **IP Protection** — Establishes an on-platform legal record for your intellectual property
 
 ---
 
-### 👑 8. Author Monetization
+### 👑 9. Author Monetization
 
-- 💰 **Monetization Pipeline** — Apply for monetization with bank details, PAN, and legal name verification
-- 📊 **Status Tracking** — Real-time monetization status: `NONE → ELIGIBLE → APPLIED → APPROVED`
-- 👶 **Guardian Approval** — Underage authors require guardian approval for monetization
-- 🏦 **Bank Account Management** — Securely store account holder name, account number, and IFSC code
-
----
-
-### 🛡️ 9. Moderation & Safety
-
-- 🚩 **Story Reporting** — Readers can report stories with typed reasons and detailed descriptions
-- ⛔ **Story Banning** — Staff can ban stories temporarily or permanently with reasons and expiry dates
-- 📢 **Author Appeals** — Banned authors can submit appeals; staff can Accept or Reject with tracked status
-- 👻 **Shadow Banning** — Toxic comments can be shadow-banned (visible only to the commenter)
-- 👨‍💼 **Role System** — Four-tier role system: `AUTHOR`, `EMPLOYEE`, `MANAGER`, `ADMIN`
+- 💰 **Monetization Pipeline** — Apply with bank details, PAN, and legal name verification
+- 📊 **Status Tracking** — Real-time progression: `NONE → ELIGIBLE → APPLIED → APPROVED → REJECTED`
+- 👶 **Guardian Approval** — Underage authors require guardian confirmation for monetization
+- 🏦 **Bank Account Management** — Securely stores account holder name, account number, and IFSC code
 
 ---
 
-### 🏅 10. Badges & Gamification
+### 🛡️ 10. Moderation & Safety
+
+- 🚩 **Story Reporting** — Readers report stories with typed reasons and detailed descriptions
+- ⛔ **Story Banning** — Staff bans stories temporarily or permanently with reasons and expiry dates
+- 📢 **Author Appeals** — Banned authors submit appeals; staff tracks `SUBMITTED → ACCEPTED / REJECTED`
+- 👻 **Shadow Banning** — Toxic comments are shadow-banned (visible only to the commenter)
+- 👨‍💼 **Role System** — Four-tier access: `AUTHOR`, `EMPLOYEE`, `MANAGER`, `ADMIN`
+
+---
+
+### 🏅 11. Badges & Gamification
 
 - 🏆 **Achievement Badges** — Earn badges like `SCHOLAR_OF_VOID`, `FIRST_BLOOD`, and more for platform milestones
-- 📅 **Reading Streaks** — Track daily and longest-ever reading streaks
-- ⭐ **Story Reviews** — Structured 1–5 star reviews with title and content per story (one per user)
+- 📅 **Reading Streaks** — Daily and longest-ever streaks tracked and displayed
+- ⭐ **Story Reviews** — Structured 1–5 star reviews with title and content (one per user, per story)
 - 📖 **Reading History** — Full reading history with scroll progress preserved per story
 
 ---
 
-### 🌌 11. The Resonance Matrix — Semantic Discovery
+### 🌌 12. The Resonance Matrix — Semantic Discovery
 
 > **The world's first atmosphere-based story recommendation engine.**
 
-- 🧬 **NVIDIA Nemotron Embeddings** — Each story is mathematically analyzed into a 4096-dimension "vibe vector" capturing its atmosphere, pacing, and emotional depth
-- ✨ **One-Click Mapping** — Authors click **Map Resonance** on their story card to instantly generate and save their story's resonance fingerprint to the database
-- 🎯 **Precision Matching** — The engine finds readers who have loved stories with a mathematically similar atmosphere — even across completely different genres
-- 💾 **Persistent Vectors** — Resonance data is stored directly on the `Story` model (`resonanceVector Float[]`, `resonanceMappedAt DateTime`) in PostgreSQL
-- 🔄 **Auto-Router Failsafe** — Powered by a dedicated embedding API at `/api/ai/embed` with full DB persistence and error recovery
+- 🧬 **NVIDIA Nemotron Embeddings** — Each story is mathematically mapped into a 4096-dimension "vibe vector" capturing atmosphere, pacing, and emotional depth
+- ✨ **One-Click Mapping** — Authors click **Map Resonance** on their story card to instantly generate and persist their resonance fingerprint
+- 🎯 **Precision Matching** — Finds readers who have loved stories with a mathematically similar atmosphere — even across different genres
+- 💾 **Persistent Vectors** — Stored directly on the `Story` model (`resonanceVector Float[]`, `resonanceMappedAt DateTime`) in PostgreSQL
+- 🔄 **Auto-Router Failsafe** — Dedicated embedding API at `/api/ai/embed` with full DB persistence and error recovery
 
 ---
 
-### 🔍 12. Discovery Engine
+### 🔍 13. Discovery Engine
 
 - 🏷️ **Genre Filtering** — Browse by Sci-Fi, Fantasy, Mystery, Romance, Horror, and more
 - 🔥 **Trending Stories** — Real-time tracking of global reads and likes to surface hot content
 - 🆕 **New Arrivals** — Discover freshly published stories from the community
-- 🔎 **Search** — Full-text story search across title, genre, and author
+- 🔎 **Full-Text Search** — Search across title, genre, and author
 - 🌌 **Resonance-Based Recommendations** *(coming soon)* — "Similar Vibes" carousel powered by semantic vector similarity
 
 ---
 
-### 👤 12. Author Profiles
+### 👤 14. Author Profiles
 
 - ✅ **Verified Chronicler Badge** — Verified authors get a special badge displayed on their profile
+- ⚔️ **Faction Display** — Your chosen faction (`NEON_SYNDICATE` / `OBSIDIAN_ORDER` / `THE_VOIDBORN`) is shown prominently
 - 👥 **Follow System** — Follow authors; view follower and following counts
 - 📰 **Author Posts** — Share blog-style posts and story updates with your followers
 - 🖼️ **Pen Name & Avatar** — Full custom identity separate from your account email
 
 ---
 
+### 💼 15. Careers & Recruitment Portal
+
+> **SOULPAD is building a team. Apply directly from within the platform.**
+
+- 📋 **Job Postings** — Dynamic, database-driven job listings with department, type, location, and required skills
+- 📬 **In-Platform Applications** — Applicants submit name, email, portfolio URL, resume URL, and cover letter directly
+- 🔄 **Application Pipeline** — Staff tracks candidates through `PENDING → REVIEWED → INTERVIEWING → HIRED / REJECTED`
+- 👨‍💼 **Admin Recruitment Dashboard** — Internal HR panel to review, filter, and manage all job applications in real-time
+
+---
+
 ## 🛠️ Technical Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      SOULPAD PLATFORM                       │
-├──────────────────────┬──────────────────────────────────────┤
-│   FRONTEND           │   AI NEURAL ENGINE                   │
-│   Next.js 16.2       │   Dynamic Model Router               │
-│   React 19           │   Venice Uncensored (Continue)       │
-│   TypeScript 5       │   Hermes 3 405B (Edit/Originality)   │
-│   Turbopack          │   openrouter/free (Failsafe)         │
-├──────────────────────┼──────────────────────────────────────┤
-│   RESONANCE MATRIX   │   AUTH                               │
-│   NVIDIA Nemotron    │   Supabase Auth                      │
-│   4096-dim Vectors   │   NextAuth.js v4                     │
-│   Float[] in PG      │   Multi-Provider SSO                 │
-├──────────────────────┼──────────────────────────────────────┤
-│   DATABASE           │   DESIGN SYSTEM                      │
-│   PostgreSQL         │   Vanilla CSS + Tailwind v4          │
-│   Prisma ORM v6      │   Space Grotesk + Newsreader         │
-│   21 Models          │   Framer Motion v12                  │
-│   Cloudflare R2      │   Lenis Smooth Scroll                │
-└──────────────────────┴──────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        SOULPAD PLATFORM                         │
+├───────────────────────┬─────────────────────────────────────────┤
+│   FRONTEND            │   AI NEURAL ENGINE                      │
+│   Next.js 16.2.4      │   Dynamic Model Router (OpenRouter)     │
+│   React 19            │   Venice Uncensored (Continue)          │
+│   TypeScript 5        │   Hermes 3 405B (Edit / Originality)    │
+│   Turbopack           │   openrouter/free (Auto-Failsafe)       │
+├───────────────────────┼─────────────────────────────────────────┤
+│   RESONANCE MATRIX    │   AUTH                                  │
+│   NVIDIA Nemotron     │   Supabase Auth + SSR                   │
+│   4096-dim Vectors    │   NextAuth.js v4                        │
+│   Float[] in PG       │   Multi-Provider SSO                    │
+├───────────────────────┼─────────────────────────────────────────┤
+│   DATABASE            │   DESIGN SYSTEM                         │
+│   PostgreSQL          │   Vanilla CSS + Tailwind v4             │
+│   Prisma ORM v6       │   Space Grotesk + Newsreader            │
+│   23 Models           │   Framer Motion v12                     │
+│   AWS S3 Storage      │   Lenis Smooth Scroll                   │
+└───────────────────────┴─────────────────────────────────────────┘
 ```
 
 | Layer | Technology | Version | Purpose |
@@ -237,17 +269,18 @@ Our AI engine is powered by a custom-built Dynamic Model Router that instantly s
 | **Frontend Framework** | Next.js | `16.2.4` | SSR, Edge delivery, App Router |
 | **UI Library** | React | `19.2.4` | Component rendering |
 | **Language** | TypeScript | `^5` | End-to-end type safety |
-| **AI Microservice** | FastAPI + Gunicorn | Latest | High-concurrency AI streaming |
-| **AI Model** | Google Gemini | `2.0-flash` / `1.5-pro` | Story generation & analysis |
+| **AI (Text)** | Google Gemini / OpenRouter | `gemini-2.0-flash` | Story generation & analysis |
+| **AI (Embeddings)** | NVIDIA Nemotron | via OpenRouter | Resonance Matrix vectors |
 | **Database** | PostgreSQL | Latest | Persistent relational storage |
 | **ORM** | Prisma | `^6.19.3` | Type-safe DB queries & migrations |
-| **Auth** | Supabase + NextAuth | `^0.10.2` | Secure multi-provider auth |
-| **Storage** | AWS S3 SDK | `^3.1032.0` | Media file storage |
+| **Auth** | Supabase + NextAuth | `^0.10.2` / `^4.24.14` | Secure multi-provider auth |
+| **Storage** | AWS S3 SDK | `^3.1032.0` | Story cover & media storage |
 | **Rich Text Editor** | TipTap | `^3.22.4` | Story writing editor |
 | **Animations** | Framer Motion | `^12.38.0` | Page transitions & UI animations |
 | **Scroll Physics** | Lenis | `^1.3.23` | Smooth momentum scrolling |
 | **Icons** | Lucide React | `^1.8.0` | UI iconography |
 | **Content Security** | DOMPurify | `^3.4.1` | XSS sanitization for story HTML |
+| **Tooltips** | Radix UI | `^1.2.8` | Accessible tooltip primitives |
 
 ---
 
@@ -259,7 +292,7 @@ Our AI engine is powered by a custom-built Dynamic Model Router that instantly s
 
 | Token | Value | Usage |
 |:---|:---|:---|
-| `surface` | `#131315` | Base page background (deep charcoal, not flat black) |
+| `surface` | `#131315` | Base page background (deep charcoal) |
 | `surface_container_low` | `#1c1b1d` | Secondary sections, sidebars |
 | `surface_container_high` | `#2a2a2c` | Cards, interactive elements |
 | `surface_container_highest` | `#353437` | Active / elevated elements |
@@ -277,7 +310,7 @@ Our AI engine is powered by a custom-built Dynamic Model Router that instantly s
 
 ### Design Principles
 
-- 🚫 **No 1px Borders** — Structure is defined through background color shifts, not lines
+- 🚫 **No 1px Borders** — Structure defined through background color shifts, not borders
 - 🌫️ **Frosted Glass** — Navbars and modals use `backdrop-filter: blur(20px)` at 60% opacity
 - 🌊 **Tonal Layering** — Depth through background shifts, not drop shadows on cards
 - ⚡ **Glow Effects** — Primary interactive elements emit `0 0 15px` ambient purple glow
@@ -295,7 +328,7 @@ stoery/
 │   │   ├── about/              # About SOULPAD page
 │   │   ├── auth/               # Login & Registration flows
 │   │   ├── author/             # Author public profile pages
-│   │   ├── careers/            # Careers at SOULPAD
+│   │   ├── careers/            # Careers portal & job applications
 │   │   ├── changelog/          # Platform changelog
 │   │   ├── community/          # The Nexus community hub
 │   │   ├── contact/            # Contact page
@@ -304,6 +337,7 @@ stoery/
 │   │   ├── faq/                # FAQ page
 │   │   ├── feed/               # Personalized story feed
 │   │   ├── guide/              # Platform guide & tutorials
+│   │   ├── guidelines/         # Community guidelines
 │   │   ├── library/            # Reader's personal library
 │   │   ├── manager/            # Story & chapter management
 │   │   ├── monetization/       # Monetization application
@@ -324,7 +358,7 @@ stoery/
 │   ├── main.py                 # FastAPI AI Engine
 │   └── requirements.txt        # Python dependencies
 ├── prisma/
-│   └── schema.prisma           # Full database schema (20 models)
+│   └── schema.prisma           # Full database schema (23 models)
 └── public/
     ├── logo.png                # SOULPAD brand logo
     ├── og-banner.png           # Open Graph banner
@@ -333,28 +367,39 @@ stoery/
 
 ---
 
-## 🗄️ Database Models
+## 🗄️ Database Schema — 23 Models
 
 ```
 User ──── Profile ──┬── Story ──── Chapter
+                    │          └── Echo (reader quote reflections)
                     ├── Like
                     ├── Comment (shadow-ban support)
-                    ├── CodexEntry (world-building)
-                    ├── NexusMessage (community)
+                    ├── CodexEntry (private world-building)
+                    ├── NexusMessage (community hub)
                     ├── License (IP protection)
                     ├── Follow (follower system)
                     ├── AuthorPost ──── PostLike
                     ├── ReadingHistory (scroll progress)
-                    ├── Notification
-                    ├── Review (1-5 star)
-                    └── Badge (gamification)
+                    ├── Notification (smart alerts)
+                    ├── Review (1–5 star structured reviews)
+                    ├── Badge (gamification milestones)
+                    └── Faction (NEON_SYNDICATE / OBSIDIAN_ORDER / THE_VOIDBORN)
 
-Story ──── Report (moderation)
-       ──── License (IP)
+Story ──── Report (moderation & appeals)
+       ──── License (IP registration)
        ──── ReadingHistory
+
+JobPosting ──── JobApplication (careers portal)
 ```
 
-**20 database models** covering the full platform: authentication, content, social, monetization, moderation, licensing, and gamification.
+| Category | Models | Count |
+|:---|:---|:---:|
+| **Auth** | Account, Session, User, VerificationToken | 4 |
+| **Content** | Profile, Story, Chapter, CodexEntry | 4 |
+| **Social** | Like, Comment, Follow, AuthorPost, PostLike, NexusMessage | 6 |
+| **Reader** | ReadingHistory, Notification, Review, Badge, Echo | 5 |
+| **Platform** | License, Report, JobPosting, JobApplication | 4 |
+| **Total** | | **23** |
 
 ---
 
@@ -366,7 +411,7 @@ Story ──── Report (moderation)
 - Python `^3.10`
 - PostgreSQL database (or Supabase project)
 - AWS S3 bucket
-- Google Gemini API key
+- Google Gemini API key / OpenRouter API key
 
 ### 1. Clone the Repository
 
@@ -416,12 +461,12 @@ Create `.env` in the `backend/` directory:
 
 ```env
 GEMINI_API_KEY="your-gemini-api-key"
+OPENROUTER_API_KEY="your-openrouter-key"
 ```
 
 ### 4. Database Setup
 
 ```bash
-# Generate Prisma client and push schema
 npx prisma generate
 npx prisma db push
 ```
@@ -443,20 +488,23 @@ Visit **http://localhost:3000** 🎉
 
 ## 🌐 Deployment
 
-### Frontend (Vercel)
+### Frontend → Vercel
 
 ```bash
-npm run build    # prisma generate + next build
+npm run build    # runs: prisma generate && next build
 ```
 
-Set all environment variables in Vercel project settings.
+Set all environment variables in your Vercel project settings. The build script automatically generates the Prisma client before bundling.
 
-### AI Backend (Render)
+### AI Backend → Render
 
 Configure as a **Web Service** on Render:
-- **Build Command**: `pip install -r requirements.txt`
-- **Start Command**: `gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app`
-- **Environment**: Add `GEMINI_API_KEY`
+
+| Setting | Value |
+|:---|:---|
+| **Build Command** | `pip install -r requirements.txt` |
+| **Start Command** | `gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app` |
+| **Environment Variable** | `GEMINI_API_KEY`, `OPENROUTER_API_KEY` |
 
 ---
 
@@ -466,17 +514,17 @@ We welcome contributions! Here's how:
 
 1. Fork the repository
 2. Create your branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'feat: add amazing feature'`
-4. Push: `git push origin feature/amazing-feature`
+3. Commit your changes: `git commit -m 'feat: add amazing feature'`
+4. Push to your branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
 
-Please follow the existing **Cinematic Codex** design language when contributing UI changes.
+> ⚠️ Please follow the existing **Cinematic Codex** design language when contributing UI changes. No plain whites, no default blues, no compromise on aesthetics.
 
 ---
 
 ## 📜 License
 
-This project is proprietary. All stories published on SOULPAD remain the intellectual property of their respective authors. The platform's story licensing system provides formal IP protection records.
+This project is proprietary software. All stories published on SOULPAD remain the intellectual property of their respective authors. The platform's on-platform licensing system provides formal IP protection records for every published work.
 
 ---
 
@@ -494,7 +542,7 @@ This project is proprietary. All stories published on SOULPAD remain the intelle
 
 <div align="center">
 
-<img src="./public/logo.png" alt="SOULPAD" width="80" />
+<img src="./public/logo.png" alt="SOULPAD" width="72" />
 
 <br/>
 
@@ -506,6 +554,7 @@ This project is proprietary. All stories published on SOULPAD remain the intelle
 
 [![Next.js](https://img.shields.io/badge/Powered_by-Next.js_16-black?style=flat-square&logo=next.js)](https://nextjs.org)
 [![Gemini](https://img.shields.io/badge/AI-Google_Gemini-4285F4?style=flat-square&logo=google)](https://ai.google.dev)
+[![OpenRouter](https://img.shields.io/badge/AI-OpenRouter-FF6B35?style=flat-square)](https://openrouter.ai)
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed_on-Vercel-black?style=flat-square&logo=vercel)](https://vercel.com)
 
 </div>
