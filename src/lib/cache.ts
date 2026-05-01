@@ -164,7 +164,7 @@ export const getMasterpieceStories = unstable_cache(
 export const getRecentReviews = unstable_cache(
   async () => {
     return prisma.review.findMany({
-      take: 6,
+      take: 18,
       orderBy: { createdAt: "desc" },
       where: { rating: { gte: 4 }, story: { status: "PUBLISHED", isBanned: false } },
       include: {
@@ -229,9 +229,22 @@ export const getNowReading = unstable_cache(
   { revalidate: 60 }
 );
 
+export const getFactionStats = unstable_cache(
+  async () => {
+    return prisma.profile.groupBy({
+      by: ["faction"],
+      _count: { id: true },
+      where: { faction: { not: null } },
+    });
+  },
+  ["faction-stats"],
+  { revalidate: 1800 }
+);
+
 export const getAuthorSpotlights = unstable_cache(
   async () => {
-    return prisma.profile.findMany({
+    // Fetch top authors by follower count with published stories
+    const authors = await prisma.profile.findMany({
       take: 3,
       where: {
         stories: { some: { status: "PUBLISHED", isBanned: false } },
@@ -247,10 +260,15 @@ export const getAuthorSpotlights = unstable_cache(
         isVerified: true,
         faction: true,
         _count: { select: { followers: true, stories: true } },
-        stories: {
-          take: 1,
-          where: { status: "PUBLISHED", isBanned: false },
-          orderBy: { likes: { _count: "desc" } },
+      },
+    });
+
+    // For each author, fetch their top story by reads (simple field sort — no relation sort)
+    const spotlights = await Promise.all(
+      authors.map(async (author) => {
+        const topStory = await prisma.story.findFirst({
+          where: { authorId: author.id, status: "PUBLISHED", isBanned: false },
+          orderBy: { reads: "desc" },
           select: {
             id: true,
             title: true,
@@ -261,9 +279,12 @@ export const getAuthorSpotlights = unstable_cache(
             createdAt: true,
             _count: { select: { likes: true, chapters: true } },
           },
-        },
-      },
-    });
+        });
+        return { ...author, topStory };
+      })
+    );
+
+    return spotlights.filter((a) => a.topStory !== null);
   },
   ["author-spotlights"],
   { revalidate: 3600 }

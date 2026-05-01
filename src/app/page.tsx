@@ -24,7 +24,8 @@ import {
   getEchoOfTheDay,
   getStreakLeaderboard,
   getNowReading,
-  getAuthorSpotlights
+  getAuthorSpotlights,
+  getFactionStats
 } from "@/lib/cache";
 
 async function HomeContent() {
@@ -43,7 +44,8 @@ async function HomeContent() {
     echoOfTheDay,
     streakLeaderboard,
     nowReading,
-    authorSpotlights
+    authorSpotlights,
+    factionStats
   ] = await Promise.all([
     supabase.auth.getUser(),
     getRecentStories(),
@@ -57,26 +59,23 @@ async function HomeContent() {
     getEchoOfTheDay(),
     getStreakLeaderboard(),
     getNowReading(),
-    getAuthorSpotlights()
+    getAuthorSpotlights(),
+    getFactionStats()
   ]);
 
   const { totalStories, totalAuthors, totalReads } = stats;
 
-  const factionStats = await prisma.profile.groupBy({
-      by: ['faction'],
-      _count: { id: true },
-      where: { faction: { not: null } }
-  });
-
+  // Fetch user-specific data — profile first, then history in parallel
   let recentHistory = null;
   let userFaction: string | null = null;
   if (user) {
-    const profile = await prisma.profile.findFirst({
-        where: { user: { email: user.email } },
+    const profile = await prisma.profile.findUnique({
+        where: { userId: user.id },
         select: { id: true, faction: true }
     });
     if (profile) {
         userFaction = profile.faction;
+        // readingHistory can now run — no second sequential lookup needed
         recentHistory = await prisma.readingHistory.findFirst({
             where: { profileId: profile.id },
             orderBy: { lastReadAt: "desc" },
@@ -184,6 +183,7 @@ async function HomeContent() {
                         src={recentHistory.story.cover_url || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"}
                         alt="Cover"
                         fill
+                        sizes="(max-width: 768px) 128px, 128px"
                         loading="lazy"
                         className="object-cover"
                     />
@@ -280,8 +280,8 @@ async function HomeContent() {
             </div>
 
             <div className="flex flex-col gap-0 border-4 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-              {authorSpotlights.map((author, i) => {
-                const story = author.stories[0];
+              {authorSpotlights.map((author: any, i: number) => {
+                const story = author.topStory;
                 if (!story) return null;
 
                 const factionLabel: Record<string, { label: string; color: string }> = {
@@ -306,6 +306,7 @@ async function HomeContent() {
                         src={story.cover_url || `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop`}
                         alt={story.title}
                         fill
+                        sizes="(max-width: 768px) 100vw, 288px"
                         className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
                       />
                       {/* Genre badge */}
@@ -501,16 +502,29 @@ async function HomeContent() {
           </section>
         )}
 
-        {/* Community Reviews Section */}
+        {/* Community Reviews Section - Animated 3-Column Marquee */}
         {recentReviews.length > 0 && (
-            <section className="w-full">
-                <div className="flex items-center gap-4 mb-12">
-                    <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">Voices from the Nexus</h2>
-                    <div className="flex-grow h-1 bg-on-surface-variant/20"></div>
+            <section className="w-full h-[800px] overflow-hidden relative border-y-8 border-on-surface bg-surface-container my-24">
+                <div className="absolute top-0 inset-x-0 h-32 z-10 pointer-events-none bg-gradient-to-b from-surface-container to-transparent"></div>
+                <div className="absolute bottom-0 inset-x-0 h-32 z-10 pointer-events-none bg-gradient-to-t from-surface-container to-transparent"></div>
+                
+                <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
+                    <div className="bg-surface-container/90 backdrop-blur-sm px-8 py-6 border-8 border-on-surface shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] -rotate-2">
+                        <h2 className="font-headline text-5xl md:text-7xl font-black text-on-surface uppercase tracking-tight text-center leading-none">
+                            Voices from <br/> the Nexus
+                        </h2>
+                    </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {recentReviews.map(review => (
-                        <div key={review.id} className="bg-surface-container border-4 border-on-surface p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_var(--color-primary)] transition-all duration-300 flex flex-col gap-4">
+
+                {(() => {
+                    const col1 = recentReviews.filter((_, i) => i % 3 === 0);
+                    const col2 = recentReviews.filter((_, i) => i % 3 === 1);
+                    const col3 = recentReviews.filter((_, i) => i % 3 === 2);
+                    
+                    const repeat = (arr: typeof recentReviews) => [...arr, ...arr, ...arr];
+
+                    const ReviewCard = ({ review }: { review: typeof recentReviews[0] }) => (
+                        <div className="bg-white border-4 border-on-surface p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-4 mx-4">
                             <div className="flex justify-between items-start">
                                 <div className="flex text-brand_yellow">
                                     {Array.from({ length: 5 }).map((_, i) => (
@@ -524,17 +538,31 @@ async function HomeContent() {
                             <div className="mt-4 pt-4 border-t-2 border-on-surface/10 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="w-8 h-8 rounded-full border-2 border-on-surface overflow-hidden bg-primary/20 relative">
-                                        <Image src={review.profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.profile.username || review.profile.full_name}`} alt="Avatar" fill unoptimized className="object-cover" />
+                                        <Image src={review.profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.profile.username || review.profile.full_name}`} alt="Avatar" fill sizes="32px" className="object-cover" />
                                     </div>
                                     <span className="font-headline text-xs font-black uppercase text-on-surface">{review.profile.full_name || review.profile.username}</span>
                                 </div>
-                                <Link href={`/read/${review.storyId}`} className="font-label text-[10px] font-bold uppercase tracking-widest text-primary hover:underline max-w-[120px] truncate text-right">
+                                <span className="font-label text-[10px] font-bold uppercase tracking-widest text-primary max-w-[120px] truncate text-right">
                                     on {review.story.title}
-                                </Link>
+                                </span>
                             </div>
                         </div>
-                    ))}
-                </div>
+                    );
+
+                    return (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 h-[250%] -mt-[20%] w-[110%] -ml-[5%] rotate-1">
+                            <div className="flex flex-col gap-8 animate-marquee-vertical-reverse pt-24">
+                                {repeat(col1).map((review, i) => <ReviewCard key={`${review.id}-${i}`} review={review} />)}
+                            </div>
+                            <div className="hidden md:flex flex-col gap-8 animate-marquee-vertical">
+                                {repeat(col2).map((review, i) => <ReviewCard key={`${review.id}-${i}`} review={review} />)}
+                            </div>
+                            <div className="hidden lg:flex flex-col gap-8 animate-marquee-vertical-reverse pt-48">
+                                {repeat(col3).map((review, i) => <ReviewCard key={`${review.id}-${i}`} review={review} />)}
+                            </div>
+                        </div>
+                    );
+                })()}
             </section>
         )}
 

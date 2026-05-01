@@ -40,6 +40,23 @@
   --font-headline: var(--font-space-grotesk);
   --font-body: var(--font-newsreader);
   --font-label: var(--font-inter);
+
+  --animate-marquee: marquee 25s linear infinite;
+  --animate-marquee-vertical: marquee-vertical 25s linear infinite;
+  --animate-marquee-vertical-reverse: marquee-vertical-reverse 25s linear infinite;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes marquee-vertical {
+    from { transform: translateY(0); }
+    to { transform: translateY(-50%); }
+  }
+  @keyframes marquee-vertical-reverse {
+    from { transform: translateY(-50%); }
+    to { transform: translateY(0); }
+  }
 }
 
 @utility glow-hover {
