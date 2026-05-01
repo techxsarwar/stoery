@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import CareerApplicationClient from "./CareerApplicationClient";
 import { Suspense } from "react";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Apply | SOULPAD Careers",
   description: "Submit your application to join the SOULPAD team.",
