@@ -12,12 +12,12 @@ import HorizontalCarousel from "@/components/HorizontalCarousel";
 import StoryCard from "@/components/StoryCard";
 import AnimatedFeatures from "@/components/AnimatedFeatures";
 import AIChatHelper from "@/components/AIChatHelper";
-import { 
-  getRecentStories, 
-  getTrendingStories, 
-  getFantasyStories, 
-  getPlatformStats, 
-  getTopAuthors, 
+import {
+  getRecentStories,
+  getTrendingStories,
+  getFantasyStories,
+  getPlatformStats,
+  getTopAuthors,
   getGenres,
   getMasterpieceStories,
   getRecentReviews,
@@ -30,7 +30,7 @@ import {
 
 async function HomeContent() {
   const supabase = await createClient();
-  
+
   const [
     { data: { user } },
     recentStories,
@@ -70,17 +70,17 @@ async function HomeContent() {
   let userFaction: string | null = null;
   if (user) {
     const profile = await prisma.profile.findUnique({
-        where: { userId: user.id },
-        select: { id: true, faction: true }
+      where: { userId: user.id },
+      select: { id: true, faction: true }
     });
     if (profile) {
-        userFaction = profile.faction;
-        // readingHistory can now run — no second sequential lookup needed
-        recentHistory = await prisma.readingHistory.findFirst({
-            where: { profileId: profile.id },
-            orderBy: { lastReadAt: "desc" },
-            include: { story: { include: { author: true } } }
-        });
+      userFaction = profile.faction;
+      // readingHistory can now run — no second sequential lookup needed
+      recentHistory = await prisma.readingHistory.findFirst({
+        where: { profileId: profile.id },
+        orderBy: { lastReadAt: "desc" },
+        include: { story: { include: { author: true } } }
+      });
     }
   }
 
@@ -89,9 +89,9 @@ async function HomeContent() {
       {/* Hero Section - Pure Wattpad Vibe */}
       <section className="relative min-h-[60vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden border-b-8 border-on-surface">
         <div className="absolute inset-0 z-0">
-          <Image 
-            src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=2070&auto=format&fit=crop" 
-            alt="Hero Background" 
+          <Image
+            src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=2070&auto=format&fit=crop"
+            alt="Hero Background"
             fill
             priority
             className="object-cover grayscale opacity-40"
@@ -100,53 +100,53 @@ async function HomeContent() {
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center flex flex-col items-center">
-            <div className="inline-block px-4 py-1 bg-primary text-on-primary font-headline text-xs font-black uppercase tracking-[0.3em] mb-8 border-2 border-on-surface transform -rotate-1">
-                The New Era of Storytelling
-            </div>
-            <h1 className="font-headline text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter text-on-surface mb-8 leading-[0.85] uppercase">
-                Where Stories <br/> Come <span className="text-primary">Alive</span>
-            </h1>
-            <p className="font-body text-xl md:text-2xl text-on-surface-variant max-w-2xl mb-12 italic leading-relaxed">
-                Join millions of readers and writers. Share your voice, build your universe, and find your next favorite obsession.
-            </p>
-            
-            <form action="/discover" method="GET" className="w-full max-w-2xl mb-12 relative group">
-                <input 
-                    name="q"
-                    type="text" 
-                    placeholder="Search for stories, authors, or genres..." 
-                    className="w-full bg-white border-4 border-on-surface px-8 py-5 font-headline text-lg focus:outline-none focus:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all placeholder:text-on-surface-variant/50"
-                />
-                <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 bg-on-surface text-surface p-2 cursor-pointer hover:bg-primary hover:text-on-primary transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </button>
-            </form>
+          <div className="inline-block px-4 py-1 bg-primary text-on-primary font-headline text-xs font-black uppercase tracking-[0.3em] mb-8 border-2 border-on-surface transform -rotate-1">
+            The New Era of Storytelling
+          </div>
+          <h1 className="font-headline text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter text-on-surface mb-8 leading-[0.85] uppercase">
+            Where Stories <br /> Come <span className="text-primary">Alive</span>
+          </h1>
+          <p className="font-body text-xl md:text-2xl text-on-surface-variant max-w-2xl mb-12 italic leading-relaxed">
+            Join millions of readers and writers. Share your voice, build your universe, and find your next favorite obsession.
+          </p>
 
-            <div className="flex flex-col sm:flex-row gap-6">
-                <Link href="/discover" className="bg-primary text-on-primary font-headline text-xl px-12 py-5 border-4 border-on-surface hover:translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all duration-300 uppercase tracking-wider font-black">
-                    Start Reading
-                </Link>
-                {!user && (
-                    <Link href="/auth/signup" className="bg-white text-on-surface border-4 border-on-surface font-headline text-xl px-12 py-5 hover:translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all duration-300 uppercase tracking-wider font-black">
-                        Start Writing
-                    </Link>
-                )}
-            </div>
+          <form action="/discover" method="GET" className="w-full max-w-2xl mb-12 relative group">
+            <input
+              name="q"
+              type="text"
+              placeholder="Search for stories, authors, or genres..."
+              className="w-full bg-white border-4 border-on-surface px-8 py-5 font-headline text-lg focus:outline-none focus:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all placeholder:text-on-surface-variant/50"
+            />
+            <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 bg-on-surface text-surface p-2 cursor-pointer hover:bg-primary hover:text-on-primary transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+          </form>
+
+          <div className="flex flex-col sm:flex-row gap-6">
+            <Link href="/discover" className="bg-primary text-on-primary font-headline text-xl px-12 py-5 border-4 border-on-surface hover:translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all duration-300 uppercase tracking-wider font-black">
+              Start Reading
+            </Link>
+            {!user && (
+              <Link href="/auth/signup" className="bg-white text-on-surface border-4 border-on-surface font-headline text-xl px-12 py-5 hover:translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all duration-300 uppercase tracking-wider font-black">
+                Start Writing
+              </Link>
+            )}
+          </div>
         </div>
       </section>
 
       {/* Cyberpunk Marquee Ticker */}
       <div className="w-full bg-primary border-b-8 border-on-surface overflow-hidden py-3 relative z-20 flex">
-          <div className="animate-marquee whitespace-nowrap flex gap-12 font-headline font-black uppercase tracking-widest text-on-primary text-sm">
-              {[...Array(4)].map((_, i) => (
-                  <span key={i} className="flex gap-12">
-                      <span>/// NEON SYNDICATE TAKES THE LEAD</span>
-                      <span>{totalReads.toLocaleString()} SOULS BURNED TODAY</span>
-                      <span>SYSTEM ARCHITECTURE: STABLE ///</span>
-                      <span>{totalAuthors.toLocaleString()} CHRONICLERS CONNECTED</span>
-                  </span>
-              ))}
-          </div>
+        <div className="animate-marquee whitespace-nowrap flex gap-12 font-headline font-black uppercase tracking-widest text-on-primary text-sm">
+          {[...Array(4)].map((_, i) => (
+            <span key={i} className="flex gap-12">
+              <span>/// NEON SYNDICATE TAKES THE LEAD</span>
+              <span>{totalReads.toLocaleString()} SOULS BURNED TODAY</span>
+              <span>SYSTEM ARCHITECTURE: STABLE ///</span>
+              <span>{totalAuthors.toLocaleString()} CHRONICLERS CONNECTED</span>
+            </span>
+          ))}
+        </div>
       </div>
 
       {/* Now Reading Live Strip */}
@@ -172,100 +172,100 @@ async function HomeContent() {
 
       {/* Main Content Area */}
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-12 flex flex-col gap-24">
-        
+
         {/* Continue Reading Section */}
         {recentHistory && (
           <section className="bg-surface-container border-4 border-on-surface p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden">
-             <div className="absolute top-0 right-0 p-4 font-headline font-black text-xs uppercase tracking-widest text-primary/20 select-none pointer-events-none">RESUME_SESSION</div>
-             <div className="flex flex-col md:flex-row items-center gap-8">
-                <div className="w-32 h-48 flex-shrink-0 relative bg-on-surface border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-                    <Image
-                        src={recentHistory.story.cover_url || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"}
-                        alt="Cover"
-                        fill
-                        sizes="(max-width: 768px) 128px, 128px"
-                        loading="lazy"
-                        className="object-cover"
-                    />
-                </div>
-                <div className="flex flex-col text-center md:text-left">
-                    <span className="font-label font-black text-xs uppercase tracking-[0.2em] text-primary mb-2">Continue Reading</span>
-                    <h2 className="font-headline text-3xl md:text-4xl font-black text-on-surface uppercase tracking-tight mb-4">{recentHistory.story.title}</h2>
-                    <p className="font-body text-on-surface-variant italic mb-6 max-w-xl line-clamp-2">
-                        {recentHistory.story.description || "Pick up where you left off in this captivating tale."}
-                    </p>
-                    <Link href={`/read/${recentHistory.storyId}`} className="inline-flex items-center justify-center md:justify-start gap-3 font-headline font-black text-xl uppercase tracking-widest text-on-surface hover:text-primary transition-colors group">
-                        Jump Back In <span className="group-hover:translate-x-2 transition-transform">→</span>
-                    </Link>
-                </div>
-             </div>
+            <div className="absolute top-0 right-0 p-4 font-headline font-black text-xs uppercase tracking-widest text-primary/20 select-none pointer-events-none">RESUME_SESSION</div>
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <div className="w-32 h-48 flex-shrink-0 relative bg-on-surface border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                <Image
+                  src={recentHistory.story.cover_url || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"}
+                  alt="Cover"
+                  fill
+                  sizes="(max-width: 768px) 128px, 128px"
+                  loading="lazy"
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex flex-col text-center md:text-left">
+                <span className="font-label font-black text-xs uppercase tracking-[0.2em] text-primary mb-2">Continue Reading</span>
+                <h2 className="font-headline text-3xl md:text-4xl font-black text-on-surface uppercase tracking-tight mb-4">{recentHistory.story.title}</h2>
+                <p className="font-body text-on-surface-variant italic mb-6 max-w-xl line-clamp-2">
+                  {recentHistory.story.description || "Pick up where you left off in this captivating tale."}
+                </p>
+                <Link href={`/read/${recentHistory.storyId}`} className="inline-flex items-center justify-center md:justify-start gap-3 font-headline font-black text-xl uppercase tracking-widest text-on-surface hover:text-primary transition-colors group">
+                  Jump Back In <span className="group-hover:translate-x-2 transition-transform">→</span>
+                </Link>
+              </div>
+            </div>
           </section>
         )}
 
         {/* Discovery Sections */}
         <div className="flex flex-col gap-24">
-            <HorizontalCarousel title="Trending Stories" subtitle="What everyone is talking about right now.">
-                {trendingStories.map((story, i) => (
-                    <StoryCard 
-                        key={story.id} 
-                        id={story.id} 
-                        title={story.title} 
-                        author={story.author.full_name || story.author.username || "Unknown"} 
-                        coverUrl={story.cover_url}
-                        genre={story.genre}
-                        reads={story.reads}
-                        likes={story._count.likes}
-                        priority={i < 5} // Load first 5 trending stories immediately
-                    />
-                ))}
-            </HorizontalCarousel>
+          <HorizontalCarousel title="Trending Stories" subtitle="What everyone is talking about right now.">
+            {trendingStories.map((story, i) => (
+              <StoryCard
+                key={story.id}
+                id={story.id}
+                title={story.title}
+                author={story.author.full_name || story.author.username || "Unknown"}
+                coverUrl={story.cover_url}
+                genre={story.genre}
+                reads={story.reads}
+                likes={story._count.likes}
+                priority={i < 5} // Load first 5 trending stories immediately
+              />
+            ))}
+          </HorizontalCarousel>
 
-            <HorizontalCarousel title="The Masterpieces" subtitle="The highest-rated chronicles of all time.">
-                {masterpieces.map((story) => (
-                    <StoryCard 
-                        key={story.id} 
-                        id={story.id} 
-                        title={story.title} 
-                        author={story.author.full_name || story.author.username || "Unknown"} 
-                        coverUrl={story.cover_url}
-                        genre={story.genre}
-                        reads={story.reads}
-                        likes={story._count.likes}
-                    />
-                ))}
-            </HorizontalCarousel>
+          <HorizontalCarousel title="The Masterpieces" subtitle="The highest-rated chronicles of all time.">
+            {masterpieces.map((story) => (
+              <StoryCard
+                key={story.id}
+                id={story.id}
+                title={story.title}
+                author={story.author.full_name || story.author.username || "Unknown"}
+                coverUrl={story.cover_url}
+                genre={story.genre}
+                reads={story.reads}
+                likes={story._count.likes}
+              />
+            ))}
+          </HorizontalCarousel>
 
-            <HorizontalCarousel title="New Arrivals" subtitle="Fresh voices and untold tales from the community.">
-                {recentStories.map(story => (
-                    <StoryCard 
-                        key={story.id} 
-                        id={story.id} 
-                        title={story.title} 
-                        author={story.author.full_name || story.author.username || "Unknown"} 
-                        coverUrl={story.cover_url}
-                        genre={story.genre}
-                        reads={story.reads}
-                        likes={story._count.likes}
-                    />
-                ))}
-            </HorizontalCarousel>
+          <HorizontalCarousel title="New Arrivals" subtitle="Fresh voices and untold tales from the community.">
+            {recentStories.map(story => (
+              <StoryCard
+                key={story.id}
+                id={story.id}
+                title={story.title}
+                author={story.author.full_name || story.author.username || "Unknown"}
+                coverUrl={story.cover_url}
+                genre={story.genre}
+                reads={story.reads}
+                likes={story._count.likes}
+              />
+            ))}
+          </HorizontalCarousel>
 
-            {fantasyStories.length > 0 && (
-                <HorizontalCarousel title="Fantasy Realms" subtitle="Escape into worlds of magic and wonder.">
-                    {fantasyStories.map(story => (
-                        <StoryCard 
-                            key={story.id} 
-                            id={story.id} 
-                            title={story.title} 
-                            author={story.author.full_name || story.author.username || "Unknown"} 
-                            coverUrl={story.cover_url}
-                            genre={story.genre}
-                            reads={story.reads}
-                            likes={story._count.likes}
-                        />
-                    ))}
-                </HorizontalCarousel>
-            )}
+          {fantasyStories.length > 0 && (
+            <HorizontalCarousel title="Fantasy Realms" subtitle="Escape into worlds of magic and wonder.">
+              {fantasyStories.map(story => (
+                <StoryCard
+                  key={story.id}
+                  id={story.id}
+                  title={story.title}
+                  author={story.author.full_name || story.author.username || "Unknown"}
+                  coverUrl={story.cover_url}
+                  genre={story.genre}
+                  reads={story.reads}
+                  likes={story._count.likes}
+                />
+              ))}
+            </HorizontalCarousel>
+          )}
         </div>
 
         {/* Author Spotlights — Chronicles from Our Community */}
@@ -287,7 +287,7 @@ async function HomeContent() {
                 const factionLabel: Record<string, { label: string; color: string }> = {
                   NEON_SYNDICATE: { label: "Neon Syndicate", color: "bg-[#00ff41] text-black" },
                   OBSIDIAN_ORDER: { label: "Obsidian Order", color: "bg-on-surface text-surface" },
-                  THE_VOIDBORN:   { label: "The Voidborn",   color: "bg-purple-600 text-white" },
+                  THE_VOIDBORN: { label: "The Voidborn", color: "bg-purple-600 text-white" },
                 };
                 const faction = author.faction ? factionLabel[author.faction] : null;
                 const isEven = i % 2 === 0;
@@ -318,7 +318,7 @@ async function HomeContent() {
                     </Link>
 
                     {/* Content */}
-                    <div className={`flex-1 p-8 md:p-12 flex flex-col justify-between gap-6 bg-surface-container ${ isEven ? "border-l-0 md:border-l-4" : "border-r-0 md:border-r-4"} border-on-surface`}>
+                    <div className={`flex-1 p-8 md:p-12 flex flex-col justify-between gap-6 bg-surface-container ${isEven ? "border-l-0 md:border-l-4" : "border-r-0 md:border-r-4"} border-on-surface`}>
                       {/* Author identity */}
                       <div className="flex items-start gap-4">
                         <Link href={`/u/${author.username || author.id}`} className="flex-shrink-0">
@@ -366,15 +366,15 @@ async function HomeContent() {
                       <div className="flex items-center justify-between flex-wrap gap-4 pt-4 border-t-2 border-on-surface/10">
                         <div className="flex items-center gap-6">
                           <span className="flex items-center gap-1.5 font-label font-bold text-xs uppercase tracking-widest text-on-surface-variant">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
                             {story.reads.toLocaleString()}
                           </span>
                           <span className="flex items-center gap-1.5 font-label font-bold text-xs uppercase tracking-widest text-on-surface-variant">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
                             {story._count.likes.toLocaleString()}
                           </span>
                           <span className="flex items-center gap-1.5 font-label font-bold text-xs uppercase tracking-widest text-on-surface-variant">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>
                             {story._count.chapters} {story._count.chapters === 1 ? "Chapter" : "Chapters"}
                           </span>
                         </div>
@@ -439,21 +439,21 @@ async function HomeContent() {
 
         {/* Genre Grid */}
         <section className="w-full">
-            <div className="flex items-center gap-4 mb-12">
-                <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">Explore Genres</h2>
-                <div className="flex-grow h-1 bg-on-surface-variant/20"></div>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-                {genres.map((genre, i) => (
-                    <Link 
-                        key={i} 
-                        href={`/discover?genre=${genre}`}
-                        className="bg-white border-2 border-on-surface p-6 text-center font-headline font-black uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all duration-300 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                    >
-                        {genre}
-                    </Link>
-                ))}
-            </div>
+          <div className="flex items-center gap-4 mb-12">
+            <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">Explore Genres</h2>
+            <div className="flex-grow h-1 bg-on-surface-variant/20"></div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+            {genres.map((genre, i) => (
+              <Link
+                key={i}
+                href={`/discover?genre=${genre}`}
+                className="bg-white border-2 border-on-surface p-6 text-center font-headline font-black uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all duration-300 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              >
+                {genre}
+              </Link>
+            ))}
+          </div>
         </section>
 
         {/* Echo of the Day */}
@@ -504,82 +504,87 @@ async function HomeContent() {
 
         {/* Community Reviews Section - Animated 3-Column Marquee */}
         {recentReviews.length > 0 && (
-            <section className="w-full h-[800px] overflow-hidden relative border-y-8 border-on-surface bg-surface-container my-24">
-                <div className="absolute top-0 inset-x-0 h-32 z-10 pointer-events-none bg-gradient-to-b from-surface-container to-transparent"></div>
-                <div className="absolute bottom-0 inset-x-0 h-32 z-10 pointer-events-none bg-gradient-to-t from-surface-container to-transparent"></div>
-                
-                <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
-                    <div className="bg-surface-container/90 backdrop-blur-sm px-8 py-6 border-8 border-on-surface shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] -rotate-2">
-                        <h2 className="font-headline text-5xl md:text-7xl font-black text-on-surface uppercase tracking-tight text-center leading-none">
-                            Voices from <br/> the Nexus
-                        </h2>
+          <section className="w-full h-[700px] md:h-[900px] overflow-hidden relative bg-on-surface my-24 border-y-8 border-primary">
+            {/* Background Texture & Title overlay */}
+            <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] z-0 pointer-events-none"></div>
+
+            {/* Title Header */}
+            <div className="absolute top-0 inset-x-0 z-20 pointer-events-none flex justify-center py-6">
+              <h2 className="font-headline text-3xl md:text-4xl font-black text-surface uppercase tracking-widest text-center px-8 py-3 bg-on-surface border-b-4 border-x-4 border-primary shadow-[8px_8px_0px_0px_var(--color-primary)]">
+                Voices from the Nexus
+              </h2>
+            </div>
+
+            {(() => {
+              const col1 = recentReviews.filter((_, i) => i % 3 === 0);
+              const col2 = recentReviews.filter((_, i) => i % 3 === 1);
+              const col3 = recentReviews.filter((_, i) => i % 3 === 2);
+
+              const repeat = (arr: typeof recentReviews) => [...arr, ...arr, ...arr, ...arr];
+
+              const ReviewCard = ({ review }: { review: typeof recentReviews[0] }) => (
+                <div className="bg-surface border-2 border-surface/10 p-8 shadow-xl flex flex-col gap-5 mx-2 hover:border-primary transition-colors duration-300 relative group">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-primary transform scale-y-0 group-hover:scale-y-100 transition-transform origin-top"></div>
+                  <div className="flex justify-between items-start">
+                    <div className="flex text-primary">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <svg key={i} xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill={i < review.rating ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                      ))}
                     </div>
+                    <span className="font-label text-[9px] font-black uppercase tracking-widest text-on-surface-variant opacity-60">{new Date(review.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <h3 className="font-headline font-black text-xl uppercase tracking-tight text-on-surface leading-snug">"{review.title}"</h3>
+                  <p className="font-body italic text-on-surface-variant leading-relaxed opacity-90">
+                    {review.content}
+                  </p>
+                  <div className="mt-2 pt-5 border-t border-on-surface/5 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full border-2 border-primary/20 overflow-hidden relative">
+                        <Image unoptimized src={review.profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.profile.username || review.profile.full_name}`} alt="Avatar" fill sizes="32px" className="object-cover" />
+                      </div>
+                      <span className="font-headline text-xs font-black uppercase text-on-surface">{review.profile.full_name || review.profile.username}</span>
+                    </div>
+                    <span className="font-label text-[9px] font-black uppercase tracking-[0.2em] text-primary truncate max-w-[100px] text-right">
+                      {review.story.title}
+                    </span>
+                  </div>
                 </div>
+              );
 
-                {(() => {
-                    const col1 = recentReviews.filter((_, i) => i % 3 === 0);
-                    const col2 = recentReviews.filter((_, i) => i % 3 === 1);
-                    const col3 = recentReviews.filter((_, i) => i % 3 === 2);
-                    
-                    const repeat = (arr: typeof recentReviews) => [...arr, ...arr, ...arr];
-
-                    const ReviewCard = ({ review }: { review: typeof recentReviews[0] }) => (
-                        <div className="bg-white border-4 border-on-surface p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-4 mx-4">
-                            <div className="flex justify-between items-start">
-                                <div className="flex text-brand_yellow">
-                                    {Array.from({ length: 5 }).map((_, i) => (
-                                        <svg key={i} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill={i < review.rating ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                                    ))}
-                                </div>
-                                <span className="font-label text-[10px] font-bold uppercase tracking-widest opacity-40">{new Date(review.createdAt).toLocaleDateString()}</span>
-                            </div>
-                            <h3 className="font-headline font-black text-lg uppercase tracking-tight text-on-surface leading-snug">"{review.title}"</h3>
-                            <p className="font-body italic text-on-surface-variant line-clamp-4 flex-grow">{review.content}</p>
-                            <div className="mt-4 pt-4 border-t-2 border-on-surface/10 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full border-2 border-on-surface overflow-hidden bg-primary/20 relative">
-                                        <Image src={review.profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.profile.username || review.profile.full_name}`} alt="Avatar" fill sizes="32px" className="object-cover" />
-                                    </div>
-                                    <span className="font-headline text-xs font-black uppercase text-on-surface">{review.profile.full_name || review.profile.username}</span>
-                                </div>
-                                <span className="font-label text-[10px] font-bold uppercase tracking-widest text-primary max-w-[120px] truncate text-right">
-                                    on {review.story.title}
-                                </span>
-                            </div>
-                        </div>
-                    );
-
-                    return (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 h-[250%] -mt-[20%] w-[110%] -ml-[5%] rotate-1">
-                            <div className="flex flex-col gap-8 animate-marquee-vertical-reverse pt-24">
-                                {repeat(col1).map((review, i) => <ReviewCard key={`${review.id}-${i}`} review={review} />)}
-                            </div>
-                            <div className="hidden md:flex flex-col gap-8 animate-marquee-vertical">
-                                {repeat(col2).map((review, i) => <ReviewCard key={`${review.id}-${i}`} review={review} />)}
-                            </div>
-                            <div className="hidden lg:flex flex-col gap-8 animate-marquee-vertical-reverse pt-48">
-                                {repeat(col3).map((review, i) => <ReviewCard key={`${review.id}-${i}`} review={review} />)}
-                            </div>
-                        </div>
-                    );
-                })()}
-            </section>
+              return (
+                <div
+                  className="w-full h-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 md:px-12 py-10"
+                  style={{ maskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)' }}
+                >
+                  <div className="flex flex-col gap-6 animate-marquee-vertical-reverse hover:[animation-play-state:paused]">
+                    {repeat(col1).map((review, i) => <ReviewCard key={`c1-${review.id}-${i}`} review={review} />)}
+                  </div>
+                  <div className="hidden md:flex flex-col gap-6 animate-marquee-vertical hover:[animation-play-state:paused]">
+                    {repeat(col2).map((review, i) => <ReviewCard key={`c2-${review.id}-${i}`} review={review} />)}
+                  </div>
+                  <div className="hidden lg:flex flex-col gap-6 animate-marquee-vertical-reverse hover:[animation-play-state:paused] pt-12">
+                    {repeat(col3).map((review, i) => <ReviewCard key={`c3-${review.id}-${i}`} review={review} />)}
+                  </div>
+                </div>
+              );
+            })()}
+          </section>
         )}
 
         {/* Community Stats Section */}
         <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-on-surface text-surface p-12 border-4 border-on-surface shadow-[8px_8px_0px_0px_var(--color-primary)]">
-                <span className="font-headline text-6xl font-black block mb-2">{totalStories.toLocaleString()}</span>
-                <span className="font-label text-sm font-black uppercase tracking-[0.2em] opacity-60">Stories Written</span>
-            </div>
-            <div className="bg-primary text-on-primary p-12 border-4 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                <span className="font-headline text-6xl font-black block mb-2">{totalAuthors.toLocaleString()}</span>
-                <span className="font-label text-sm font-black uppercase tracking-[0.2em] opacity-80">Chroniclers Joined</span>
-            </div>
-            <div className="bg-white text-on-surface p-12 border-4 border-on-surface shadow-[8px_8px_0px_0px_var(--color-tertiary,black)]">
-                <span className="font-headline text-6xl font-black block mb-2">{(totalReads || 0).toLocaleString()}</span>
-                <span className="font-label text-sm font-black uppercase tracking-[0.2em] opacity-60">Global Reads</span>
-            </div>
+          <div className="bg-on-surface text-surface p-12 border-4 border-on-surface shadow-[8px_8px_0px_0px_var(--color-primary)]">
+            <span className="font-headline text-6xl font-black block mb-2">{totalStories.toLocaleString()}</span>
+            <span className="font-label text-sm font-black uppercase tracking-[0.2em] opacity-60">Stories Written</span>
+          </div>
+          <div className="bg-primary text-on-primary p-12 border-4 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <span className="font-headline text-6xl font-black block mb-2">{totalAuthors.toLocaleString()}</span>
+            <span className="font-label text-sm font-black uppercase tracking-[0.2em] opacity-80">Chroniclers Joined</span>
+          </div>
+          <div className="bg-white text-on-surface p-12 border-4 border-on-surface shadow-[8px_8px_0px_0px_var(--color-tertiary,black)]">
+            <span className="font-headline text-6xl font-black block mb-2">{(totalReads || 0).toLocaleString()}</span>
+            <span className="font-label text-sm font-black uppercase tracking-[0.2em] opacity-60">Global Reads</span>
+          </div>
         </section>
 
         {/* Reading Streak Leaderboard */}
@@ -594,11 +599,10 @@ async function HomeContent() {
               {streakLeaderboard.map((reader, i) => (
                 <div
                   key={reader.id}
-                  className={`flex items-center gap-6 px-8 py-5 border-b-2 border-on-surface/10 last:border-b-0 hover:-translate-x-1 transition-transform ${
-                    i === 0 ? "bg-primary text-on-primary" : i === 1 ? "bg-surface-container-high text-on-surface" : "bg-surface-container text-on-surface"
-                  }`}
+                  className={`flex items-center gap-6 px-8 py-5 border-b-2 border-on-surface/10 last:border-b-0 hover:-translate-x-1 transition-transform ${i === 0 ? "bg-primary text-on-primary" : i === 1 ? "bg-surface-container-high text-on-surface" : "bg-surface-container text-on-surface"
+                    }`}
                 >
-                  <span className={`font-headline font-black text-3xl w-10 text-center ${ i === 0 ? "text-on-primary" : "text-primary"}`}>
+                  <span className={`font-headline font-black text-3xl w-10 text-center ${i === 0 ? "text-on-primary" : "text-primary"}`}>
                     {i === 0 ? "👑" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`}
                   </span>
                   <div className="w-10 h-10 rounded-full border-2 border-on-surface overflow-hidden bg-primary/20 relative flex-shrink-0">
@@ -625,65 +629,65 @@ async function HomeContent() {
 
         {/* Faction Leaderboard */}
         <section className="w-full">
-            <div className="flex items-center gap-4 mb-12">
-                <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">The Faction Wars</h2>
-                <div className="flex-grow h-1 bg-on-surface-variant/20"></div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {['NEON_SYNDICATE', 'OBSIDIAN_ORDER', 'THE_VOIDBORN'].map((faction) => {
-                    const count = factionStats.find((f:any) => f.faction === faction)?._count.id || 0;
-                    const names = {
-                        NEON_SYNDICATE: "The Neon Syndicate",
-                        OBSIDIAN_ORDER: "The Obsidian Order",
-                        THE_VOIDBORN: "The Voidborn"
-                    };
-                    const colors = {
-                        NEON_SYNDICATE: "border-[#00ff41] text-on-surface shadow-[8px_8px_0px_0px_#00ff41]",
-                        OBSIDIAN_ORDER: "border-on-surface text-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-on-surface/5",
-                        THE_VOIDBORN: "border-purple-500 text-on-surface shadow-[8px_8px_0px_0px_#a855f7]"
-                    };
-                    return (
-                        <div key={faction} className={`bg-white border-4 p-8 hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all ${colors[faction as keyof typeof colors]}`}>
-                            <h3 className="font-headline text-2xl font-black uppercase tracking-tight mb-4">{names[faction as keyof typeof names]}</h3>
-                            <span className="font-headline text-6xl font-black block mb-2 text-on-surface">{count}</span>
-                            <span className="font-label text-sm font-black uppercase tracking-[0.2em] text-on-surface-variant">Souls Pledged</span>
-                        </div>
-                    );
-                })}
-            </div>
+          <div className="flex items-center gap-4 mb-12">
+            <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">The Faction Wars</h2>
+            <div className="flex-grow h-1 bg-on-surface-variant/20"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {['NEON_SYNDICATE', 'OBSIDIAN_ORDER', 'THE_VOIDBORN'].map((faction) => {
+              const count = factionStats.find((f: any) => f.faction === faction)?._count.id || 0;
+              const names = {
+                NEON_SYNDICATE: "The Neon Syndicate",
+                OBSIDIAN_ORDER: "The Obsidian Order",
+                THE_VOIDBORN: "The Voidborn"
+              };
+              const colors = {
+                NEON_SYNDICATE: "border-[#00ff41] text-on-surface shadow-[8px_8px_0px_0px_#00ff41]",
+                OBSIDIAN_ORDER: "border-on-surface text-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-on-surface/5",
+                THE_VOIDBORN: "border-purple-500 text-on-surface shadow-[8px_8px_0px_0px_#a855f7]"
+              };
+              return (
+                <div key={faction} className={`bg-white border-4 p-8 hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all ${colors[faction as keyof typeof colors]}`}>
+                  <h3 className="font-headline text-2xl font-black uppercase tracking-tight mb-4">{names[faction as keyof typeof names]}</h3>
+                  <span className="font-headline text-6xl font-black block mb-2 text-on-surface">{count}</span>
+                  <span className="font-label text-sm font-black uppercase tracking-[0.2em] text-on-surface-variant">Souls Pledged</span>
+                </div>
+              );
+            })}
+          </div>
         </section>
 
         {/* Featured Authors */}
         <section className="w-full">
-            <div className="flex items-center justify-between gap-4 mb-12">
-                <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">Top Chroniclers</h2>
-                <Link href="/community" className="font-headline font-black text-sm uppercase tracking-widest hover:text-primary transition-colors underline decoration-2 underline-offset-4">See All</Link>
-            </div>
-            <div className="flex flex-wrap gap-8 justify-center md:justify-between">
-                {topAuthors.map((author, i) => (
-                    <Link href={`/u/${author.username || author.id}`} key={i} className="group flex flex-col items-center gap-4">
-                        <div className="w-24 h-24 rounded-full border-4 border-on-surface overflow-hidden group-hover:scale-110 transition-transform bg-primary-container relative">
-                            <Image
-                                src={author.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${author.username || author.id}`}
-                                alt={author.username || "Author"}
-                                fill
-                                unoptimized
-                                loading="lazy"
-                                className="object-cover"
-                            />
-                            <div className="absolute inset-0 border-4 border-on-surface rounded-full"></div>
-                        </div>
-                        <div className="text-center">
-                            <h3 className="font-headline text-lg font-black text-on-surface uppercase group-hover:text-primary transition-colors">
-                                {author.full_name || author.username || "Anonymous"}
-                            </h3>
-                            <p className="font-label text-[10px] font-bold uppercase text-on-surface-variant">
-                                {author._count.followers} Followers
-                            </p>
-                        </div>
-                    </Link>
-                ))}
-            </div>
+          <div className="flex items-center justify-between gap-4 mb-12">
+            <h2 className="font-headline text-4xl font-black text-on-surface uppercase tracking-tight">Top Chroniclers</h2>
+            <Link href="/community" className="font-headline font-black text-sm uppercase tracking-widest hover:text-primary transition-colors underline decoration-2 underline-offset-4">See All</Link>
+          </div>
+          <div className="flex flex-wrap gap-8 justify-center md:justify-between">
+            {topAuthors.map((author, i) => (
+              <Link href={`/u/${author.username || author.id}`} key={i} className="group flex flex-col items-center gap-4">
+                <div className="w-24 h-24 rounded-full border-4 border-on-surface overflow-hidden group-hover:scale-110 transition-transform bg-primary-container relative">
+                  <Image
+                    src={author.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${author.username || author.id}`}
+                    alt={author.username || "Author"}
+                    fill
+                    unoptimized
+                    loading="lazy"
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 border-4 border-on-surface rounded-full"></div>
+                </div>
+                <div className="text-center">
+                  <h3 className="font-headline text-lg font-black text-on-surface uppercase group-hover:text-primary transition-colors">
+                    {author.full_name || author.username || "Anonymous"}
+                  </h3>
+                  <p className="font-label text-[10px] font-bold uppercase text-on-surface-variant">
+                    {author._count.followers} Followers
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </section>
 
         {/* Join a Faction CTA */}
@@ -704,7 +708,7 @@ async function HomeContent() {
                 {([
                   { key: "NEON_SYNDICATE", label: "Neon Syndicate", emoji: "🔴", shadow: "hover:shadow-[6px_6px_0px_0px_#00ff41]" },
                   { key: "OBSIDIAN_ORDER", label: "Obsidian Order", emoji: "⚫", shadow: "hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]" },
-                  { key: "THE_VOIDBORN",   label: "The Voidborn",   emoji: "🌌", shadow: "hover:shadow-[6px_6px_0px_0px_#a855f7]" },
+                  { key: "THE_VOIDBORN", label: "The Voidborn", emoji: "🌌", shadow: "hover:shadow-[6px_6px_0px_0px_#a855f7]" },
                 ] as const).map(f => (
                   <Link
                     key={f.key}
@@ -744,13 +748,13 @@ async function HomeContent() {
 
         {/* Final CTA */}
         <section className="w-full py-24 bg-primary border-8 border-on-surface shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center justify-center text-center px-6 relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-            <h2 className="font-headline text-6xl md:text-8xl font-black text-on-primary uppercase tracking-tighter mb-12 relative z-10 leading-none">
-                Start Your <br/> Legacy
-            </h2>
-            <Link href={user ? "/dashboard" : "/auth/signup"} className="bg-white text-on-surface border-4 border-on-surface font-headline text-2xl px-16 py-6 rounded-none font-black hover:translate-x-2 hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-300 uppercase tracking-widest relative z-10">
-                {user ? "Go to Dashboard" : "Join Soulpad"}
-            </Link>
+          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+          <h2 className="font-headline text-6xl md:text-8xl font-black text-on-primary uppercase tracking-tighter mb-12 relative z-10 leading-none">
+            Start Your <br /> Legacy
+          </h2>
+          <Link href={user ? "/dashboard" : "/auth/signup"} className="bg-white text-on-surface border-4 border-on-surface font-headline text-2xl px-16 py-6 rounded-none font-black hover:translate-x-2 hover:-translate-y-2 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-300 uppercase tracking-widest relative z-10">
+            {user ? "Go to Dashboard" : "Join Soulpad"}
+          </Link>
         </section>
 
       </div>
@@ -781,8 +785,8 @@ export default async function Home() {
         <div className="flex-grow pt-32 pb-24 px-6 max-w-7xl mx-auto w-full animate-pulse">
           <div className="h-64 bg-surface-container rounded-none mb-20 border-4 border-on-surface"></div>
           <div className="grid grid-cols-5 gap-6">
-            {[1,2,3,4,5].map(i => (
-                <div key={i} className="aspect-[2/3] bg-surface-container border-2 border-on-surface"></div>
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="aspect-[2/3] bg-surface-container border-2 border-on-surface"></div>
             ))}
           </div>
         </div>
@@ -794,9 +798,9 @@ export default async function Home() {
       <footer className="bg-on-surface w-full pt-24 pb-12 px-6 md:px-12 mt-auto z-10 relative border-t-[12px] border-primary overflow-hidden">
         {/* Background Noise/Texture */}
         <div className="absolute inset-0 opacity-5 pointer-events-none mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
-        
+
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-16 relative z-10">
-          
+
           {/* Brand & Manifesto */}
           <div className="md:col-span-5 flex flex-col items-start gap-6">
             <Link href="/" className="text-5xl md:text-7xl font-black text-surface font-headline uppercase tracking-tighter hover:text-primary transition-colors duration-500">
@@ -816,7 +820,7 @@ export default async function Home() {
 
           {/* Links Grid */}
           <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8 sm:gap-12">
-            
+
             <div className="flex flex-col gap-4">
               <span className="font-headline font-black text-primary text-xs uppercase tracking-[0.3em] mb-4">Platform</span>
               <Link className="text-surface-variant/70 hover:text-surface hover:translate-x-2 transition-all font-label font-bold uppercase text-xs tracking-widest flex items-center gap-2 group" href="/about">
@@ -835,7 +839,7 @@ export default async function Home() {
                 <span className="w-0 group-hover:w-2 h-[2px] bg-error transition-all duration-300"></span> Staff Portal
               </Link>
             </div>
-            
+
             <div className="flex flex-col gap-4">
               <span className="font-headline font-black text-primary text-xs uppercase tracking-[0.3em] mb-4">Community</span>
               <Link className="text-surface-variant/70 hover:text-surface hover:translate-x-2 transition-all font-label font-bold uppercase text-xs tracking-widest flex items-center gap-2 group" href="/guidelines">

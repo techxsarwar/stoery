@@ -6,10 +6,10 @@ export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user?.email) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const profile = await prisma.profile.findFirst({
-    where: { user: { email: user.email } }
+  const profile = await prisma.profile.findUnique({
+    where: { userId: user.id }
   });
 
   if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
@@ -27,10 +27,10 @@ export async function PUT() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user?.email) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const profile = await prisma.profile.findFirst({
-    where: { user: { email: user.email } }
+  const profile = await prisma.profile.findUnique({
+    where: { userId: user.id }
   });
 
   if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });

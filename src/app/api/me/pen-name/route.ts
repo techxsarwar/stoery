@@ -8,12 +8,12 @@ export async function GET() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user?.email) {
+  if (!user?.id) {
     return NextResponse.json({ penName: null }, { status: 401 });
   }
 
-  const profile = await prisma.profile.findFirst({
-    where: { user: { email: user.email } },
+  const profile = await prisma.profile.findUnique({
+    where: { userId: user.id },
     select: { pen_name: true },
   });
 
