@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
-const pdfParse = require("pdf-parse");
-
 export async function POST(req: NextRequest) {
     try {
+        const pdfParse = require("pdf-parse");
         const supabase = await createClient();
         const { data: { session } } = await supabase.auth.getSession();
 
