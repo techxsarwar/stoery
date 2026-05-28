@@ -4,7 +4,8 @@ import { createClient } from "@/utils/supabase/server";
 
 export async function GET() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user;
 
   if (!user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -12,7 +13,7 @@ export async function GET() {
     where: { userId: user.id }
   });
 
-  if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+  if (!profile) return NextResponse.json({ notifications: [] });
 
   const notifications = await prisma.notification.findMany({
     where: { profileId: profile.id },
@@ -25,7 +26,8 @@ export async function GET() {
 
 export async function PUT() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user;
 
   if (!user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

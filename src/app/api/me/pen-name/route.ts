@@ -5,8 +5,9 @@ import { NextResponse } from "next/server";
 export async function GET() {
   const supabase = await createClient();
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
 
   if (!user?.id) {
     return NextResponse.json({ penName: null }, { status: 401 });

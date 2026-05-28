@@ -2,7 +2,7 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Bold, Italic, Heading1, Heading2, List, ListOrdered, Quote, Maximize2, Minimize2, Wand2, Loader2, ChevronDown } from "lucide-react";
+import { Bold, Italic, Heading1, Heading2, List, ListOrdered, Quote, Maximize2, Minimize2, Wand2, Loader2, ChevronDown, FileText } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 interface EditorProps {
@@ -16,6 +16,8 @@ export default function Editor({ content, onChange, isSaving }: EditorProps) {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiError, setAiError] = useState("");
   const [isAiMenuOpen, setIsAiMenuOpen] = useState(false);
+  const [isUploadingPdf, setIsUploadingPdf] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const aiMenuRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
@@ -127,6 +129,44 @@ export default function Editor({ content, onChange, isSaving }: EditorProps) {
 
   };
 
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file || !editor) return;
+
+      setIsUploadingPdf(true);
+      setAiError("");
+
+      try {
+          const formData = new FormData();
+          formData.append("file", file);
+
+          const res = await fetch("/api/upload-pdf", {
+              method: "POST",
+              body: formData
+          });
+
+          if (!res.ok) {
+              const data = await res.json();
+              throw new Error(data.error || "Failed to upload PDF");
+          }
+
+          const data = await res.json();
+          if (!data.text) throw new Error("No text found in PDF");
+
+          // Convert plain text to paragraph blocks for Tiptap
+          const paragraphs = data.text.split('\n').filter((p:string) => p.trim() !== '').map((p: string) => `<p>${p}</p>`).join('');
+          
+          editor.chain().focus().insertContent(paragraphs).run();
+          
+      } catch (e: any) {
+          setAiError(e.message || "Failed to parse PDF.");
+          setTimeout(() => setAiError(""), 5000);
+      } finally {
+          setIsUploadingPdf(false);
+          if (fileInputRef.current) fileInputRef.current.value = ''; // Reset input
+      }
+  };
+
   return (
     <div className={`transition-all duration-700 flex flex-col ${
         isDistractionFree
@@ -145,6 +185,26 @@ export default function Editor({ content, onChange, isSaving }: EditorProps) {
             <button type="button" onClick={() => editor.chain().focus().toggleBulletList().run()} className={`${baseBtn} ${editor.isActive("bulletList") ? activeBtn : inactiveBtn}`}><List size={16} /></button>
             <button type="button" onClick={() => editor.chain().focus().toggleOrderedList().run()} className={`${baseBtn} ${editor.isActive("orderedList") ? activeBtn : inactiveBtn}`}><ListOrdered size={16} /></button>
             <button type="button" onClick={() => editor.chain().focus().toggleBlockquote().run()} className={`${baseBtn} ${editor.isActive("blockquote") ? activeBtn : inactiveBtn}`}><Quote size={16} /></button>
+
+            <div className="w-px h-6 bg-on-surface/10 mx-1"></div>
+
+            {/* PDF Upload */}
+            <input 
+                type="file" 
+                accept="application/pdf" 
+                ref={fileInputRef}
+                onChange={handlePdfUpload}
+                className="hidden" 
+            />
+            <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingPdf}
+                className={`${baseBtn} ${inactiveBtn} disabled:opacity-50`}
+                title="Upload PDF Manuscript"
+            >
+                {isUploadingPdf ? <Loader2 size={16} className="animate-spin" /> : <FileText size={16} />}
+            </button>
 
             <div className="w-px h-6 bg-on-surface/10 mx-1"></div>
 
